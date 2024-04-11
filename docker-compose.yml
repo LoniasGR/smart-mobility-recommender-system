@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+services:
+  neo4j:
+    image: neo4j
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - /srv/neo4j/data:/data/:rw
+    restart: always
+
+networks:
+  default:
+    name: docker_server
+    external: true
