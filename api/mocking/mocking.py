@@ -1,9 +1,11 @@
+import argparse
 import requests
 import json
-import argparse
 import uuid
 import random
 from faker import Faker
+
+OPTIONS = ["vehicle", "person", "vehicle_stats"]
 
 vehicle_template = {"id": "", "type": ""}
 
@@ -35,11 +37,13 @@ groups = {
 }
 
 
-def send_request(method: str, url: str, data: dict = dict()):
+def send_request(
+    method: str, url: str, data: dict = dict()
+) -> requests.Response | None:
     headers = {"Content-Type": "application/json"}
     response = requests.request(method, url, data=json.dumps(data), headers=headers)
 
-    if response.status_code >= 200 and response.status_code < 300:
+    if 200 <= response.status_code < 300:
         print(f"{method.upper()} request successful!")
         return response
     else:
@@ -69,22 +73,51 @@ def create_payload_field(key: str):
             return random.choice(["IN_USE", "IDLE", "CHARGING"])
 
 
-def create_payload(template):
+def create_payload(template) -> dict:
     payload = dict()
     for k in template.keys():
         payload[k] = create_payload_field(k)
     return payload
 
 
+def parse_input():
+    parser = argparse.ArgumentParser(
+        description="A tool to create mock data for the smart-mobility recommender system"
+    )
+    parser.add_argument("-c", "--count", help="Count of items to create")
+    parser.add_argument(
+        "-t",
+        "--type",
+        help="Type of data to generate",
+        choices=OPTIONS,
+    )
+
+    return parser.parse_args()
+
+
+def handle_input():
+    args = parse_input()
+    count = args.count
+    type = args.type
+    if type == None:
+        type: str = input(
+            f"What kind of data should I be creating? Options are {OPTIONS}: "
+        )
+        while type not in OPTIONS:
+            type = input(f"Not a valid option. Please pick one of {OPTIONS}: ")
+    if count == None:
+        count: str = input(f"How many items of type {type} should be created? ")
+    return (type, int(count))
+
+
 if __name__ == "__main__":
-    group_type = "person"
-    count = 100
+    (group_type, count) = handle_input()
 
     group = groups[group_type]
 
-    url = group["url"]
+    url: str = group["url"]
     template = group["template"]
-    method = group["method"]
+    method: str = group["method"]
 
     for i in range(count):
 
