@@ -4,6 +4,8 @@ import gr.iccs.smart.mobility.usage.Used;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -14,7 +16,7 @@ public class UserService {
         this.vehicleService = vehicleService;
     }
 
-    public Iterable<User> getAll() {
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
@@ -39,7 +41,7 @@ public class UserService {
         useInfo.setVehicle(vehicle);
 
 
-        person.getVehicles().add(useInfo);
+        person.getVehiclesUsed().add(useInfo);
         userRepository.save(person);
     }
 

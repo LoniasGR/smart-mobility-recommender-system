@@ -1,7 +1,9 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -12,7 +14,7 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public Iterable<Vehicle> getAll() {
+    public List<Vehicle> getAll() {
         return vehicleRepository.findAll();
     }
 
@@ -35,18 +37,17 @@ public class VehicleService {
         throw new VehicleNotFoundException();
     }
 
-    public void updateVehicleStatus(UUID id, VehicleRecord vehicleRecord) {
+    public Vehicle updateVehicleStatus(UUID id, VehicleInfoDTO vehicleInfoDTO) {
         var oldVehicle = vehicleRepository.findById(id);
         if (oldVehicle.isEmpty()) {
             throw new VehicleNotFoundException();
         }
         var vehicle = oldVehicle.get();
 
-        vehicle.setBattery(vehicleRecord.battery());
-        vehicle.setLatitude(vehicleRecord.latitude());
-        vehicle.setLongitude(vehicleRecord.longitude());
-        vehicle.setStatus(vehicleRecord.status());
+        vehicle.setBattery(vehicleInfoDTO.battery());
+        vehicle.setLocation(new GeographicPoint2d(vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()));
+        vehicle.setStatus(vehicleInfoDTO.status());
 
-        vehicleRepository.save(vehicle);
+        return vehicleRepository.save(vehicle);
     }
 }

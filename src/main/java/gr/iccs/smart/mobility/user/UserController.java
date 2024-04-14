@@ -5,6 +5,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/people")
 public class UserController {
@@ -15,13 +18,15 @@ public class UserController {
     }
 
     @GetMapping
-    public Iterable<User> getAll() {
-        return userService.getAll();
+    public List<UserDTO> getAll() {
+        return userService.getAll()
+                .stream().map(UserDTO::fromUser)
+                .collect(Collectors.toList());
     }
 
     @GetMapping(value = "/{username}")
-    public User getById(@PathVariable String username) {
-        return userService.getById(username);
+    public UserDTO getById(@PathVariable String username) {
+        return UserDTO.fromUser(userService.getById(username));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,4 +39,9 @@ public class UserController {
     public void addRide(@PathVariable String username, @RequestBody Used useInfo) {
         userService.addRide(username, useInfo);
     }
+
+//    @PostMapping("{username}/suggest")
+//    public void suggestRoute(@PathVariable String username, @RequestBody ) {
+//
+//    }
 }

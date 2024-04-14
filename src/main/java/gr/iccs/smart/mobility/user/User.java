@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -28,11 +27,11 @@ public class User {
     private Long version;
 
     @Relationship(type="USED", direction = Relationship.Direction.OUTGOING)
-    private final List<Used> vehicles;
+    private final List<Used> vehiclesUsed;
 
-    public User(@JsonProperty("username") String username, List<Used> vehicles) {
+    public User(@JsonProperty("username") String username, List<Used> vehiclesUsed) {
         this.username = username;
-        this.vehicles = vehicles;
+        this.vehiclesUsed = vehiclesUsed;
     }
 
     /*
@@ -61,8 +60,8 @@ public class User {
         this.gender = gender;
     }
 
-    public List<Used> getVehicles() {
-        return vehicles;
+    public List<Used> getVehiclesUsed() {
+        return vehiclesUsed;
     }
 
     public Long getVersion() {
