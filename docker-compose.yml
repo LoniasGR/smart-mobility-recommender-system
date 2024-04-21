@@ -8,3 +8,9 @@ services:
     volumes:
       - /srv/neo4j/data:/data/:rw
     restart: always
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8000:8000
