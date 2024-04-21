@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import jakarta.validation.constraints.NotNull;
+import org.neo4j.driver.types.Point;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -23,7 +24,7 @@ public class Vehicle {
         We can measure distance with spatial functions of neo4j
         https://neo4j.com/docs/cypher-manual/current/functions/spatial/
     */
-    private GeographicPoint2d location;
+    private Point location;
     private Float battery;
 
     private VehicleStatus status;
@@ -65,11 +66,11 @@ public class Vehicle {
         this.battery = battery;
     }
 
-    public GeographicPoint2d getLocation() {
+    public Point getLocation() {
         return location;
     }
 
-    public void setLocation(GeographicPoint2d location) {
+    public void setLocation(Point location) {
         this.location = location;
     }
 

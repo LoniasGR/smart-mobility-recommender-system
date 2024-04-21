@@ -1,6 +1,10 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import org.springframework.data.neo4j.types.GeographicPoint2d;
+import org.neo4j.driver.Values;
+import org.neo4j.driver.types.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.geo.Distance;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,6 +12,8 @@ import java.util.UUID;
 
 @Service
 public class VehicleService {
+    private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
+
     private final VehicleRepository vehicleRepository;
 
     public VehicleService(VehicleRepository vehicleRepository) {
@@ -45,9 +51,16 @@ public class VehicleService {
         var vehicle = oldVehicle.get();
 
         vehicle.setBattery(vehicleInfoDTO.battery());
-        vehicle.setLocation(new GeographicPoint2d(vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()));
+        vehicle.setLocation(Values.point(4326, vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()).asPoint());
         vehicle.setStatus(vehicleInfoDTO.status());
 
         return vehicleRepository.save(vehicle);
+    }
+
+    public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
+        if(maxDistance == null) {
+            return vehicleRepository.findByLocationNear(point);
+        }
+        return vehicleRepository.findByLocationNear(point, maxDistance);
     }
 }

@@ -1,9 +1,9 @@
 package gr.iccs.smart.mobility.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import jakarta.validation.constraints.NotNull;
-
 import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Property;
@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class User {
 
@@ -26,12 +27,18 @@ public class User {
     @Version
     private Long version;
 
-    @Relationship(type="USED", direction = Relationship.Direction.OUTGOING)
+    @Relationship(type = "USED", direction = Relationship.Direction.OUTGOING)
     private final List<Used> vehiclesUsed;
 
     public User(@JsonProperty("username") String username, List<Used> vehiclesUsed) {
         this.username = username;
         this.vehiclesUsed = vehiclesUsed;
+    }
+
+    public Optional<Used> getCurrentRide() {
+        return vehiclesUsed.stream()
+                .filter(r -> r.getStatus().equals(UseStatus.ACTIVE))
+                .findFirst();
     }
 
     /*

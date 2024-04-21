@@ -1,10 +1,14 @@
 package gr.iccs.smart.mobility.user;
 
+import gr.iccs.smart.mobility.usage.UseDTO;
+import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
+import org.neo4j.driver.Values;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -29,20 +33,44 @@ public class UserService {
     }
 
     public User create(User user) {
-        if(userRepository.existsById(user.getUsername())) {
+        if (userRepository.existsById(user.getUsername())) {
             throw new PersonBadRequest("Person already exists");
         }
         return userRepository.save(user);
     }
 
-    public void addRide(String username, Used useInfo) {
+    public void manageRide(String username, UseDTO useInfo) {
         var person = getById(username);
-        var vehicle = vehicleService.getById(useInfo.getVehicle().getId());
-        useInfo.setVehicle(vehicle);
+        var vehicle = vehicleService.getById(useInfo.vehicle().getId());
+        var ride = person.getCurrentRide();
 
-
-        person.getVehiclesUsed().add(useInfo);
+        // The user does not have an active ride, so this call should be creating one
+        if (ride.isEmpty()) {
+            if (useInfo.status().equals(UseStatus.COMPLETED)) {
+                throw new IllegalArgumentException("There is no ride to be completed.");
+            }
+            var newRide = new Used();
+            newRide.setVehicle(vehicle);
+            newRide.setStatus(useInfo.status());
+            var startLocation = Values.point(4326, useInfo.latitude(), useInfo.longitude()).asPoint();
+            newRide.setStartingLocation(startLocation);
+            person.getVehiclesUsed().add(newRide);
+        } else {
+            if (useInfo.status().equals(UseStatus.ACTIVE)) {
+                throw new IllegalArgumentException("A new ride cannot be started while one is already in use");
+            }
+            var currentRide = ride.get();
+            currentRide.setStatus(useInfo.status());
+            var endingLocation = Values.point(4326, useInfo.latitude(), useInfo.longitude()).asPoint();
+            currentRide.setEndingLocation(endingLocation);
+            currentRide.setEndingTime(useInfo.time());
+        }
         userRepository.save(person);
+    }
+
+    public Optional<Used> rideStatus(String username) {
+        var person = getById(username);
+        return person.getCurrentRide();
     }
 
 }
