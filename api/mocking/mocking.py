@@ -5,34 +5,50 @@ import uuid
 import random
 from faker import Faker
 
-OPTIONS = ["vehicle", "person", "vehicle_stats"]
+OPTIONS = ["vehicle", "person", "vehicle_status", "vehicle_use"]
+HOSTNAME = "http://localhost:8080"
 
 vehicle_template = {"id": "", "type": ""}
 
-vehicle_status_status = {
+vehicle_status_template = {
     "latitude": "",
     "longitude": "",
     "battery": "",
-    "vehicleStatus": "",
+    "status": "",
+}
+
+vehicle_use_template = {
+    "startingTime": "",
+    "startingLatitude": "",
+    "startingLongitude": "",
+    "endingTime": "",
+    "endingLatitude": "",
+    "endingLongitude": "",
+    "vehicle": "",
 }
 
 person_template = {"username": ""}
 
 groups = {
     "vehicle": {
-        "url": "http://localhost:8080/api/vehicles",
+        "url": f"{HOSTNAME}/api/vehicles",
         "template": vehicle_template,
         "method": "post",
     },
     "person": {
         "method": "post",
         "template": person_template,
-        "url": "http://localhost:8080/api/people",
+        "url": f"{HOSTNAME}/api/people",
     },
     "vehicle_status": {
         "method": "put",
-        "template": vehicle_status_status,
-        "url": "http://localhost:8080/api/vehicles/",
+        "template": vehicle_status_template,
+        "url": f"{HOSTNAME}/api/vehicles/",
+    },
+    "vehicle_use": {
+        "method": "post",
+        "template": vehicle_use_template,
+        "url": f"{HOSTNAME}/api/people/",
     },
 }
 
@@ -65,11 +81,13 @@ def create_payload_field(key: str):
             return random.choice(["MALE", "FEMALE", "OTHER"])
         case "battery":
             return random.uniform(0, 1)
-        case "latitude":
+        case "latitude" | "startingLatitude" | "endingLatitude":
+            return random.uniform(0, 180)
+        case "longitude" | "startingLongitude" | "endingLongitude":
             return random.uniform(0, 90)
-        case "longitude":
-            return random.uniform(0, 90)
-        case "vehicleStatus":
+        case "startingTime" | "endingTime":
+            return fake.date_time_this_month().isoformat()
+        case "status":
             return random.choice(["IN_USE", "IDLE", "CHARGING"])
 
 
@@ -119,14 +137,26 @@ if __name__ == "__main__":
     template = group["template"]
     method: str = group["method"]
 
+    if group_type == "vehicle_status" or group_type == "vehicle_use":
+        vehicle_data = send_request("get", groups["vehicle"]["url"]).json()
+
+    if group_type == "vehicle_use":
+        user_data = send_request("get", groups["person"]["url"]).json()
+
     for i in range(count):
 
         payload = create_payload(template)
-
+        print(payload)
         if group_type == "vehicle_status":
-            data = send_request("get", groups["vehicle"]["url"]).json()
-            selected_vehicle = random.choice(data)
-            url = f"{url}{selected_vehicle['id']}"
+            selected_vehicle = random.choice(vehicle_data)
+            url = f"{group['url']}{selected_vehicle['id']}"
             payload["id"] = selected_vehicle["id"]
+
+        if group_type == "vehicle_use":
+            selected_user = random.choice(user_data)
+            selected_vehicle = random.choice(vehicle_data)
+            url = f"{group['url']}{selected_user['username']}/ride"
+            payload["vehicle"] = {"id": selected_vehicle["id"]}
+            print(payload)
 
         send_request(method, url, payload)
