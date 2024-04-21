@@ -5,7 +5,6 @@ import org.neo4j.driver.types.Point;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.types.GeographicPoint2d;
 
 import java.util.UUID;
 
