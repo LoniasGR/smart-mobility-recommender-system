@@ -19,16 +19,12 @@ public record LocationDTO(Double latitude, Double longitude) {
         LocationDTO location = LocationDTO.fromGeographicPoint(point);
         LocationDTO first = new LocationDTO(41.1227, 29.0726);
         LocationDTO second = new LocationDTO(41.0963, 29.0532);
-        switch (comparePointAndLine(location, first, second)) {
-            case 1:
-                return IstanbulLocation.ASIAN_SIDE;
-            case 0:
-                return IstanbulLocation.SEA;
-            case -1:
-                return IstanbulLocation.EUROPEAN_SIDE;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (comparePointAndLine(location, first, second)) {
+            case 1 -> IstanbulLocation.ASIAN_SIDE;
+            case 0 -> IstanbulLocation.SEA;
+            case -1 -> IstanbulLocation.EUROPEAN_SIDE;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     private static int comparePointAndLine(LocationDTO point, LocationDTO lineStart, LocationDTO lineEnd) {

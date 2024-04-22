@@ -1,5 +1,6 @@
 package gr.iccs.smart.mobility.recommendation;
 
+import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
@@ -9,6 +10,7 @@ import org.springframework.data.geo.Metrics;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class RecommendationService {

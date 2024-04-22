@@ -5,7 +5,6 @@ import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import jakarta.validation.Valid;
-import org.neo4j.driver.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

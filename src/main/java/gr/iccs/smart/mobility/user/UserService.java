@@ -4,7 +4,6 @@ import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
-import org.neo4j.driver.Values;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
