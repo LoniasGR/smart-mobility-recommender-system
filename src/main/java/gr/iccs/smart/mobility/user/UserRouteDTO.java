@@ -1,5 +1,7 @@
 package gr.iccs.smart.mobility.user;
 
-public record UserRouteDTO(Double startingLatitude, Double startingLongitude, Double endingLatitude, Double endingLongitude) {
+import gr.iccs.smart.mobility.location.LocationDTO;
+
+public record UserRouteDTO(LocationDTO startingLocation, LocationDTO endingLocation) {
 
 }

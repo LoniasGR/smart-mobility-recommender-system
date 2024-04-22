@@ -67,8 +67,8 @@ public class UserController {
     @PostMapping("{username}/recommend")
     public Iterable<VehicleDTO> suggestRoute(@PathVariable String username, @RequestBody UserRouteDTO route) {
         log.debug("User API: suggest route for user" + username + " with data " + route );
-        var start = Values.point(4326, route.startingLatitude(), route.startingLongitude()).asPoint();
-        var finish = Values.point(4326, route.endingLatitude(), route.endingLongitude()).asPoint();
+        var start = route.startingLocation().toPoint();
+        var finish = route.endingLocation().toPoint();
         return recommendationService.recommend(start, finish)
                 .stream().map(VehicleDTO::fromVehicle)
                 .collect(Collectors.toList());

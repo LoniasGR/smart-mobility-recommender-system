@@ -52,7 +52,7 @@ public class UserService {
             var newRide = new Used();
             newRide.setVehicle(vehicle);
             newRide.setStatus(useInfo.status());
-            var startLocation = Values.point(4326, useInfo.latitude(), useInfo.longitude()).asPoint();
+            var startLocation = useInfo.location().toPoint();
             newRide.setStartingLocation(startLocation);
             person.getVehiclesUsed().add(newRide);
         } else {
@@ -61,7 +61,7 @@ public class UserService {
             }
             var currentRide = ride.get();
             currentRide.setStatus(useInfo.status());
-            var endingLocation = Values.point(4326, useInfo.latitude(), useInfo.longitude()).asPoint();
+            var endingLocation = useInfo.location().toPoint();
             currentRide.setEndingLocation(endingLocation);
             currentRide.setEndingTime(useInfo.time());
         }
