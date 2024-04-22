@@ -8,6 +8,22 @@ from faker import Faker
 OPTIONS = ["vehicle", "person", "vehicle_status", "vehicle_use"]
 HOSTNAME = "http://localhost:8080"
 
+LOCATIONS = [
+# (lat, long)
+(41.0085, 28.9799),
+(41.0115, 28.9833),
+(41.0054, 28.9768),
+(41.0256, 28.9744),
+(41.0105, 28.9688),
+(41.0365, 28.9850),
+(41.0387, 28.9981),
+(41.0225, 29.0059),
+(41.0167, 28.9603),
+(41.0172, 28.9708),
+(41.00501,29.01697),
+]
+
+
 vehicle_template = {"id": "", "type": ""}
 
 vehicle_status_template = {
@@ -67,9 +83,15 @@ def send_request(
             f"{method.upper()} request failed with status code: {response.status_code} and payload {response.text}"
         )
 
-
+def location_pertrubations(location) {
+return (
+    random.uniform(location[0] - 0.050, location[0] + 0.050),
+    random.uniform(location[1] - 0.050, location[1] + 0.050)
+    )
+}
 def create_payload_field(key: str):
     fake = Faker()
+    location = random.choice(LOCATIONS)
     match key:
         case "id":
             return str(uuid.uuid4())
@@ -82,9 +104,9 @@ def create_payload_field(key: str):
         case "battery":
             return random.uniform(0, 1)
         case "latitude" | "startingLatitude" | "endingLatitude":
-            return random.uniform(0, 180)
+            return location[0]
         case "longitude" | "startingLongitude" | "endingLongitude":
-            return random.uniform(0, 90)
+            return location[1]
         case "startingTime" | "endingTime":
             return fake.date_time_this_month().isoformat()
         case "status":
