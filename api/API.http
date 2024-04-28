@@ -26,40 +26,61 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8080/api/people/johnsonroberta
+GET http://localhost:8080/api/people/porterjason
 
 ###
 
-GET http://localhost:8080/api/vehicles/ae080e39-54a4-4c3f-9115-08ec655e8d07
+GET http://localhost:8080/api/vehicles/3610afde-2bad-4045-a642-cfd2f5edb8d2
+
 
 ###
 
 
-PUT http://localhost:8080/api/vehicles/ae080e39-54a4-4c3f-9115-08ec655e8d07
+PUT http://localhost:8080/api/vehicles/d4c9316b-a5cc-41d1-8823-a2f4ea5b2b88
 Content-Type: application/json
 
 {
-  "id": "ae080e39-54a4-4c3f-9115-08ec655e8d07",
-  "type": "SCOOTER",
   "battery": 22.5,
-  "latitude": 12.2321,
-  "longitude": 14.2321,
-  "users": ["test123"]
+  "latitude": 85.3,
+  "longitude": 100.5,
+  "status": "IN_USE"
 }
 
 ###
 
-POST http://localhost:8080/api/people/johnsonroberta/ride
+POST http://localhost:8080/api/people/porterjason/ride
 Content-Type: application/json
 
 {
   "startingLatitude": 0,
   "startingLongitude": 0,
-  "endingLongitude": 0,
   "startingTime": "2007-12-03T10:15:30",
-  "endingTime": "2007-12-03T14:15:30",
-  "endingLatitude": 0,
   "vehicle": {
-    "id": "da45072b-65c7-43f4-a18b-1d8ad17142c8"
+    "id": "63f501bf-5592-4d7f-86de-6b32e6364e6b"
   }
+}
+
+###
+POST http://localhost:8080/api/people/porterjason/recommend
+Content-Type: application/json
+
+{
+  "startingLocation": {
+    "latitude": 41.1227,
+    "longitude": 29.0726
+  },
+  "endingLocation": {
+    "latitude": 3.85,
+    "longitude": 37.0
+  }
+}
+
+###
+
+POST http://localhost:8080/api/locations
+Content-Type: application/json
+
+{
+  "latitude": 41.0429,
+  "longitude": 29.029
 }

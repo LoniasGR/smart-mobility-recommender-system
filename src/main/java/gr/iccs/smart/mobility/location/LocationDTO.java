@@ -3,7 +3,10 @@ package gr.iccs.smart.mobility.location;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Point;
 
+import java.util.List;
+
 public record LocationDTO(Double latitude, Double longitude) {
+
     public static LocationDTO fromGeographicPoint(Point point) {
         if (point == null) {
             return null;
@@ -17,34 +20,37 @@ public record LocationDTO(Double latitude, Double longitude) {
 
     public static IstanbulLocation istanbulLocation(Point point) {
         LocationDTO location = LocationDTO.fromGeographicPoint(point);
-        LocationDTO first = new LocationDTO(41.1227, 29.0726);
-        LocationDTO second = new LocationDTO(41.0963, 29.0532);
-        return switch (comparePointAndLine(location, first, second)) {
-            case 1 -> IstanbulLocation.ASIAN_SIDE;
-            case 0 -> IstanbulLocation.SEA;
-            case -1 -> IstanbulLocation.EUROPEAN_SIDE;
-            default -> throw new IllegalArgumentException();
-        };
+        return istanbulLocation(location);
     }
-
-    private static int comparePointAndLine(LocationDTO point, LocationDTO lineStart, LocationDTO lineEnd) {
-        // m = (y2 - y1)/(x2 - x1)
-        double slope = (lineEnd.longitude() - lineStart.longitude()) / (lineEnd.latitude() - lineStart.latitude());
-
-        // b = y1 - m x1
-        double b = lineStart.longitude() - slope * lineStart.latitude();
-
-        // Line is y = m x + b
-        double longitudeInLine = slope * point.latitude() + b;
-
-        double distance = point.longitude() - longitudeInLine;
-        if (distance < 0) {
-            return 1;
-        } else if (distance == 0) {
-            return 0;
-        } else {
-            return -1;
+    public static IstanbulLocation istanbulLocation(LocationDTO location) {
+        if(pointInPolygon(location, IstanbulPolygons.europeanSidePolygon)) {
+            return IstanbulLocation.EUROPEAN_SIDE;
         }
 
+        if(pointInPolygon(location, IstanbulPolygons.asianSidePolygon)) {
+            return IstanbulLocation.ASIAN_SIDE;
+        }
+        return IstanbulLocation.SEA;
+    }
+
+    /**
+     * <a href="https://observablehq.com/@tmcw/understanding-point-in-polygon">Source</a>
+     */
+    private static boolean pointInPolygon(LocationDTO point, List<LocationDTO> polygon) {
+        Double x = point.latitude(), y = point.longitude();
+        var inside = false;
+        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
+            Double xi = polygon.get(i).latitude(), yi = polygon.get(i).longitude();
+            Double xj = polygon.get(j).latitude(), yj = polygon.get(j).longitude();
+
+            // If edge is above or below the point then they definitely don't intersect
+            var intersect = ((yi > y) != (yj > y))
+                    // Check if the point is left from the edge or not
+                    // We are substituting the position of the point in the line
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+
+            if (intersect) inside = !inside;
+        }
+        return inside;
     }
 }
