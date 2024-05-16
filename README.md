@@ -22,3 +22,12 @@
 1. If haven't already installed Docker, go ahead and install it.
 2. Start the neo4j and the application container by running `docker compose up -d`.
 3. The application will be listening on port 8000 of your machine.
+
+## Database credentials
+
+There are default database credentials set in the `application.properties` file, as well as in the container definition 
+in `docker-compose.yml`. These are:
+```
+username: neo4j
+password: develop-colombo-clara-sponsor-erosion-6500
+```
