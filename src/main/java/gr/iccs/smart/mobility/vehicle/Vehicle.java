@@ -1,5 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import gr.iccs.smart.mobility.location.IstanbulLocations;
+import gr.iccs.smart.mobility.location.LocationDTO;
 import jakarta.validation.constraints.NotNull;
 import org.neo4j.driver.types.Point;
 import org.springframework.data.annotation.Version;

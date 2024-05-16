@@ -4,6 +4,7 @@ import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
+import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final VehicleService vehicleService;
+
+    private final Faker faker = new Faker();
 
     public UserService(UserRepository userRepository, VehicleService vehicleService) {
         this.userRepository = userRepository;
@@ -72,4 +75,10 @@ public class UserService {
         return person.getCurrentRide();
     }
 
+    public void createScenarioUsers() {
+        for (int i = 0; i < 10; i++) {
+            var user = new User(faker.internet().username(), null);
+            create(user);
+        }
+    }
 }

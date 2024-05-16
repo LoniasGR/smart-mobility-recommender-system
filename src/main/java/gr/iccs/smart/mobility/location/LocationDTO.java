@@ -6,7 +6,6 @@ import org.neo4j.driver.types.Point;
 import java.util.List;
 
 public record LocationDTO(Double latitude, Double longitude) {
-
     public static LocationDTO fromGeographicPoint(Point point) {
         if (point == null) {
             return null;
@@ -18,19 +17,19 @@ public record LocationDTO(Double latitude, Double longitude) {
         return Values.point(4326, latitude(), longitude()).asPoint();
     }
 
-    public static IstanbulLocation istanbulLocation(Point point) {
+    public static IstanbulLocations.IstanbulLocationDescription istanbulLocation(Point point) {
         LocationDTO location = LocationDTO.fromGeographicPoint(point);
         return istanbulLocation(location);
     }
-    public static IstanbulLocation istanbulLocation(LocationDTO location) {
-        if(pointInPolygon(location, IstanbulPolygons.europeanSidePolygon)) {
-            return IstanbulLocation.EUROPEAN_SIDE;
+    public static IstanbulLocations.IstanbulLocationDescription istanbulLocation(LocationDTO location) {
+        if(pointInPolygon(location, IstanbulLocations.europeanSidePolygon)) {
+            return IstanbulLocations.IstanbulLocationDescription.EUROPEAN_SIDE;
         }
 
-        if(pointInPolygon(location, IstanbulPolygons.asianSidePolygon)) {
-            return IstanbulLocation.ASIAN_SIDE;
+        if(pointInPolygon(location, IstanbulLocations.asianSidePolygon)) {
+            return IstanbulLocations.IstanbulLocationDescription.ASIAN_SIDE;
         }
-        return IstanbulLocation.SEA;
+        return IstanbulLocations.IstanbulLocationDescription.SEA;
     }
 
     /**

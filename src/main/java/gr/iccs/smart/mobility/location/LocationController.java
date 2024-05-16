@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/locations")
-public class LocationController {
+public class    LocationController {
 
     @PostMapping
-    public IstanbulLocation whereIs(@RequestBody LocationDTO location) {
+    public IstanbulLocations.IstanbulLocationDescription whereIs(@RequestBody LocationDTO location) {
         return LocationDTO.istanbulLocation(location);
     }
 }
