@@ -1,10 +1,11 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,13 @@ public class VehicleController {
     public VehicleDTO updateStatus(@PathVariable UUID id, @RequestBody VehicleInfoDTO vehicle) {
         log.debug("Vehicle API: updateStatus for" + id + " with data " + vehicle);
         return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
+    }
+
+
+    @GetMapping(value = "/geojson")
+    public FeatureCollection generateGeoJSON() {
+        var geojson = vehicleService.createGeoJSON();
+        return geojson;
     }
 }
 

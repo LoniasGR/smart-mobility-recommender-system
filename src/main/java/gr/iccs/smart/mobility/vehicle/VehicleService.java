@@ -2,6 +2,8 @@ package gr.iccs.smart.mobility.vehicle;
 
 import gr.iccs.smart.mobility.boatStop.BoatStop;
 import gr.iccs.smart.mobility.boatStop.BoatStopService;
+import gr.iccs.smart.mobility.geojson.Feature;
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import org.neo4j.driver.Values;
@@ -61,8 +63,8 @@ public class VehicleService {
         validateLocation(newLocation, boatStops, vehicle.getType());
 
 
-        if(vehicle.getType() == VehicleType.SEA_VESSEL) {
-          updateRelatedBoatStops(newLocation, boatStops, vehicle);
+        if (vehicle.getType() == VehicleType.SEA_VESSEL) {
+            updateRelatedBoatStops(newLocation, boatStops, vehicle);
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
@@ -89,19 +91,36 @@ public class VehicleService {
         var coastLocation = boatStops.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
         // If the sea vessel is parked in a boat stop, add it to the list of boats in the stop
-        if(coastLocation.isPresent()) {
+        if (coastLocation.isPresent()) {
             coastLocation.get().getParkedVehicles().add(vehicle);
             boatStopService.update(coastLocation.get());
         }
         // Otherwise remove it if it's leaving a boat stop
         else {
             var oldBoatStop = boatStopService.getByExactLocation(vehicle.getLocation());
-            if(oldBoatStop.isPresent()) {
+            if (oldBoatStop.isPresent()) {
                 oldBoatStop.get().getParkedVehicles().remove(vehicle);
                 boatStopService.update(oldBoatStop.get());
             }
         }
     }
+
+    public FeatureCollection createGeoJSON() {
+        var vehicles = getAll();
+        FeatureCollection geoJSON = new FeatureCollection();
+
+        for (Vehicle v : vehicles) {
+            Feature f = new Feature();
+            f.getGeometry().getCoordinates().add(v.getLocation().y());
+            f.getGeometry().getCoordinates().add(v.getLocation().x());
+            f.getProperties().put("type", v.getType().toString());
+            f.getProperties().put("id", v.getId().toString());
+            geoJSON.getFeatures().add(f);
+
+        }
+        return geoJSON;
+    }
+
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
         if (maxDistance == null) {
@@ -111,8 +130,16 @@ public class VehicleService {
     }
 
     public void createScenarioVehicles() {
-        for (int i = 0; i < 100; i++) {
-            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.randomVehicleType());
+        for (int i = 0; i < 30; i++) {
+            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.CAR);
+            create(vehicle);
+        }
+        for (int i = 0; i < 30; i++) {
+            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.SCOOTER);
+            create(vehicle);
+        }
+        for (int i = 0; i < 30; i++) {
+            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.SEA_VESSEL);
             create(vehicle);
         }
     }
