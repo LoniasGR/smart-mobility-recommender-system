@@ -115,6 +115,20 @@ public class VehicleService {
             f.getGeometry().getCoordinates().add(v.getLocation().x());
             f.getProperties().put("type", v.getType().toString());
             f.getProperties().put("id", v.getId().toString());
+            switch (v.getType()) {
+                case SEA_VESSEL:
+                    f.getProperties().put("marker-symbol", "racetrack-boat");
+                    f.getProperties().put("marker-color", "#5fd60f");
+                    break;
+                case CAR:
+                    f.getProperties().put("marker-symbol", "car");
+                    f.getProperties().put("marker-color", "#b11313");
+                    break;
+                case SCOOTER:
+                    f.getProperties().put("marker-symbol", "scooter");
+                    f.getProperties().put("marker-color", "#3309ce");
+                    break;
+            }
             geoJSON.getFeatures().add(f);
 
         }
