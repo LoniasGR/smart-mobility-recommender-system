@@ -2,8 +2,8 @@ package gr.iccs.smart.mobility.vehicle;
 
 import gr.iccs.smart.mobility.boatStop.BoatStop;
 import gr.iccs.smart.mobility.boatStop.BoatStopService;
-import gr.iccs.smart.mobility.geojson.Feature;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
+import gr.iccs.smart.mobility.geojson.GeoJSONService;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import org.neo4j.driver.Values;
@@ -23,10 +23,12 @@ public class VehicleService {
     private static final Random RANDOM = new Random();
     private final VehicleRepository vehicleRepository;
     private final BoatStopService boatStopService;
+    private final GeoJSONService geoJSONService;
 
-    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService) {
+    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService, GeoJSONService geoJSONService) {
         this.vehicleRepository = vehicleRepository;
         this.boatStopService = boatStopService;
+        this.geoJSONService = geoJSONService;
     }
 
     public List<Vehicle> getAll() {
@@ -110,36 +112,21 @@ public class VehicleService {
         FeatureCollection geoJSON = new FeatureCollection();
 
         for (Vehicle v : vehicles) {
-            Feature f = new Feature();
-            f.getGeometry().getCoordinates().add(v.getLocation().y());
-            f.getGeometry().getCoordinates().add(v.getLocation().x());
-            f.getProperties().put("type", v.getType().toString());
-            f.getProperties().put("id", v.getId().toString());
-            switch (v.getType()) {
-                case SEA_VESSEL:
-                    f.getProperties().put("marker-symbol", "racetrack-boat");
-                    f.getProperties().put("marker-color", "#5fd60f");
-                    break;
-                case CAR:
-                    f.getProperties().put("marker-symbol", "car");
-                    f.getProperties().put("marker-color", "#b11313");
-                    break;
-                case SCOOTER:
-                    f.getProperties().put("marker-symbol", "scooter");
-                    f.getProperties().put("marker-color", "#3309ce");
-                    break;
-            }
-            geoJSON.getFeatures().add(f);
-
+            geoJSON.getFeatures().add(geoJSONService.createVehicleFeature(v));
         }
         return geoJSON;
     }
 
+    public List<Vehicle> findLandVehicleNearLocation(Point point, Integer max) {
+        return vehicleRepository.findLandVesselsByLocationNear(point, max);
+    }
+
+    public List<Vehicle> findSeaVesselsParkedInBoatStop(UUID uuid) {
+        return vehicleRepository.findSeaVesselsParkedInBoatStop(uuid);
+    }
+
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
-        if (maxDistance == null) {
-            return vehicleRepository.findByLocationNear(point);
-        }
         return vehicleRepository.findByLocationNear(point, maxDistance);
     }
 

@@ -1,5 +1,6 @@
 package gr.iccs.smart.mobility.user;
 
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.recommendation.RecommendationService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
@@ -71,5 +72,13 @@ public class UserController {
         return recommendationService.recommend(start, finish)
                 .stream().map(VehicleDTO::fromVehicle)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("{username}/recommendation/visualize")
+    public FeatureCollection visualizeRecommendation(@PathVariable String username, @RequestBody UserRouteDTO route) {
+        log.debug("User API: visualize suggested route for user" + username + " with data " + route );
+        var start = route.startingLocation().toPoint();
+        var finish = route.endingLocation().toPoint();
+        return recommendationService.createRecommendationGeoJSON(start, finish);
     }
 }
