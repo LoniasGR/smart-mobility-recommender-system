@@ -9,6 +9,7 @@ import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.vehicle.VehicleType;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,9 @@ public class RecommendationService {
     private final VehicleService vehicleService;
     private final GeoJSONService geoJSONService;
 
-    public RecommendationService(BoatStopService boatStopService, VehicleService vehicleService, GeoJSONService geoJSONService) {
+    public RecommendationService(BoatStopService boatStopService,
+                                 VehicleService vehicleService,
+                                 GeoJSONService geoJSONService) {
         this.boatStopService = boatStopService;
         this.vehicleService = vehicleService;
         this.geoJSONService = geoJSONService;
@@ -56,7 +59,7 @@ public class RecommendationService {
 
         if(sameSide) {
             // Scenario A, we only need one vehicle
-            return vehicleService.findLandVehicleNearLocation(startingPoint, 10);
+            return sameSideRecommendation(startingPoint);
 
         } else {
             // Scenario B, we need more than one vehicle
@@ -76,6 +79,24 @@ public class RecommendationService {
                     lastVehicle.getFirst()
             );
         }
+    }
+
+    /**
+     * Για απόσταση, μπορούμε να χρησιμοποιήσουμε το ίδιο με το neo4j
+     * <p>
+     * <a href="https://github.com/neo4j/neo4j/blob/5.17/community/values/src/main/java/org/neo4j/values/storable/CRSCalculator.java#L140">GitHub</a>
+     */
+    private List<Vehicle> sameSideRecommendation(Point startingPoint) {
+        var car = vehicleService.findVehicleByTypeAndLocationNear(VehicleType.CAR, startingPoint, 1).getFirst();
+        var scooter = vehicleService.findVehicleByTypeAndLocationNear(VehicleType.SCOOTER, startingPoint, 1).getFirst();
+
+        var carDistance = vehicleService.distance(car.getLocation(), startingPoint);
+        var scooterDistance = vehicleService.distance(scooter.getLocation(), startingPoint);
+
+        if(carDistance > scooterDistance) {
+            return List.of(scooter, car);
+        }
+        return List.of(car, scooter);
     }
 
     private List<Vehicle> findClosestSeaVessels(List<BoatStop> boatStops) {

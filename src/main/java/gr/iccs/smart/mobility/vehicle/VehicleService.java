@@ -122,10 +122,22 @@ public class VehicleService {
         return vehicleRepository.findLandVesselsByLocationNear(point, max);
     }
 
+    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance, Integer max) {
+        return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance.getValue(), max);
+    }
+
+    public List<Vehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
+        return vehicleRepository.findLandVesselsByLocationAround(point, distance.getValue(), max);
+    }
+
+
+    public List<Vehicle> findVehicleByTypeAndLocationNear(VehicleType type, Point point, Integer max) {
+        return vehicleRepository.findVehicleByTypeAndLocationNear(type.name(), point, max);
+    }
+
     public List<Vehicle> findSeaVesselsParkedInBoatStop(UUID uuid) {
         return vehicleRepository.findSeaVesselsParkedInBoatStop(uuid);
     }
-
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
         return vehicleRepository.findByLocationNear(point, maxDistance);
@@ -162,5 +174,13 @@ public class VehicleService {
                     VehicleStatus.IDLE);
             updateVehicleStatus(v.getId(), vehicleInfo);
         }
+    }
+
+    public Double distance(Point p1, Point p2) {
+        return vehicleRepository.calculateDistance(p1, p2);
+    }
+
+    public Double distance(LocationDTO loc1, LocationDTO loc2) {
+        return vehicleRepository.calculateDistance(loc1.toPoint(), loc2.toPoint());
     }
 }
