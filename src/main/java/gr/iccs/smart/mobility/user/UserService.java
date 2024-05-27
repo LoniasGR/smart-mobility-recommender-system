@@ -3,7 +3,10 @@ package gr.iccs.smart.mobility.user;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
+import gr.iccs.smart.mobility.vehicle.Vehicle;
+import gr.iccs.smart.mobility.vehicle.VehicleInfoDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 
@@ -43,31 +46,48 @@ public class UserService {
 
     public void manageRide(String username, UseDTO useInfo) {
         var person = getById(username);
-        var vehicle = vehicleService.getById(useInfo.vehicle().getId());
+        Vehicle vehicle = vehicleService.getById(useInfo.vehicle().getId());
         var ride = person.getCurrentRide();
+        VehicleStatus vehicleStatus;
 
         // The user does not have an active ride, so this call should be creating one
         if (ride.isEmpty()) {
             if (useInfo.status().equals(UseStatus.COMPLETED)) {
                 throw new IllegalArgumentException("There is no ride to be completed.");
             }
-            var newRide = new Used();
-            newRide.setVehicle(vehicle);
-            newRide.setStatus(useInfo.status());
-            var startLocation = useInfo.location().toPoint();
-            newRide.setStartingLocation(startLocation);
+            var newRide = createOrUpdateRide(null, useInfo, vehicle);
             person.getVehiclesUsed().add(newRide);
+            vehicleStatus = VehicleStatus.IN_USE;
+
         } else {
             if (useInfo.status().equals(UseStatus.ACTIVE)) {
-                throw new IllegalArgumentException("A new ride cannot be started while one is already in use");
+                throw new IllegalArgumentException("A new ride cannot be started while one is already in use.");
             }
-            var currentRide = ride.get();
-            currentRide.setStatus(useInfo.status());
-            var endingLocation = useInfo.location().toPoint();
-            currentRide.setEndingLocation(endingLocation);
-            currentRide.setEndingTime(useInfo.time());
+            createOrUpdateRide(ride.get(), useInfo, null);
+            vehicleStatus = VehicleStatus.IDLE;
         }
+        var vehicleInfo = new VehicleInfoDTO(null,
+                useInfo.location().latitude(),
+                useInfo.location().longitude(),
+                vehicleStatus);
         userRepository.save(person);
+        vehicleService.updateVehicleStatus(vehicle.getId(), vehicleInfo);
+    }
+
+    private Used createOrUpdateRide(Used rideInfo, UseDTO useInfo, Vehicle vehicle) {
+        var location = useInfo.location().toPoint();
+        var ride = rideInfo;
+        if (ride == null) {
+            ride = new Used();
+            ride.setVehicle(vehicle);
+            ride.setStartingLocation(location);
+            ride.setStartingTime(useInfo.time());
+        } else {
+            ride.setEndingLocation(location);
+            ride.setEndingTime(useInfo.time());
+        }
+        ride.setStatus(useInfo.status());
+        return ride;
     }
 
     public Optional<Used> rideStatus(String username) {

@@ -64,13 +64,14 @@ public class VehicleService {
         var boatStops = boatStopService.getAll();
         validateLocation(newLocation, boatStops, vehicle.getType());
 
-
         if (vehicle.getType() == VehicleType.SEA_VESSEL) {
             updateRelatedBoatStops(newLocation, boatStops, vehicle);
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
-        vehicle.setBattery(vehicleInfoDTO.battery());
+        if(vehicleInfoDTO.battery() != null) {
+            vehicle.setBattery(vehicleInfoDTO.battery());
+        }
         return vehicleRepository.save(vehicle);
     }
 
