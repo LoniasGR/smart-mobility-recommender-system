@@ -1,0 +1,296 @@
+{
+	"info": {
+		"_postman_id": "68c9d057-c14d-4514-9540-b9390b541556",
+		"name": "Smart Mobility",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15833183"
+	},
+	"item": [
+		{
+			"name": "All Vehicles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{hostname}}/api/vehicles",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"vehicles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{hostname}}/api/people",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Scenario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{hostname}}/api/scenario",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"scenario"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Location",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/locations",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"locations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vehicle geoJSON",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/vehicles/geojson",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"vehicles",
+						"geojson"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend route Scenario A",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people",
+						"harriet.johns",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Execute Scenario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people",
+						"harriet.johns",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend route Scenario B",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people",
+						"harriet.johns",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vizualize Scenario B",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people",
+						"harriet.johns",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Visualize Scenario A",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"api",
+						"people",
+						"harriet.johns",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "hostname",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
