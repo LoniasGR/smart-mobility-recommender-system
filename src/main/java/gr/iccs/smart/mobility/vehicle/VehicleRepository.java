@@ -16,8 +16,8 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
             "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
     List<Vehicle> findLandVesselsByLocationNear(Point point, Integer limit);
 
-    @Query("MATCH (v: Vehicle) WHERE v.type <> 'SEA_VESSEL' RETURN v " +
-            "WHERE point.distance(v.location, $point) < $range " +
+    @Query("MATCH (v: Vehicle) WHERE v.type <> 'SEA_VESSEL' " +
+            "AND point.distance(v.location, $point) < $range RETURN v " +
             "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
     List<Vehicle> findLandVesselsByLocationAround(Point point, Double range, Integer limit);
 

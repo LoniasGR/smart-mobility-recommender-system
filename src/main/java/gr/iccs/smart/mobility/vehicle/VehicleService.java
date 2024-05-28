@@ -122,14 +122,13 @@ public class VehicleService {
         return vehicleRepository.findLandVesselsByLocationNear(point, max);
     }
 
-    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance, Integer max) {
-        return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance.getValue(), max);
-    }
-
     public List<Vehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
         return vehicleRepository.findLandVesselsByLocationAround(point, distance.getValue(), max);
     }
 
+    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance, Integer max) {
+        return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance.getValue(), max);
+    }
 
     public List<Vehicle> findVehicleByTypeAndLocationNear(VehicleType type, Point point, Integer max) {
         return vehicleRepository.findVehicleByTypeAndLocationNear(type.name(), point, max);
