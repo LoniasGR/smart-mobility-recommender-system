@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -23,9 +22,6 @@ public class User {
     private LocalDate dateOfBirth;
 
     private Gender gender;
-
-    @Version
-    private Long version;
 
     @Relationship(type = "USED", direction = Relationship.Direction.OUTGOING)
     private final List<Used> vehiclesUsed;
@@ -69,13 +65,5 @@ public class User {
 
     public List<Used> getVehiclesUsed() {
         return vehiclesUsed;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 }

@@ -1,10 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.location.IstanbulLocations;
-import gr.iccs.smart.mobility.location.LocationDTO;
 import jakarta.validation.constraints.NotNull;
 import org.neo4j.driver.types.Point;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
@@ -29,9 +26,6 @@ public class Vehicle {
     private Float battery;
 
     private VehicleStatus status;
-
-    @Version
-    private Long version;
 
     public Vehicle(UUID id, VehicleType type) {
         this.id = id;
@@ -74,15 +68,4 @@ public class Vehicle {
     public void setLocation(Point location) {
         this.location = location;
     }
-
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-
 }
