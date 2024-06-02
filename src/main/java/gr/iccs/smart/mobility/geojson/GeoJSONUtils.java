@@ -5,8 +5,8 @@ import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GeoJSONService {
-    public Feature createVehicleFeature(Vehicle v) {
+public class GeoJSONUtils {
+    public static Feature createVehicleFeature(Vehicle v) {
         Feature f = new Feature();
         f.getGeometry().getCoordinates().add(v.getLocation().y());
         f.getGeometry().getCoordinates().add(v.getLocation().x());
@@ -29,14 +29,20 @@ public class GeoJSONService {
         return f;
     }
 
-    public Feature createPointFeature(Point point, String symbol) {
+    public static Feature createPointFeature(Point point) {
+        return createPointFeature(point, null, null);
+    }
+
+    public static Feature createPointFeature(Point point, String symbol) {
         return createPointFeature(point, symbol, null);
     }
-    public Feature createPointFeature(Point p, String symbol, String color) {
+    public static Feature createPointFeature(Point p, String symbol, String color) {
         Feature f = new Feature();
         f.getGeometry().getCoordinates().add(p.y());
         f.getGeometry().getCoordinates().add(p.x());
-        f.getProperties().put("marker-symbol", symbol);
+        if(symbol != null) {
+            f.getProperties().put("marker-symbol", symbol);
+        }
         if(color != null) {
             f.getProperties().put("marker-color", color);
         }

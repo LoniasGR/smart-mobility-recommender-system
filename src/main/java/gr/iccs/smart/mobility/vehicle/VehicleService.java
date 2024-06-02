@@ -3,7 +3,7 @@ package gr.iccs.smart.mobility.vehicle;
 import gr.iccs.smart.mobility.boatStop.BoatStop;
 import gr.iccs.smart.mobility.boatStop.BoatStopService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
-import gr.iccs.smart.mobility.geojson.GeoJSONService;
+import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import org.neo4j.driver.Values;
@@ -23,12 +23,10 @@ public class VehicleService {
     private static final Random RANDOM = new Random();
     private final VehicleRepository vehicleRepository;
     private final BoatStopService boatStopService;
-    private final GeoJSONService geoJSONService;
 
-    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService, GeoJSONService geoJSONService) {
+    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService) {
         this.vehicleRepository = vehicleRepository;
         this.boatStopService = boatStopService;
-        this.geoJSONService = geoJSONService;
     }
 
     public List<Vehicle> getAll() {
@@ -113,7 +111,7 @@ public class VehicleService {
         FeatureCollection geoJSON = new FeatureCollection();
 
         for (Vehicle v : vehicles) {
-            geoJSON.getFeatures().add(geoJSONService.createVehicleFeature(v));
+            geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
         }
         return geoJSON;
     }

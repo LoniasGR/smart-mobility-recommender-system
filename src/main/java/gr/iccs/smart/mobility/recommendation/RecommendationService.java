@@ -3,7 +3,7 @@ package gr.iccs.smart.mobility.recommendation;
 import gr.iccs.smart.mobility.boatStop.BoatStop;
 import gr.iccs.smart.mobility.boatStop.BoatStopService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
-import gr.iccs.smart.mobility.geojson.GeoJSONService;
+import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
@@ -21,14 +21,11 @@ import java.util.*;
 public class RecommendationService {
     private final BoatStopService boatStopService;
     private final VehicleService vehicleService;
-    private final GeoJSONService geoJSONService;
 
     public RecommendationService(BoatStopService boatStopService,
-                                 VehicleService vehicleService,
-                                 GeoJSONService geoJSONService) {
+                                 VehicleService vehicleService) {
         this.boatStopService = boatStopService;
         this.vehicleService = vehicleService;
-        this.geoJSONService = geoJSONService;
     }
 
     public FeatureCollection createRecommendationGeoJSON(Point startingPoint, Point finishingPoint) {
@@ -37,20 +34,20 @@ public class RecommendationService {
         var vehicles = recommend(startingPoint, finishingPoint);
         FeatureCollection geoJSON = new FeatureCollection();
 
-        var startingPointFeature = geoJSONService.createPointFeature(startingPoint, "arrow", "#07694c");
-        var endingPointFeature = geoJSONService.createPointFeature(finishingPoint, "circle-stroked", "#bd0000");
+        var startingPointFeature = GeoJSONUtils.createPointFeature(startingPoint, "arrow", "#07694c");
+        var endingPointFeature = GeoJSONUtils.createPointFeature(finishingPoint, "circle-stroked", "#bd0000");
 
         geoJSON.getFeatures().add(startingPointFeature);
         geoJSON.getFeatures().add(endingPointFeature);
 
         if (!sameSide) {
             var endingBoatStop = boatStopService.getByLocationNear(finishingPoint).getFirst();
-            var endingBoatStopFeature = geoJSONService.createPointFeature(endingBoatStop.getLocation(), "harbor");
+            var endingBoatStopFeature = GeoJSONUtils.createPointFeature(endingBoatStop.getLocation(), "harbor");
             geoJSON.getFeatures().add(endingBoatStopFeature);
         }
 
         for (Vehicle v : vehicles) {
-            geoJSON.getFeatures().add(geoJSONService.createVehicleFeature(v));
+            geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
         }
         return geoJSON;
     }

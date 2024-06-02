@@ -96,6 +96,8 @@ public class UserService {
     }
 
     public void createScenarioUsers() {
+        var custom_user = new User("test.user", null);
+        create(custom_user);
         for (int i = 0; i < 10; i++) {
             var user = new User(faker.internet().username(), null);
             create(user);
