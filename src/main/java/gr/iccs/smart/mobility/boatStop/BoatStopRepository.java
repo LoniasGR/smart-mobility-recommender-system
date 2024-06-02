@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.List;
 
 public interface BoatStopRepository extends Neo4jRepository<BoatStop, UUID> {
-
     List<BoatStop> findByLocationNear(Point point);
     Optional<BoatStop> findByLocation(Point point);
 }

@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.boatStop;
 
 import gr.iccs.smart.mobility.location.IstanbulLocations;
+import gr.iccs.smart.mobility.vehicle.Vehicle;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,10 @@ public class BoatStopService {
         return boatStopRepository.findAll();
     }
 
+    public Optional<BoatStop> getByID(UUID id) {
+        return boatStopRepository.findById(id);
+    }
+
     public List<BoatStop> getByLocationNear(Point location) {
         return boatStopRepository.findByLocationNear(location);
     }
@@ -28,7 +33,6 @@ public class BoatStopService {
     public Optional<BoatStop> getByExactLocation(Point location) {
         return boatStopRepository.findByLocation(location);
     }
-
     public BoatStop create(BoatStop boatStop) {
         var locationExists = boatStopRepository.findByLocation(boatStop.getLocation());
 
