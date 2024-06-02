@@ -7,58 +7,399 @@
 	},
 	"item": [
 		{
-			"name": "All Vehicles",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{hostname}}/api/vehicles",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"vehicles"
-					]
+			"name": "Users",
+			"item": [
+				{
+					"name": "All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/people",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Single User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/people/test.user",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"test.user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ride Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/people/jani.rempel/ride-status",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"jani.rempel",
+								"ride-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ride",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vehicle\": {\r\n        \"id\": \"6985e7d5-6221-426a-b254-8fa5ed9d8cf8\"\r\n    },\r\n    \"status\": \"COMPLETED\",\r\n    \"location\" : {\r\n        \"latitude\": 41.0273,\r\n        \"longitude\": 29.0147\r\n    },\r\n    \"time\": \"2024-05-02T17:55:44.562478258\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/people/jani.rempel/ride",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"jani.rempel",
+								"ride"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "All Users",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{hostname}}/api/people",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people"
-					]
+			"name": "Vehicles",
+			"item": [
+				{
+					"name": "All Vehicles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/vehicles",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"vehicles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vehicle geoJSON",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/vehicles/geojson",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								"geojson"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Create Scenario",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{hostname}}/api/scenario",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"scenario"
-					]
+			"name": "Scenarios",
+			"item": [
+				{
+					"name": "Create Scenario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/scenario",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"scenario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Execute Scenario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"vehicleID\": \"ca1b51ce-c62f-4b02-b52e-55d5f925a016\",\r\n       \"location\": {\r\n            \"latitude\": 41.0218,\r\n            \"longitude\": 28.9765\r\n        }\r\n    },\r\n    {\r\n        \"vehicleID\": \"b6542eb6-26ec-4919-83ad-14076f1c8cc9\",\r\n        \"location\": {\r\n            \"latitude\":  41.037,\r\n            \"longitude\": 29.0297\r\n                    \r\n        }\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/scenario/ride/test.user",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"scenario",
+								"ride",
+								"test.user"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "Boat Stops",
+			"item": [
+				{
+					"name": "All Boat Stops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/boat-stop",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"boat-stop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Boat Stop By Location",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"latitude\": 41.0273,\r\n    \"longitude\": 29.0147\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/boat-stop/exact-location",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"boat-stop",
+								"exact-location"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recommendations",
+			"item": [
+				{
+					"name": "Recommend route Scenario A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/people/test.user/recommend",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"test.user",
+								"recommend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recommend route Scenario B",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\":  41.01754351481824,\r\n    \"longitude\": 28.962921245529145\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.034996457365224,\r\n    \"longitude\": 29.03018274272216\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/people/test.user/recommend",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"test.user",
+								"recommend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vizualize Scenario B",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\":  41.01754351481824,\r\n    \"longitude\": 28.962921245529145\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.034996457365224,\r\n    \"longitude\": 29.03018274272216\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/people/test.user/recommendation/visualize",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"test.user",
+								"recommendation",
+								"visualize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visualize Scenario A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/people/test.user/recommendation/visualize",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"people",
+								"test.user",
+								"recommendation",
+								"visualize"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Locations",
+			"item": [
+				{
+					"name": "European Side Polygons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}/api/locations/european-polygon",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"locations",
+								"european-polygon"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "Search Location",
@@ -82,182 +423,6 @@
 					"path": [
 						"api",
 						"locations"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Vehicle geoJSON",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/vehicles/geojson",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"vehicles",
-						"geojson"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Recommend route Scenario A",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people",
-						"harriet.johns",
-						"recommend"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Execute Scenario",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people",
-						"harriet.johns",
-						"recommend"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Recommend route Scenario B",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people",
-						"harriet.johns",
-						"recommend"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Vizualize Scenario B",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people",
-						"harriet.johns",
-						"recommend"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Visualize Scenario A",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/people/harriet.johns/recommend",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"people",
-						"harriet.johns",
-						"recommend"
 					]
 				}
 			},
