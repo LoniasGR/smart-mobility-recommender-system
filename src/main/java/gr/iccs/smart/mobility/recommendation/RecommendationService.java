@@ -8,6 +8,7 @@ import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
+import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
 import org.neo4j.driver.types.Point;
@@ -22,8 +23,7 @@ public class RecommendationService {
     private final BoatStopService boatStopService;
     private final VehicleService vehicleService;
 
-    public RecommendationService(BoatStopService boatStopService,
-                                 VehicleService vehicleService) {
+    public RecommendationService(BoatStopService boatStopService, VehicleService vehicleService) {
         this.boatStopService = boatStopService;
         this.vehicleService = vehicleService;
     }
@@ -46,18 +46,20 @@ public class RecommendationService {
             geoJSON.getFeatures().add(endingBoatStopFeature);
         }
 
-        for (Vehicle v : vehicles) {
-            geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
+        for (List<RecommendationDTO> rl : vehicles) {
+            for (RecommendationDTO r : rl) {
+                geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(r.vehicle()));
+            }
         }
         return geoJSON;
     }
 
-    public List<Vehicle> recommend(Point startingPoint, Point finishingPoint) {
+    public List<List<RecommendationDTO>> recommend(Point startingPoint, Point finishingPoint) {
         var sameSide = areSameIstanbulSide(startingPoint, finishingPoint);
 
         if (sameSide) {
             // Scenario A, we only need one vehicle
-            return sameSideRecommendation(startingPoint);
+            return sameSideRecommendation(startingPoint, finishingPoint);
 
         } else {
             // Scenario B, we need more than one vehicle
@@ -65,7 +67,7 @@ public class RecommendationService {
         }
     }
 
-    private List<Vehicle> multiSideRecommendation(Point startingPoint, Point finishingPoint) {
+    private List<List<RecommendationDTO>> multiSideRecommendation(Point startingPoint, Point finishingPoint) {
         var startingBoatStops = boatStopService.getByLocationNear(startingPoint);
         var endingBoatStop = boatStopService.getByLocationNear(finishingPoint).getFirst();
         var startingSeaVessels = findClosestSeaVessels(startingBoatStops);
@@ -73,46 +75,31 @@ public class RecommendationService {
             return Collections.emptyList();
         }
         var seaVessel = startingSeaVessels.getFirst();
-        List<Vehicle> suggestedVehicles = new ArrayList<>();
+        List<List<RecommendationDTO>> suggestedVehicles = new ArrayList<>();
+        suggestedVehicles.add(new ArrayList<>());
 
         var userSeaVesselDistance = vehicleService.distance(seaVessel.getLocation(), startingPoint);
-        var firstVehicle = vehicleService.findLandVesselsByLocationAround(
-                startingPoint,
-                new Distance(userSeaVesselDistance, Metrics.KILOMETERS),
-                1);
+        var firstVehicle = vehicleService.findLandVesselsByLocationAround(startingPoint, new Distance(userSeaVesselDistance, Metrics.KILOMETERS), 1);
         if (!firstVehicle.isEmpty() && areSameIstanbulSide(firstVehicle.getFirst().getLocation(), startingPoint)) {
-            suggestedVehicles.add(firstVehicle.getFirst());
+            suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(firstVehicle.getFirst()), LocationDTO.fromGeographicPoint(seaVessel.getLocation())));
         }
-        suggestedVehicles.add(seaVessel);
+        suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(seaVessel), LocationDTO.fromGeographicPoint(endingBoatStop.getLocation())));
 
         var boatStopFinishingPointDistance = vehicleService.distance(endingBoatStop.getLocation(), finishingPoint);
-        var lastVehicle = vehicleService.findLandVesselsByLocationAround(
-                endingBoatStop.getLocation(),
-                new Distance(boatStopFinishingPointDistance, Metrics.KILOMETERS),
-                1);
+        var lastVehicle = vehicleService.findLandVesselsByLocationAround(endingBoatStop.getLocation(), new Distance(boatStopFinishingPointDistance, Metrics.KILOMETERS), 1);
         if (!lastVehicle.isEmpty() && areSameIstanbulSide(lastVehicle.getFirst().getLocation(), finishingPoint)) {
-            suggestedVehicles.add(lastVehicle.getFirst());
+            suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(lastVehicle.getFirst()), LocationDTO.fromGeographicPoint(finishingPoint)));
         }
         return suggestedVehicles;
     }
 
-
-    /**
-     * Για απόσταση, μπορούμε να χρησιμοποιήσουμε το ίδιο με το neo4j
-     * <p>
-     * <a href="https://github.com/neo4j/neo4j/blob/5.17/community/values/src/main/java/org/neo4j/values/storable/CRSCalculator.java#L140">GitHub</a>
-     */
-    private List<Vehicle> sameSideRecommendation(Point startingPoint) {
+    private List<List<RecommendationDTO>> sameSideRecommendation(Point startingPoint, Point finishingPoint) {
         var car = findVehicleByTypeAndLocationOnSameSide(VehicleType.CAR, startingPoint);
         var scooter = findVehicleByTypeAndLocationOnSameSide(VehicleType.SCOOTER, startingPoint);
 
         List<Optional<Vehicle>> maybeRecommendation = List.of(car, scooter);
 
-        return maybeRecommendation.stream()
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .sorted(Comparator.comparing(v -> vehicleService.distance(v.getLocation(), startingPoint)))
-                .toList();
+        return maybeRecommendation.stream().filter(Optional::isPresent).map(Optional::get).sorted(Comparator.comparing(v -> vehicleService.distance(v.getLocation(), startingPoint))).map(v -> List.of(new RecommendationDTO(VehicleDTO.fromVehicle(v), LocationDTO.fromGeographicPoint(finishingPoint)))).toList();
     }
 
     private Optional<Vehicle> findVehicleByTypeAndLocationOnSameSide(VehicleType type, Point point) {
@@ -137,8 +124,7 @@ public class RecommendationService {
         var startingPointPosition = LocationDTO.istanbulLocation(startingPoint);
         var finishingPointPosition = LocationDTO.istanbulLocation(finishingPoint);
 
-        if (startingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA ||
-                finishingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA) {
+        if (startingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA || finishingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA) {
             throw new InvalidLocationException("The starting and ending locations must not be on the sea");
         }
         return startingPointPosition == finishingPointPosition;

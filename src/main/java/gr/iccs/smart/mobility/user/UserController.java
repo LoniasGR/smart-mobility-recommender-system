@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.user;
 
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
+import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
@@ -65,13 +66,11 @@ public class UserController {
     }
 
     @PostMapping("{username}/recommend")
-    public Iterable<VehicleDTO> suggestRoute(@PathVariable String username, @RequestBody UserRouteDTO route) {
+    public List<List<RecommendationDTO>> suggestRoute(@PathVariable String username, @RequestBody UserRouteDTO route) {
         log.debug("User API: suggest route for user" + username + " with data " + route );
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
-        return recommendationService.recommend(start, finish)
-                .stream().map(VehicleDTO::fromVehicle)
-                .collect(Collectors.toList());
+        return recommendationService.recommend(start, finish);
     }
 
     @PostMapping("{username}/recommendation/visualize")

@@ -2,6 +2,7 @@ package gr.iccs.smart.mobility.scenario;
 
 import gr.iccs.smart.mobility.boatStop.BoatStopService;
 import gr.iccs.smart.mobility.location.LocationDTO;
+import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.user.UserService;
@@ -50,18 +51,18 @@ public class ScenarioController {
     }
 
     @PostMapping("ride/{username}")
-    public void executeMovementScenario(@PathVariable String username, @RequestBody List<UseScenarioDTO> vehicleScenarios) {
+    public void executeMovementScenario(@PathVariable String username, @RequestBody List<RecommendationDTO> vehicleScenarios) {
         if(userService.rideStatus(username).isPresent()) {
             throw new ScenarioException("The user is already on a ride");
         }
         var time = LocalDateTime.now();
-        for(UseScenarioDTO s: vehicleScenarios) {
+        for(RecommendationDTO s: vehicleScenarios) {
             time = time.plusMinutes(3);
-            var vehicle = vehicleService.getById(s.vehicleID());
+            var vehicle = vehicleService.getById(s.vehicle().id());
             UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE, LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
             userService.manageRide(username, usageStart);
             time = time.plusMinutes(25);
-            UseDTO usageEnd = new UseDTO(vehicle, UseStatus.COMPLETED, s.location(), time);
+            UseDTO usageEnd = new UseDTO(vehicle, UseStatus.COMPLETED, s.destination(), time);
             userService.manageRide(username, usageEnd);
         }
     }

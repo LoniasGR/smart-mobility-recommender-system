@@ -1,18 +1,23 @@
 package gr.iccs.smart.mobility.geojson;
 
 import gr.iccs.smart.mobility.vehicle.Vehicle;
+import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GeoJSONUtils {
+
     public static Feature createVehicleFeature(Vehicle v) {
+        return createVehicleFeature(VehicleDTO.fromVehicle(v));
+    }
+    public static Feature createVehicleFeature(VehicleDTO v) {
         Feature f = new Feature();
-        f.getGeometry().getCoordinates().add(v.getLocation().y());
-        f.getGeometry().getCoordinates().add(v.getLocation().x());
-        f.getProperties().put("type", v.getType().toString());
-        f.getProperties().put("id", v.getId().toString());
-        switch (v.getType()) {
+        f.getGeometry().getCoordinates().add(v.location().longitude());
+        f.getGeometry().getCoordinates().add(v.location().latitude());
+        f.getProperties().put("type", v.type().toString());
+        f.getProperties().put("id", v.id().toString());
+        switch (v.type()) {
             case SEA_VESSEL:
                 f.getProperties().put("marker-symbol", "racetrack-boat");
                 f.getProperties().put("marker-color", "#5fd60f");
