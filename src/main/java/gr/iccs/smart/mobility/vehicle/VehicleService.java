@@ -92,17 +92,15 @@ public class VehicleService {
         var coastLocation = boatStops.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
         // If the sea vessel is parked in a boat stop, add it to the list of boats in the stop
-        if (coastLocation.isPresent()) {
+        if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
             boatStopService.update(coastLocation.get());
         }
         // Otherwise remove it if it's leaving a boat stop
         else {
-            var oldBoatStop = boatStopService.getByExactLocation(vehicle.getLocation());
-            if (oldBoatStop.isPresent()) {
-                oldBoatStop.get().getParkedVehicles().remove(vehicle);
-                boatStopService.update(oldBoatStop.get());
-            }
+            boatStopService
+                    .getByExactLocation(vehicle.getLocation())
+                    .ifPresent(boatStop -> boatStopService.removeVehicle(boatStop, vehicle));
         }
     }
 
