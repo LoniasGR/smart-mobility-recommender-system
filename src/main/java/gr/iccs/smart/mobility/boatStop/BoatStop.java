@@ -47,4 +47,8 @@ public class BoatStop {
         return parkedVehicles;
     }
 
+    public void setParkedVehicles(List<Vehicle> parkedVehicles) {
+        this.parkedVehicles = parkedVehicles;
+    }
+
 }

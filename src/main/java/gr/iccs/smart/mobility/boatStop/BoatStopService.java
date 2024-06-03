@@ -50,6 +50,10 @@ public class BoatStopService {
         return boatStopRepository.save(newBoatStop);
     }
 
+    public void removeVehicle(BoatStop boatStop, Vehicle v) {
+        boatStopRepository.deleteParkedIn(boatStop.getId(), v.getId());
+    }
+
     public void createBoatStopScenario() {
         for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
             var boardStop = new BoatStop(UUID.randomUUID(), IstanbulLocations.coastLocations.get(i).toPoint());
