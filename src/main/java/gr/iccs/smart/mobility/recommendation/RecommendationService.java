@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+// TODO: Maybe create a controller for this class?
 @Service
 public class RecommendationService {
     private final BoatStopService boatStopService;
@@ -67,6 +68,14 @@ public class RecommendationService {
         }
     }
 
+    /**
+     * Handles the recommendation for moving from one side of Istanbul to the other. <br>
+     * TODO: Maybe split this into multiple methods?
+     *
+     * @param startingPoint The location of the starting point of the user
+     * @param finishingPoint The location of the end of the user's trip
+     * @return A list of options. Each option is a list of recommended steps.
+     */
     private List<List<RecommendationDTO>> multiSideRecommendation(Point startingPoint, Point finishingPoint) {
         var startingBoatStops = boatStopService.getByLocationNear(startingPoint);
         var endingBoatStop = boatStopService.getByLocationNear(finishingPoint).getFirst();
