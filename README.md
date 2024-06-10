@@ -2,6 +2,10 @@
 
 ## Description
 
+This is a recommendation service for the ECOMobility project. It provides routing services for 
+individuals around the city of Istanbul, using the vehicles of the project. The functionality is 
+exposed through a REST API, which currently does not authenticate the user in any way.
+
 ## Requirements
 
 * Java 21
