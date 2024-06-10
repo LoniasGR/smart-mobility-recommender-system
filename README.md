@@ -6,6 +6,7 @@
 
 * Java 21
 * Docker
+* Postman
 
 ## Running from source
 
@@ -31,3 +32,11 @@ in `docker-compose.yml`. These are:
 username: neo4j
 password: develop-colombo-clara-sponsor-erosion-6500
 ```
+
+## Postman Collection
+
+Inside the `api/` folder, there is a Postman collection included. This can be imported into the postman app
+to try out the different endpoints. They are divided by category and should be relatively easy to navigate, since
+examples are provided. 
+
+In the future, this could be moved into the OpenAPI specification.

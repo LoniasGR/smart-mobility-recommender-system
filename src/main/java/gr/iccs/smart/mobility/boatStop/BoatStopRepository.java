@@ -12,6 +12,7 @@ public interface BoatStopRepository extends Neo4jRepository<BoatStop, UUID> {
     List<BoatStop> findByLocationNear(Point point);
     Optional<BoatStop> findByLocation(Point point);
 
+    // TODO: Investigate if we could do this with what the ORM offers alone
     @Query("MATCH (bs:BoatStop{id: $boatStopID})-[p:PARKED_IN]-(v:Vehicle{id: $vehicleID}) " +
             "DETACH DELETE p")
     public void deleteParkedIn(UUID boatStopID, UUID vehicleID);
