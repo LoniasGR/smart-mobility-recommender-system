@@ -1,36 +1,82 @@
 package gr.iccs.smart.mobility.geojson;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
-public class Feature {
-    private final String type = "Feature";
+public class Feature extends GeoJsonObject {
 
-    private Geometry geometry;
+	@JsonInclude()
+	private Map<String, Object> properties = new HashMap<>();
+	@JsonInclude()
+	private GeoJsonObject geometry;
+	private String id;
 
-    private HashMap<String, String> properties;
+	public void setProperty(String key, Object value) {
+		properties.put(key, value);
+	}
 
-    public Feature() {
-        this.geometry = new Geometry();
-        this.properties = new HashMap<>();
-    }
+	@SuppressWarnings("unchecked")
+	public <T> T getProperty(String key) {
+		return (T)properties.get(key);
+	}
 
-    public String getType() {
-        return type;
-    }
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
 
-    public Geometry getGeometry() {
-        return geometry;
-    }
+	public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
+	}
 
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
-    }
+	public GeoJsonObject getGeometry() {
+		return geometry;
+	}
 
-    public HashMap<String, String> getProperties() {
-        return properties;
-    }
+	public void setGeometry(GeoJsonObject geometry) {
+		this.geometry = geometry;
+	}
 
-    public void setProperties(HashMap<String, String> properties) {
-        this.properties = properties;
-    }
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public <T> T accept(GeoJsonObjectVisitor<T> geoJsonObjectVisitor) {
+		return geoJsonObjectVisitor.visit(this);
+	}
+
+	@Override public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		if (!super.equals(o))
+			return false;
+		Feature feature = (Feature)o;
+		if (!Objects.equals(properties, feature.properties))
+			return false;
+		if (!Objects.equals(geometry, feature.geometry))
+			return false;
+		return Objects.equals(id, feature.id);
+	}
+
+	@Override public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + (properties != null ? properties.hashCode() : 0);
+		result = 31 * result + (geometry != null ? geometry.hashCode() : 0);
+		result = 31 * result + (id != null ? id.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Feature{properties=" + properties + ", geometry=" + geometry + ", id='" + id + "'}";
+	}
 }

@@ -13,8 +13,8 @@ public class GeoJSONUtils {
     }
     public static Feature createVehicleFeature(VehicleDTO v) {
         Feature f = new Feature();
-        f.getGeometry().getCoordinates().add(v.location().longitude());
-        f.getGeometry().getCoordinates().add(v.location().latitude());
+        f.setGeometry(new gr.iccs.smart.mobility.geojson.Point(v.location().longitude(), v.location().latitude()));
+
         f.getProperties().put("type", v.type().toString());
         f.getProperties().put("id", v.id().toString());
         switch (v.type()) {
@@ -43,8 +43,8 @@ public class GeoJSONUtils {
     }
     public static Feature createPointFeature(Point p, String symbol, String color) {
         Feature f = new Feature();
-        f.getGeometry().getCoordinates().add(p.y());
-        f.getGeometry().getCoordinates().add(p.x());
+        f.setGeometry(new gr.iccs.smart.mobility.geojson.Point(p.y(), p.x()));
+
         if(symbol != null) {
             f.getProperties().put("marker-symbol", symbol);
         }
