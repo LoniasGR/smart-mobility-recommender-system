@@ -1,11 +1,12 @@
 package gr.iccs.smart.mobility.user;
 
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
+import gr.iccs.smart.mobility.location.LocationDTO;
+import gr.iccs.smart.mobility.openrouteservice.Directions;
 import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
-import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,12 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final RecommendationService recommendationService;
+    private final Directions directions;
 
-    public UserController(UserService userService, RecommendationService recommendationService) {
+    public UserController(UserService userService, RecommendationService recommendationService, Directions directions) {
         this.userService = userService;
         this.recommendationService = recommendationService;
+        this.directions = directions;
     }
 
     @GetMapping
@@ -79,5 +82,13 @@ public class UserController {
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
         return recommendationService.createRecommendationGeoJSON(start, finish);
+    }
+
+    @GetMapping("/test")
+    public FeatureCollection test() {
+        return directions.getDirectionsService(
+                new LocationDTO(41.17966906821479, 29.073934531693254).toPoint(),
+                new LocationDTO(41.18307348212525, 29.03549217863099).toPoint()
+        );
     }
 }
