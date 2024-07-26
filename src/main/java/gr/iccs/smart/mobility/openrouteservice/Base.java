@@ -1,10 +1,10 @@
 package gr.iccs.smart.mobility.openrouteservice;
 
 import gr.iccs.smart.mobility.PropertiesConfig;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Service
+@Component
 public class Base {
     protected RestClient client;
     protected String APIKey;

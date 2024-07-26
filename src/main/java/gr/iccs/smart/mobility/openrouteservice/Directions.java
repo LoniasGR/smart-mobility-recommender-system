@@ -4,12 +4,12 @@ import gr.iccs.smart.mobility.PropertiesConfig;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import org.neo4j.driver.types.Point;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-@Service
+@Component
 public class Directions extends Base {
 
     public Directions(PropertiesConfig config) {
