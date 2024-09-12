@@ -6,8 +6,8 @@ services:
       NEO4J_AUTH: "neo4j/develop-colombo-clara-sponsor-erosion-6500"
       NEO4J_PLUGINS: '["graph-data-science"]'
     ports:
-      - 7474:7474
-      - 7687:7687
+      - "7474:7474"
+      - "7687:7687"
     volumes:
       - /srv/neo4j/data:/data/:rw
     restart: always
@@ -16,7 +16,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - 8000:8000
+      - "8000:8000"
   openrouteservice:
     container_name: openrouteservice
     ports:
@@ -80,8 +80,3 @@ services:
     #  timeout: 2s
     #  retries: 3
     #  disable: false
-
-networks:
-  default:
-    name: docker_server
-    external: true
