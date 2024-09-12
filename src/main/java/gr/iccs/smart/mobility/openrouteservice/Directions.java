@@ -8,18 +8,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @Component
 public class Directions extends Base {
+    private static final List<String> validProfiles = List.of("driving-car",
+            "driving-hvg", "cycling-regular", "cycling-road", "cycling-mountain",
+            "cycling-electric", "foot-walking", "foot-hiking", "wheelchair");
 
     public Directions(PropertiesConfig config) {
         super(config);
         this.baseURL += "/directions";
     }
 
-    public FeatureCollection getDirectionsService(Point start, Point end) {
+    public FeatureCollection getDirectionsService(String profile, Point start, Point end) {
+        if(!verifyProfile(profile)) {
+            throw new IllegalArgumentException("The profile needs to be one of " + validProfiles.toString());
+        }
         URI uri = UriComponentsBuilder
-                .fromUriString(baseURL + "/driving-car")
+                .fromUriString(baseURL + "/" + profile)
                 .queryParam("start", start.y() + "," + start.x())
                 .queryParam("end", end.y() + "," + end.x())
                 .encode()
@@ -31,5 +38,9 @@ public class Directions extends Base {
                 .toEntity(FeatureCollection.class);
 
         return entity.getBody();
+    }
+
+    public boolean verifyProfile(String profile) {
+        return validProfiles.contains(profile);
     }
 }

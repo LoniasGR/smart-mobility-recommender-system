@@ -4,18 +4,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Configuration
-@ConfigurationProperties("openrouteservice") //part of our property configured name - prefix
+@ConfigurationProperties("openrouteservice")
 public class PropertiesConfig {
-    private String apikey;
+    private String apiKey;
     private String host;
-    private String apiversion;
+    private String apiVersion;
 
     public String getAPIKey() {
-        return apikey;
+        return apiKey;
     }
 
     public void setAPIKey(String APIKey) {
-        this.apikey = APIKey;
+        this.apiKey = APIKey;
     }
 
     public String getHost() {
@@ -27,11 +27,11 @@ public class PropertiesConfig {
     }
 
     public String getAPIVersion() {
-        return apiversion;
+        return apiVersion;
     }
 
     public void setAPIVersion(String APIVersion) {
-        this.apiversion = APIVersion;
+        this.apiVersion = APIVersion;
     }
 
 }

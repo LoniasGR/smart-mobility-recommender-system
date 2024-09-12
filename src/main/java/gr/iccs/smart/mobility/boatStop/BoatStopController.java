@@ -27,13 +27,13 @@ public class BoatStopController {
 
     @PostMapping("/locate")
     public List<BoatStop> getByLocationNear(@RequestBody LocationDTO location) {
-        log.debug("BoatStop API: getByLocation");
+        log.debug("BoatStop API: getByLocationNear");
         return boatStopService.getByLocationNear(location.toPoint());
     }
 
     @PostMapping("/exact-location")
     public BoatStop getByLocationExact(@RequestBody LocationDTO location) {
-        log.debug("BoatStop API: getByLocation");
+        log.debug("BoatStop API: getByLocationExact");
         var boatStop = boatStopService.getByExactLocation(location.toPoint());
         if(boatStop.isEmpty()) {
             throw new InvalidBoatStopException("The boat stop does not exist.");
@@ -43,7 +43,7 @@ public class BoatStopController {
 
     @GetMapping("/{id}")
     public BoatStop getById(@PathVariable String id) {
-        log.debug("BoatStop API:Get by id " + id);
+        log.debug("BoatStop API:Get by id {}", id);
         var boatStop = boatStopService.getByID(UUID.fromString(id));
         if(boatStop.isEmpty()) {
             throw new InvalidBoatStopException("The boat stop does not exist.");

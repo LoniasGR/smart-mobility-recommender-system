@@ -48,19 +48,19 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        log.debug("User API: Create " + user);
+        log.debug("User API: Create {}", user);
         return userService.create(user);
     }
 
     @PostMapping("{username}/ride")
     public void rideManagement(@PathVariable String username, @RequestBody UseDTO useInfo) {
-        log.debug("User API: add ride for user " + username + "with ride data " + useInfo);
+        log.debug("User API: add ride for user {}with ride data {}", username, useInfo);
         userService.manageRide(username, useInfo);
     }
 
     @GetMapping("{username}/ride-status")
     public ResponseEntity<?> rideStatus(@PathVariable String username) {
-        log.debug("User API: get ride status for " + username);
+        log.debug("User API: get ride status for {}", username);
         var status = userService.rideStatus(username);
         if (status.isEmpty()) {
             return new ResponseEntity<>(new EmptyJsonResponse(), HttpStatus.OK);
@@ -70,7 +70,7 @@ public class UserController {
 
     @PostMapping("{username}/recommend")
     public List<List<RecommendationDTO>> suggestRoute(@PathVariable String username, @RequestBody UserRouteDTO route) {
-        log.debug("User API: suggest route for user" + username + " with data " + route );
+        log.debug("User API: suggest route for user{} with data {}", username, route);
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
         return recommendationService.recommend(start, finish);
@@ -78,7 +78,7 @@ public class UserController {
 
     @PostMapping("{username}/recommendation/visualize")
     public FeatureCollection visualizeRecommendation(@PathVariable String username, @RequestBody UserRouteDTO route) {
-        log.debug("User API: visualize suggested route for user" + username + " with data " + route );
+        log.debug("User API: visualize suggested route for user{} with data {}", username, route);
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
         return recommendationService.createRecommendationGeoJSON(start, finish);
@@ -86,9 +86,14 @@ public class UserController {
 
     @GetMapping("/test")
     public FeatureCollection test() {
-        return directions.getDirectionsService(
-                new LocationDTO(41.17966906821479, 29.073934531693254).toPoint(),
-                new LocationDTO(41.18307348212525, 29.03549217863099).toPoint()
-        );
+        try {
+            return directions.getDirectionsService(
+                    "driving-car",
+                    new LocationDTO(41.17966906821479, 29.073934531693254).toPoint(),
+                    new LocationDTO(41.18307348212525, 29.03549217863099).toPoint()
+            );
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
