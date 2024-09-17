@@ -3,6 +3,9 @@ target/
 *.class
 *.jar
 
+### Configuration files ###
+application.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
