@@ -45,10 +45,12 @@ public class UserService {
     }
 
     public void manageRide(String username, UseDTO useInfo) {
-        var person = getById(username);
         Vehicle vehicle = vehicleService.getById(useInfo.vehicle().getId());
-        var ride = person.getCurrentRide();
         VehicleStatus vehicleStatus;
+
+        var person = getById(username);
+        var ride = person.getCurrentRide();
+
 
         // The user does not have an active ride, so this call should be creating one
         if (ride.isEmpty()) {

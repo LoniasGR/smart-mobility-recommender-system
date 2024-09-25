@@ -9,7 +9,9 @@ import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class User {
@@ -28,7 +30,7 @@ public class User {
 
     public User(@JsonProperty("username") String username, List<Used> vehiclesUsed) {
         this.username = username;
-        this.vehiclesUsed = vehiclesUsed;
+        this.vehiclesUsed = Objects.requireNonNullElseGet(vehiclesUsed, ArrayList::new);
     }
 
     public Optional<Used> getCurrentRide() {

@@ -11,17 +11,17 @@ import java.util.UUID;
  * Vehicle info + current status
  */
 @Node
-public class Vehicle {
+public abstract sealed class Vehicle permits Boat, LandVehicle {
     @Id
     @NotNull(message = "id cannot be empty")
     private final UUID id;
     private final VehicleType type;
 
     /*
-        TODO:
-        We can measure distance with spatial functions of neo4j
-        https://neo4j.com/docs/cypher-manual/current/functions/spatial/
-    */
+     * TODO:
+     * We can measure distance with spatial functions of neo4j
+     * https://neo4j.com/docs/cypher-manual/current/functions/spatial/
+     */
     private Point location;
     private Float battery;
 
@@ -67,5 +67,12 @@ public class Vehicle {
 
     public void setLocation(Point location) {
         this.location = location;
+    }
+
+    public boolean isLandVehicle() {
+        if (this.type.equals(VehicleType.SEA_VESSEL)) {
+            return false;
+        }
+        return true;
     }
 }

@@ -1,6 +1,6 @@
 package gr.iccs.smart.mobility.scenario;
 
-import gr.iccs.smart.mobility.boatStop.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;

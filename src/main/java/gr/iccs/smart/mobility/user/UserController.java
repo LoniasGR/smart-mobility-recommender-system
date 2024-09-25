@@ -83,17 +83,4 @@ public class UserController {
         var finish = route.endingLocation().toPoint();
         return recommendationService.createRecommendationGeoJSON(start, finish);
     }
-
-    @GetMapping("/test")
-    public FeatureCollection test() {
-        try {
-            return directions.getDirectionsService(
-                    "driving-car",
-                    new LocationDTO(41.17966906821479, 29.073934531693254).toPoint(),
-                    new LocationDTO(41.18307348212525, 29.03549217863099).toPoint()
-            );
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

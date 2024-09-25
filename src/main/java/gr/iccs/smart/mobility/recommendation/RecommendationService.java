@@ -1,7 +1,7 @@
 package gr.iccs.smart.mobility.recommendation;
 
-import gr.iccs.smart.mobility.boatStop.BoatStop;
-import gr.iccs.smart.mobility.boatStop.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;

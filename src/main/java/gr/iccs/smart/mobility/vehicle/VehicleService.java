@@ -1,7 +1,9 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.boatStop.BoatStop;
-import gr.iccs.smart.mobility.boatStop.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import gr.iccs.smart.mobility.connection.ConnectionService;
+import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
@@ -23,10 +25,13 @@ public class VehicleService {
     private static final Random RANDOM = new Random();
     private final VehicleRepository vehicleRepository;
     private final BoatStopService boatStopService;
+    private final ConnectionService connectionService;
 
-    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService) {
+    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService,
+            ConnectionService connectionService) {
         this.vehicleRepository = vehicleRepository;
         this.boatStopService = boatStopService;
+        this.connectionService = connectionService;
     }
 
     public List<Vehicle> getAll() {
@@ -67,14 +72,31 @@ public class VehicleService {
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
-        if(vehicleInfoDTO.battery() != null) {
+        if (vehicleInfoDTO.battery() != null) {
             vehicle.setBattery(vehicleInfoDTO.battery());
         }
         return vehicleRepository.save(vehicle);
     }
 
+    public void createConnectionTo(UUID id, ReachableNode destination) {
+        var maybeVehicle = vehicleRepository.findById(id);
+        if (maybeVehicle.isEmpty()) {
+            throw new VehicleNotFoundException();
+        }
+
+        if (!maybeVehicle.get().isLandVehicle()) {
+            throw new BadVehicleRequest("The requested vehicle is a boat");
+        }
+        LandVehicle vehicle = (LandVehicle) maybeVehicle.get();
+
+        var connection = connectionService.generateConnection(vehicle, destination);
+        vehicle.addConnection(connection);
+        vehicleRepository.save(vehicle);
+    }
+
     private void validateLocation(Point newLocation, List<BoatStop> boatStops, VehicleType vehicleType) {
-        var isSeaLocation = LocationDTO.istanbulLocation(newLocation) == IstanbulLocations.IstanbulLocationDescription.SEA;
+        var isSeaLocation = LocationDTO
+                .istanbulLocation(newLocation) == IstanbulLocations.IstanbulLocationDescription.SEA;
         var isCoastLocation = boatStops.stream().anyMatch(bs -> bs.getLocation().equals(newLocation));
 
         // Check if the location provided is valid for a sea vessel
@@ -91,7 +113,8 @@ public class VehicleService {
     private void updateRelatedBoatStops(Point newLocation, List<BoatStop> boatStops, Vehicle vehicle) {
         var coastLocation = boatStops.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
-        // If the sea vessel is parked in a boat stop, add it to the list of boats in the stop
+        // If the sea vessel is parked in a boat stop, add it to the list of boats in
+        // the stop
         if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
             boatStopService.update(coastLocation.get());
@@ -114,15 +137,20 @@ public class VehicleService {
         return geoJSON;
     }
 
-    public List<Vehicle> findLandVehicleNearLocation(Point point, Integer max) {
+    public List<LandVehicle> getAllLandVehicles() {
+        return vehicleRepository.getAllLandVehicles();
+    }
+
+    public List<LandVehicle> findLandVehicleNearLocation(Point point, Integer max) {
         return vehicleRepository.findLandVesselsByLocationNear(point, max);
     }
 
-    public List<Vehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
+    public List<LandVehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
         return vehicleRepository.findLandVesselsByLocationAround(point, distance.getValue(), max);
     }
 
-    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance, Integer max) {
+    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance,
+            Integer max) {
         return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance.getValue(), max);
     }
 
@@ -140,15 +168,15 @@ public class VehicleService {
 
     public void createScenarioVehicles() {
         for (int i = 0; i < 30; i++) {
-            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.CAR);
+            var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.CAR, null);
             create(vehicle);
         }
         for (int i = 0; i < 30; i++) {
-            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.SCOOTER);
+            var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.SCOOTER, null);
             create(vehicle);
         }
         for (int i = 0; i < 30; i++) {
-            var vehicle = new Vehicle(UUID.randomUUID(), VehicleType.SEA_VESSEL);
+            var vehicle = new Boat(UUID.randomUUID(), VehicleType.SEA_VESSEL, 10);
             create(vehicle);
         }
     }
