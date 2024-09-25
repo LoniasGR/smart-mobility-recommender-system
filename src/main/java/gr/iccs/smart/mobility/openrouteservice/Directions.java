@@ -35,6 +35,9 @@ public class Directions extends Base {
     }
 
     private Long timeToWaitForRateLimit() {
+        if (rateLimit == 0) {
+            return 0L;
+        }
         if (rate.size() < rateLimit) {
             return 0L;
         }
@@ -47,6 +50,10 @@ public class Directions extends Base {
     }
 
     private void updateRateLimit() {
+        if (rateLimit == 0) {
+            return;
+        }
+
         if (rate.size() == rateLimit) {
             rate.removeLast();
         }
