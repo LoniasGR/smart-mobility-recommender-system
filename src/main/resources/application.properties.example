@@ -11,3 +11,4 @@ logging.level.org.springframework.data.neo4j.cypher=trace
 openrouteservice.apikey=
 openrouteservice.host=https://api.openrouteservice.org
 openrouteservice.apiversion=v2
+openrouteservice.ratelimit=40

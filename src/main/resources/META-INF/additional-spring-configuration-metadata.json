@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "openrouteservice.host",
+      "type": "java.net.URI",
+      "description": "The hostname of the openrouteservice"
+    },
+    {
+      "name": "openrouteservice.apikey",
+      "type": "java.lang.String",
+      "description": "The API key to connect to the openrouteservice"
+    },
+    {
+      "name": "openrouteservice.ratelimit",
+      "type": "java.lang.Integer",
+      "description": "The limit for sending requests (per minute)"
+    },
+    {
+      "name": "openrouteservice.apiversion",
+      "type": "java.lang.String",
+      "description": "The API Version to be used (should probably always be `v2`"
+    }
+  ]
+}

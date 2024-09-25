@@ -9,17 +9,26 @@ public class PropertiesConfig {
     private String apiKey;
     private String host;
     private String apiVersion;
+    private Integer rateLimit;
 
-    public String getAPIKey() {
-        return apiKey;
+    public Integer getRateLimit() {
+        return this.rateLimit;
     }
 
-    public void setAPIKey(String APIKey) {
-        this.apiKey = APIKey;
+    public void setRateLimit(Integer ratelimit) {
+        this.rateLimit = ratelimit;
+    }
+
+    public String getAPIKey() {
+        return this.apiKey;
+    }
+
+    public void setAPIKey(String apikey) {
+        this.apiKey = apikey;
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public void setHost(String host) {
@@ -27,11 +36,11 @@ public class PropertiesConfig {
     }
 
     public String getAPIVersion() {
-        return apiVersion;
+        return this.apiVersion;
     }
 
-    public void setAPIVersion(String APIVersion) {
-        this.apiVersion = APIVersion;
+    public void setAPIVersion(String apiversion) {
+        this.apiVersion = apiversion;
     }
 
 }

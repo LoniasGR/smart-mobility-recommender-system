@@ -6,17 +6,20 @@ import org.springframework.web.client.RestClient;
 
 @Component
 public class Base {
-    protected RestClient client;
-    protected String APIKey;
+    protected static RestClient client;
+    protected static Integer rateLimit;
+    protected static String APIKey;
     protected String baseURL;
 
     public Base(PropertiesConfig config) {
-        this.APIKey = config.getAPIKey();
-        this.baseURL = config.getHost() + "/" + config.getAPIVersion();
+        APIKey = config.getAPIKey();
+        baseURL = config.getHost() + "/" + config.getAPIVersion();
+        rateLimit = config.getRateLimit();
 
-        this.client = RestClient.builder()
-                .defaultHeader("Authorization", this.APIKey)
-                .defaultHeader("Accept","application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8")
+        client = RestClient.builder()
+                .defaultHeader("Authorization", APIKey)
+                .defaultHeader("Accept",
+                        "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8")
                 .build();
     }
 }
