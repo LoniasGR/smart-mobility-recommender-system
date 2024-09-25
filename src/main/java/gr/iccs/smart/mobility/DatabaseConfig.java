@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.core.DatabaseSelection;
 import org.springframework.data.neo4j.core.DatabaseSelectionProvider;
 
-
 @Configuration
 public class DatabaseConfig {
 
@@ -27,7 +26,7 @@ public class DatabaseConfig {
      *
      * @param database the configured database name
      * @return DatabaseSelection the corresponding database name for Neo4j 4+ or
-     * undefined otherwise
+     *         undefined otherwise
      */
     @Bean
     DatabaseSelectionProvider databaseSelectionProvider(@Value("${spring.data.neo4j.database}") String database) {
@@ -43,7 +42,7 @@ public class DatabaseConfig {
     @Bean
     org.neo4j.cypherdsl.core.renderer.Configuration cypherDslConfiguration() {
 
-        var dialect = Dialect.DEFAULT;
+        var dialect = Dialect.NEO4J_5;
         String neo4jVersion = System.getenv("NEO4J_VERSION");
         if (neo4jVersion == null || neo4jVersion.startsWith("5")) {
             dialect = Dialect.NEO4J_5;
@@ -53,4 +52,3 @@ public class DatabaseConfig {
                 .withDialect(dialect).build();
     }
 }
-
