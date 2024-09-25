@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.boatStop;
+package gr.iccs.smart.mobility.pointsOfInterest;
 
 import gr.iccs.smart.mobility.location.LocationDTO;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.boatStop;
+package gr.iccs.smart.mobility.pointsOfInterest;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.repository.Neo4jRepository;

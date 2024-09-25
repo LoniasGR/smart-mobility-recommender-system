@@ -1,8 +1,8 @@
-package gr.iccs.smart.mobility.boatStop;
+package gr.iccs.smart.mobility.pointsOfInterest;
 
+import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import org.neo4j.driver.types.Point;
-import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -11,15 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Node
-public class BoatStop {
-    @Id
-    private final UUID id;
-
-    private Point location;
+public final class BoatStop extends PointOfInterest implements ReachableNode {
 
     public BoatStop(UUID id, Point location) {
-        this.id = id;
-        this.location = location;
+        super(id, location);
     }
 
     @Relationship(type = "PARKED_IN", direction = Relationship.Direction.INCOMING)
@@ -30,18 +25,6 @@ public class BoatStop {
      * GETTERS & SETTERS
      **************************************************************************
      */
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Point getLocation() {
-        return location;
-    }
-
-    public void setLocation(Point location) {
-        this.location = location;
-    }
 
     public List<Vehicle> getParkedVehicles() {
         return parkedVehicles;

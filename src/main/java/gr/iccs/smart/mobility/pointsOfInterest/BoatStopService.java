@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.boatStop;
+package gr.iccs.smart.mobility.pointsOfInterest;
 
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
