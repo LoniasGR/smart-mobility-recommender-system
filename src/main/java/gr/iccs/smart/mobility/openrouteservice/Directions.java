@@ -1,7 +1,10 @@
 package gr.iccs.smart.mobility.openrouteservice;
 
-import gr.iccs.smart.mobility.PropertiesConfig;
-import gr.iccs.smart.mobility.geojson.FeatureCollection;
+import java.net.URI;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
@@ -12,11 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
+import gr.iccs.smart.mobility.config.OrsPropertiesConfig;
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
 
 @Component
 public class Directions extends Base {
@@ -29,7 +29,7 @@ public class Directions extends Base {
     private static final Logger log = LoggerFactory.getLogger(Directions.class);
 
     public Directions(
-            PropertiesConfig config) {
+            OrsPropertiesConfig config) {
         super(config);
         baseURL += "/directions";
     }
@@ -42,11 +42,12 @@ public class Directions extends Base {
             return 0L;
         }
         var duration = Duration.between(rate.getFirst(), LocalDateTime.now()).toMillis();
-        if (duration > 60000L) {
+        log.info("Duration is: {}", duration);
+        if (duration > 50000L) {
             return 0L;
         }
         // We use a little bit more delay just to be sure
-        return 62000L - duration;
+        return 66000L - duration;
     }
 
     private void updateRateLimit() {
@@ -55,23 +56,31 @@ public class Directions extends Base {
         }
 
         if (rate.size() == rateLimit) {
-            rate.removeLast();
+            rate.removeFirst();
         }
         rate.addLast(LocalDateTime.now());
+    }
+
+    private void waitToRuntimeException(Long waitMillis) {
+        try {
+            Thread.sleep(waitMillis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public FeatureCollection getDirectionsService(String profile, Point start, Point end) {
         if (!verifyProfile(profile)) {
             throw new IllegalArgumentException("The profile needs to be one of " + validProfiles.toString());
         }
+        if (rate.size() > 2) {
+            log.info("First element time is: {}, Last element time is: {}, size is: {}", rate.getFirst(),
+                    rate.getLast(), rate.size());
+        }
         var waitMillis = timeToWaitForRateLimit();
         if (waitMillis > 0L) {
             log.info("Waiting for rate limit for " + waitMillis + "ms");
-            try {
-                Thread.sleep(waitMillis);
-            } catch (Exception e) {
-                log.error("Failed to sleep for rate limiting", e);
-            }
+            waitToRuntimeException(waitMillis);
         }
         URI uri = UriComponentsBuilder
                 .fromUriString(baseURL + "/" + profile)
@@ -87,6 +96,7 @@ public class Directions extends Base {
 
         updateRateLimit();
         return entity.getBody();
+
     }
 
     public boolean verifyProfile(String profile) {

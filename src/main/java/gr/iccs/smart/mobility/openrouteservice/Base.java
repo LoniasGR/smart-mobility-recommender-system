@@ -1,8 +1,9 @@
 package gr.iccs.smart.mobility.openrouteservice;
 
-import gr.iccs.smart.mobility.PropertiesConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import gr.iccs.smart.mobility.config.OrsPropertiesConfig;
 
 @Component
 public class Base {
@@ -11,7 +12,7 @@ public class Base {
     protected static String APIKey;
     protected String baseURL;
 
-    public Base(PropertiesConfig config) {
+    public Base(OrsPropertiesConfig config) {
         APIKey = config.getAPIKey();
         baseURL = config.getHost() + "/" + config.getAPIVersion();
         rateLimit = config.getRateLimit();
