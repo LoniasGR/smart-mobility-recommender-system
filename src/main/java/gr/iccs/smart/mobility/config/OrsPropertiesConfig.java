@@ -1,11 +1,11 @@
-package gr.iccs.smart.mobility;
+package gr.iccs.smart.mobility.config;
 
-import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties("openrouteservice")
-public class PropertiesConfig {
+public class OrsPropertiesConfig {
     private String apiKey;
     private String host;
     private String apiVersion;

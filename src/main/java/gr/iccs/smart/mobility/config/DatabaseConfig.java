@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility;
+package gr.iccs.smart.mobility.config;
 
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.springframework.beans.factory.annotation.Value;
