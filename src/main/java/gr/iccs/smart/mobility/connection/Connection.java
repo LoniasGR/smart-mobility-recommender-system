@@ -53,4 +53,12 @@ public class Connection {
     public void setDistance(Float distance) {
         this.distance = distance;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

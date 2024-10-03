@@ -1,15 +1,23 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.geojson.FeatureCollection;
-import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -22,7 +30,7 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
-    @GetMapping(value = {"", "/"})
+    @GetMapping(value = { "", "/" })
     public List<VehicleDTO> getAll() {
         log.debug("Vehicle API: Get All");
         return vehicleService.getAll()
@@ -37,7 +45,7 @@ public class VehicleController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
+    @PostMapping("/create")
     public void create(@Valid @RequestBody Vehicle vehicle) {
         log.debug("Vehicle API: Create " + vehicle);
         vehicleService.create(vehicle);
@@ -49,10 +57,8 @@ public class VehicleController {
         return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
     }
 
-
     @GetMapping(value = "/geojson")
     public FeatureCollection generateGeoJSON() {
         return vehicleService.createGeoJSON();
     }
 }
-

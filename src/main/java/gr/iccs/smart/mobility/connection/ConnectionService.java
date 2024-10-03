@@ -11,9 +11,11 @@ public class ConnectionService {
     private static final Logger log = LoggerFactory.getLogger(ConnectionService.class);
 
     private final Directions directions;
+    private final ConnectionRepository connectionRepository;
 
-    public ConnectionService(Directions directions) {
+    public ConnectionService(Directions directions, ConnectionRepository connectionRepository) {
         this.directions = directions;
+        this.connectionRepository = connectionRepository;
     }
 
     public Connection createConnection(ReachableNode destinationNode,
@@ -29,5 +31,9 @@ public class ConnectionService {
         var summary = directions.getDirectionsSummary(startingNode.getOrsProfile(), startingNode.getLocation(),
                 destinationNode.getLocation());
         return createConnection(destinationNode, summary.getDistance(), summary.getDuration());
+    }
+
+    public void deleteAllConnections() {
+        connectionRepository.deleteAllConnections();
     }
 }

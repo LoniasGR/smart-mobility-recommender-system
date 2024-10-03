@@ -1,8 +1,8 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.location.LocationDTO;
-
 import java.util.UUID;
+
+import gr.iccs.smart.mobility.location.LocationDTO;
 
 public record VehicleDTO(UUID id, VehicleType type, Float battery, LocationDTO location, VehicleStatus status) {
     public static VehicleDTO fromVehicle(Vehicle vehicle) {
@@ -11,8 +11,6 @@ public record VehicleDTO(UUID id, VehicleType type, Float battery, LocationDTO l
                 vehicle.getType(),
                 vehicle.getBattery(),
                 LocationDTO.fromGeographicPoint(vehicle.getLocation()),
-                vehicle.getStatus()
-        );
+                vehicle.getStatus());
     }
-
 }

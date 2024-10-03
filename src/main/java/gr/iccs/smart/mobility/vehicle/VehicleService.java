@@ -1,23 +1,25 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import org.neo4j.driver.Values;
+import org.neo4j.driver.types.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.neo4j.core.Neo4jTemplate;
+import org.springframework.stereotype.Service;
+
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
-import org.neo4j.driver.Values;
-import org.neo4j.driver.types.Point;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.geo.Distance;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
 
 @Service
 public class VehicleService {
@@ -26,12 +28,14 @@ public class VehicleService {
     private final VehicleRepository vehicleRepository;
     private final BoatStopService boatStopService;
     private final ConnectionService connectionService;
+    private final Neo4jTemplate neo4jTemplate;
 
     public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService,
-            ConnectionService connectionService) {
+            ConnectionService connectionService, Neo4jTemplate neo4jTemplate) {
         this.vehicleRepository = vehicleRepository;
         this.boatStopService = boatStopService;
         this.connectionService = connectionService;
+        this.neo4jTemplate = neo4jTemplate;
     }
 
     public List<Vehicle> getAll() {
@@ -78,20 +82,10 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public void createConnectionTo(UUID id, ReachableNode destination) {
-        var maybeVehicle = vehicleRepository.findById(id);
-        if (maybeVehicle.isEmpty()) {
-            throw new VehicleNotFoundException();
-        }
-
-        if (!maybeVehicle.get().isLandVehicle()) {
-            throw new BadVehicleRequest("The requested vehicle is a boat");
-        }
-        LandVehicle vehicle = (LandVehicle) maybeVehicle.get();
-
+    public void createConnectionTo(LandVehicle vehicle, ReachableNode destination) {
         var connection = connectionService.generateConnection(vehicle, destination);
-        vehicle.addConnection(connection);
-        vehicleRepository.save(vehicle);
+        vehicle.getConnections().add(connection);
+        neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
     }
 
     private void validateLocation(Point newLocation, List<BoatStop> boatStops, VehicleType vehicleType) {
@@ -137,12 +131,20 @@ public class VehicleService {
         return geoJSON;
     }
 
-    public List<LandVehicle> getAllLandVehicles() {
-        return vehicleRepository.getAllLandVehicles();
+    public <T> List<T> getAllLandVehicles(Class<T> type) {
+        return vehicleRepository.getAllLandVehicles(type);
     }
 
-    public List<LandVehicle> findLandVehicleNearLocation(Point point, Integer max) {
-        return vehicleRepository.findLandVesselsByLocationNear(point, max);
+    public List<LandVehicle> getAllLandVehiclesWithOneLevelConnection() {
+        return vehicleRepository.findAllWithOneLevelConnection();
+    }
+
+    public List<LandVehicle> findLandVehicleWithOneLevelConnectionNearLocation(Point point, Long max) {
+        return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationNear(point, max);
+    }
+
+    public <T> List<T> findLandVehicleNearLocation(Class<T> type, Point point, Long max) {
+        return vehicleRepository.findLandVesselsByLocationNear(point, max, type);
     }
 
     public List<LandVehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
@@ -167,15 +169,15 @@ public class VehicleService {
     }
 
     public void createScenarioVehicles() {
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 5; i++) {
             var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.CAR, null);
             create(vehicle);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 5; i++) {
             var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.SCOOTER, null);
             create(vehicle);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             var vehicle = new Boat(UUID.randomUUID(), VehicleType.SEA_VESSEL, 10);
             create(vehicle);
         }

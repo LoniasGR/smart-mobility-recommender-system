@@ -1,16 +1,16 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import gr.iccs.smart.mobility.connection.Connection;
-import gr.iccs.smart.mobility.connection.ReachableNode;
-import gr.iccs.smart.mobility.connection.StartingNode;
-
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Relationship;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
+
+import gr.iccs.smart.mobility.connection.Connection;
+import gr.iccs.smart.mobility.connection.ReachableNode;
+import gr.iccs.smart.mobility.connection.StartingNode;
 
 @Node
 public final class LandVehicle extends Vehicle implements ReachableNode, StartingNode {
@@ -24,6 +24,10 @@ public final class LandVehicle extends Vehicle implements ReachableNode, Startin
 
     public void addConnection(Connection connection) {
         this.connections.add(connection);
+    }
+
+    public List<Connection> getConnections() {
+        return this.connections;
     }
 
     public String getOrsProfile() {

@@ -1,25 +1,32 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
 
         List<Vehicle> findByLocationNear(Point point, Distance max);
 
         @Query("MATCH (v: LandVehicle) RETURN v")
-        List<LandVehicle> getAllLandVehicles();
+        <T> List<T> getAllLandVehicles(Class<T> type);
 
-        @Query("MATCH (v: Vehicle) WHERE v.type <> 'SEA_VESSEL' RETURN v " +
+        @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
+        List<LandVehicle> findAllWithOneLevelConnection();
+
+        @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)" +
+                        "ORDER BY point.distance(n.location, $point) ASC LIMIT $limit;")
+        List<LandVehicle> findLandVechicleWithOneLevelConnectionByLocationNear(Point point, Long limit);
+
+        @Query("MATCH (v: LandVehicle) RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
-        List<LandVehicle> findLandVesselsByLocationNear(Point point, Integer limit);
+        <T> List<T> findLandVesselsByLocationNear(Point point, Long limit, Class<T> type);
 
-        @Query("MATCH (v: Vehicle) WHERE v.type <> 'SEA_VESSEL' " +
+        @Query("MATCH (v: LandVehicle)" +
                         "AND point.distance(v.location, $point) < $range RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
         List<LandVehicle> findLandVesselsByLocationAround(Point point, Double range, Integer limit);
