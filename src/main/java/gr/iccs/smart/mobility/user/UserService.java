@@ -1,5 +1,11 @@
 package gr.iccs.smart.mobility.user;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
@@ -8,22 +14,17 @@ import gr.iccs.smart.mobility.vehicle.VehicleInfoDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import net.datafaker.Faker;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-    private final VehicleService vehicleService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private VehicleService vehicleService;
 
     private final Faker faker = new Faker();
-
-    public UserService(UserRepository userRepository, VehicleService vehicleService) {
-        this.userRepository = userRepository;
-        this.vehicleService = vehicleService;
-    }
 
     public List<User> getAll() {
         return userRepository.findAll();
@@ -50,7 +51,6 @@ public class UserService {
 
         var person = getById(username);
         var ride = person.getCurrentRide();
-
 
         // The user does not have an active ride, so this call should be creating one
         if (ride.isEmpty()) {
