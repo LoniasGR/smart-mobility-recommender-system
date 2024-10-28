@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException.TooManyRequests;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -90,10 +91,16 @@ public class Directions extends Base {
                 .build()
                 .toUri();
 
-        ResponseEntity<FeatureCollection> entity = client.get().uri(uri)
-                .retrieve()
-                .toEntity(FeatureCollection.class);
-
+        ResponseEntity<FeatureCollection> entity;
+        try {
+            entity = client.get().uri(uri)
+                    .retrieve()
+                    .toEntity(FeatureCollection.class);
+        } catch (TooManyRequests e) {
+            log.error("Too many requests reached... Waiting for 30s");
+            waitToRuntimeException(30000L);
+            return getDirectionsService(profile, start, end);
+        }
         updateRateLimit();
         return entity.getBody();
 
@@ -109,8 +116,8 @@ public class Directions extends Base {
         ObjectMapper mapper = new ObjectMapper();
         var summaryObj = mapper.convertValue(summary, Summary.class);
         if (summaryObj.getDistance() == null || summaryObj.getDuration() == null) {
-            summaryObj.setDistance(0F);
-            summaryObj.setDuration(0F);
+            summaryObj.setDistance(0D);
+            summaryObj.setDuration(0D);
         }
         return summaryObj;
     }
