@@ -9,6 +9,7 @@ import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +21,15 @@ import java.util.List;
 @RequestMapping("/api/scenario")
 public class ScenarioController {
     private static final Logger log = LoggerFactory.getLogger(ScenarioController.class);
-    private final VehicleService vehicleService;
-    private final BoatStopService boatStopService;
-    private final UserService userService;
 
-    public ScenarioController(VehicleService vehicleService, BoatStopService boatStopService, UserService userService) {
-        this.vehicleService = vehicleService;
-        this.boatStopService = boatStopService;
-        this.userService = userService;
-    }
+    @Autowired
+    private VehicleService vehicleService;
+
+    @Autowired
+    private BoatStopService boatStopService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<String> createScenario() {
@@ -51,15 +52,17 @@ public class ScenarioController {
     }
 
     @PostMapping("ride/{username}")
-    public void executeMovementScenario(@PathVariable String username, @RequestBody List<RecommendationDTO> vehicleScenarios) {
-        if(userService.rideStatus(username).isPresent()) {
+    public void executeMovementScenario(@PathVariable String username,
+            @RequestBody List<RecommendationDTO> vehicleScenarios) {
+        if (userService.rideStatus(username).isPresent()) {
             throw new ScenarioException("The user is already on a ride");
         }
         var time = LocalDateTime.now();
-        for(RecommendationDTO s: vehicleScenarios) {
+        for (RecommendationDTO s : vehicleScenarios) {
             time = time.plusMinutes(3);
             var vehicle = vehicleService.getById(s.vehicle().id());
-            UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE, LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
+            UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE,
+                    LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
             userService.manageRide(username, usageStart);
             time = time.plusMinutes(25);
             UseDTO usageEnd = new UseDTO(vehicle, UseStatus.COMPLETED, s.destination(), time);

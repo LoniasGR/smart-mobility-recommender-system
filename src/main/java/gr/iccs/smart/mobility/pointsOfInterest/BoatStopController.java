@@ -3,6 +3,7 @@ package gr.iccs.smart.mobility.pointsOfInterest;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,12 +13,9 @@ import java.util.UUID;
 @RequestMapping("api/boat-stop")
 public class BoatStopController {
     private static final Logger log = LoggerFactory.getLogger(BoatStopController.class);
-    
-    private final BoatStopService boatStopService;
 
-    public BoatStopController(BoatStopService boatStopService) {
-        this.boatStopService = boatStopService;
-    }
+    @Autowired
+    private BoatStopService boatStopService;
 
     @GetMapping
     public List<BoatStop> getAll() {
@@ -35,7 +33,7 @@ public class BoatStopController {
     public BoatStop getByLocationExact(@RequestBody LocationDTO location) {
         log.debug("BoatStop API: getByLocationExact");
         var boatStop = boatStopService.getByExactLocation(location.toPoint());
-        if(boatStop.isEmpty()) {
+        if (boatStop.isEmpty()) {
             throw new InvalidBoatStopException("The boat stop does not exist.");
         }
         return boatStop.get();
@@ -45,7 +43,7 @@ public class BoatStopController {
     public BoatStop getById(@PathVariable String id) {
         log.debug("BoatStop API:Get by id {}", id);
         var boatStop = boatStopService.getByID(UUID.fromString(id));
-        if(boatStop.isEmpty()) {
+        if (boatStop.isEmpty()) {
             throw new InvalidBoatStopException("The boat stop does not exist.");
         }
         return boatStop.get();

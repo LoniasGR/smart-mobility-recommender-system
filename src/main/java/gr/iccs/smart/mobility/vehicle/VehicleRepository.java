@@ -16,7 +16,13 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
         <T> List<T> getAllLandVehicles(Class<T> type);
 
         @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
-        List<LandVehicle> findAllWithOneLevelConnection();
+        List<LandVehicle> findAllLandVehiclesWithOneLevelConnection();
+
+        @Query("MATCH p=(n:LandVehicle{id: $vehicleId})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
+        LandVehicle findLandVehicleWithOneLevelConnection(UUID vehicleId);
+
+        @Query("MATCH (v:Vehicle) RETURN v")
+        List<VehicleDTO> findAllVehiclesNoConnections();
 
         @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)" +
                         "ORDER BY point.distance(n.location, $point) ASC LIMIT $limit;")
@@ -24,7 +30,7 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
 
         @Query("MATCH (v: LandVehicle) RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
-        <T> List<T> findLandVesselsByLocationNear(Point point, Long limit, Class<T> type);
+        List<LandVehicle> findLandVehicleNoConnectionByLocationNear(Point point, Long limit);
 
         @Query("MATCH (v: LandVehicle)" +
                         "AND point.distance(v.location, $point) < $range RETURN v " +
@@ -43,6 +49,4 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
         @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:BoatStop{id: $uuid}) RETURN v")
         List<Vehicle> findSeaVesselsParkedInBoatStop(UUID uuid);
 
-        @Query("RETURN point.distance($p1, $p2)")
-        Double calculateDistance(Point p1, Point p2);
 }

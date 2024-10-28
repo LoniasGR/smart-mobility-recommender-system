@@ -2,10 +2,10 @@ package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,18 +24,13 @@ import jakarta.validation.Valid;
 public class VehicleController {
     private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
 
-    private final VehicleService vehicleService;
-
-    public VehicleController(VehicleService vehicleService) {
-        this.vehicleService = vehicleService;
-    }
+    @Autowired
+    private VehicleService vehicleService;
 
     @GetMapping(value = { "", "/" })
     public List<VehicleDTO> getAll() {
         log.debug("Vehicle API: Get All");
-        return vehicleService.getAll()
-                .stream().map(VehicleDTO::fromVehicle)
-                .collect(Collectors.toList());
+        return vehicleService.getAll();
     }
 
     @GetMapping(value = "/{id}")

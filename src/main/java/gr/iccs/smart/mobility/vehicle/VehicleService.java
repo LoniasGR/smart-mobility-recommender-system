@@ -8,6 +8,7 @@ import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
@@ -25,21 +26,21 @@ import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
 public class VehicleService {
     private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
     private static final Random RANDOM = new Random();
-    private final VehicleRepository vehicleRepository;
-    private final BoatStopService boatStopService;
-    private final ConnectionService connectionService;
-    private final Neo4jTemplate neo4jTemplate;
 
-    public VehicleService(VehicleRepository vehicleRepository, BoatStopService boatStopService,
-            ConnectionService connectionService, Neo4jTemplate neo4jTemplate) {
-        this.vehicleRepository = vehicleRepository;
-        this.boatStopService = boatStopService;
-        this.connectionService = connectionService;
-        this.neo4jTemplate = neo4jTemplate;
-    }
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
-    public List<Vehicle> getAll() {
-        return vehicleRepository.findAll();
+    @Autowired
+    private BoatStopService boatStopService;
+
+    @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
+    private Neo4jTemplate neo4jTemplate;
+
+    public List<VehicleDTO> getAll() {
+        return vehicleRepository.findAllVehiclesNoConnections();
     }
 
     public Vehicle create(Vehicle vehicle) {
@@ -82,10 +83,11 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public void createConnectionTo(LandVehicle vehicle, ReachableNode destination) {
+    public LandVehicle createConnectionTo(LandVehicle vehicle, ReachableNode destination) {
         var connection = connectionService.generateConnection(vehicle, destination);
-        vehicle.getConnections().add(connection);
+        vehicle.addConnection(connection);
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
+        return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
     }
 
     private void validateLocation(Point newLocation, List<BoatStop> boatStops, VehicleType vehicleType) {
@@ -125,7 +127,7 @@ public class VehicleService {
         var vehicles = getAll();
         FeatureCollection geoJSON = new FeatureCollection();
 
-        for (Vehicle v : vehicles) {
+        for (var v : vehicles) {
             geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
         }
         return geoJSON;
@@ -136,15 +138,15 @@ public class VehicleService {
     }
 
     public List<LandVehicle> getAllLandVehiclesWithOneLevelConnection() {
-        return vehicleRepository.findAllWithOneLevelConnection();
+        return vehicleRepository.findAllLandVehiclesWithOneLevelConnection();
     }
 
     public List<LandVehicle> findLandVehicleWithOneLevelConnectionNearLocation(Point point, Long max) {
         return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationNear(point, max);
     }
 
-    public <T> List<T> findLandVehicleNearLocation(Class<T> type, Point point, Long max) {
-        return vehicleRepository.findLandVesselsByLocationNear(point, max, type);
+    public List<LandVehicle> findLandVehicleNoConnectionByNearLocation(Point point, Long max) {
+        return vehicleRepository.findLandVehicleNoConnectionByLocationNear(point, max);
     }
 
     public List<LandVehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
@@ -185,27 +187,19 @@ public class VehicleService {
 
     public void createScenarioLocations() {
         var vehicles = getAll();
-        for (Vehicle v : vehicles) {
+        for (var v : vehicles) {
             LocationDTO newLocation;
-            if (v.getType() == VehicleType.SEA_VESSEL) {
+            if (v.type() == VehicleType.SEA_VESSEL) {
                 newLocation = IstanbulLocations.randomCoastLocation();
             } else {
                 newLocation = IstanbulLocations.randomLandLocation();
             }
             VehicleInfoDTO vehicleInfo = new VehicleInfoDTO(
-                    RANDOM.nextFloat(100),
+                    RANDOM.nextDouble(100),
                     newLocation.latitude(),
                     newLocation.longitude(),
                     VehicleStatus.IDLE);
-            updateVehicleStatus(v.getId(), vehicleInfo);
+            updateVehicleStatus(v.id(), vehicleInfo);
         }
-    }
-
-    public Double distance(Point p1, Point p2) {
-        return vehicleRepository.calculateDistance(p1, p2);
-    }
-
-    public Double distance(LocationDTO loc1, LocationDTO loc2) {
-        return vehicleRepository.calculateDistance(loc1.toPoint(), loc2.toPoint());
     }
 }
