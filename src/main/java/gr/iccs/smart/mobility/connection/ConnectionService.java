@@ -19,11 +19,8 @@ public class ConnectionService {
     }
 
     public Connection createConnection(ReachableNode destinationNode,
-            Float distance, Float time) {
-        var connection = new Connection();
-        connection.setTime(time);
-        connection.setDistance(distance);
-        connection.setTarget(destinationNode);
+            Double distance, Double time) {
+        var connection = new Connection(destinationNode, distance, time, null);
         return connection;
     }
 

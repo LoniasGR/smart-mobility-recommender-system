@@ -9,12 +9,19 @@ public class Connection {
     @RelationshipId
     private String id;
 
-    private Float distance;
-    private Float time;
-    private Float cost;
+    private final Double distance;
+    private final Double time;
+    private final Double cost;
 
     @TargetNode
-    private ReachableNode target;
+    private final ReachableNode target;
+
+    public Connection(ReachableNode target, Double distance, Double time, Double cost) {
+        this.cost = cost;
+        this.distance = distance;
+        this.time = time;
+        this.target = target;
+    }
 
     /*
      ******************************************************************
@@ -22,36 +29,20 @@ public class Connection {
      ******************************************************************
      */
 
-    public Float getTime() {
+    public Double getTime() {
         return time;
     }
 
-    public void setTime(Float time) {
-        this.time = time;
-    }
-
-    public Float getCost() {
+    public Double getCost() {
         return cost;
-    }
-
-    public void setCost(Float cost) {
-        this.cost = cost;
     }
 
     public ReachableNode getTarget() {
         return target;
     }
 
-    public void setTarget(ReachableNode target) {
-        this.target = target;
-    }
-
-    public Float getDistance() {
+    public Double getDistance() {
         return distance;
-    }
-
-    public void setDistance(Float distance) {
-        this.distance = distance;
     }
 
     public String getId() {

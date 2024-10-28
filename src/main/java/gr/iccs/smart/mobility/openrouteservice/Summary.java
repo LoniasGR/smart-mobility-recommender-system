@@ -1,22 +1,22 @@
 package gr.iccs.smart.mobility.openrouteservice;
 
 public class Summary {
-    private Float distance;
-    private Float duration;
+    private Double distance;
+    private Double duration;
 
-    public Float getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public void setDistance(Float distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 
-    public Float getDuration() {
+    public Double getDuration() {
         return duration;
     }
 
-    public void setDuration(Float duration) {
+    public void setDuration(Double duration) {
         this.duration = duration;
     }
 }

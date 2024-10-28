@@ -23,7 +23,7 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
      * https://neo4j.com/docs/cypher-manual/current/functions/spatial/
      */
     private Point location;
-    private Float battery;
+    private Double battery;
 
     private VehicleStatus status;
 
@@ -53,11 +53,11 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
         this.status = status;
     }
 
-    public Float getBattery() {
+    public Double getBattery() {
         return battery;
     }
 
-    public void setBattery(Float battery) {
+    public void setBattery(Double battery) {
         this.battery = battery;
     }
 

@@ -1,9 +1,11 @@
 package gr.iccs.smart.mobility.connection;
 
-import gr.iccs.smart.mobility.vehicle.LandVehicleDTO;
-
-public interface ConnectionDTO {
-    String getId();
-
-    LandVehicleDTO getTarget();
+public record ConnectionDTO(String id, Double distance, Double time, ReachableNode target) {
+    public static ConnectionDTO fromConnection(Connection connection) {
+        return new ConnectionDTO(
+                connection.getId(),
+                connection.getDistance(),
+                connection.getTime(),
+                connection.getTarget());
+    }
 }

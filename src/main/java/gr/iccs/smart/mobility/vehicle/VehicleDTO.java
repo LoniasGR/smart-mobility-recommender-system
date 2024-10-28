@@ -2,15 +2,16 @@ package gr.iccs.smart.mobility.vehicle;
 
 import java.util.UUID;
 
-import gr.iccs.smart.mobility.location.LocationDTO;
+import org.neo4j.driver.types.Point;
+import org.springframework.data.annotation.Id;
 
-public record VehicleDTO(UUID id, VehicleType type, Float battery, LocationDTO location, VehicleStatus status) {
+public record VehicleDTO(@Id UUID id, VehicleType type, Double battery, Point location, VehicleStatus status) {
     public static VehicleDTO fromVehicle(Vehicle vehicle) {
         return new VehicleDTO(
                 vehicle.getId(),
                 vehicle.getType(),
                 vehicle.getBattery(),
-                LocationDTO.fromGeographicPoint(vehicle.getLocation()),
+                vehicle.getLocation(),
                 vehicle.getStatus());
     }
 }
