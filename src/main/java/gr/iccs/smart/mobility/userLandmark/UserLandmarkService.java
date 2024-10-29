@@ -11,4 +11,8 @@ public class UserLandmarkService {
     public void save(UserLandmark landmark) {
         userLandmarkRepository.save(landmark);
     }
+
+    public void delete(UserLandmark landmark) {
+        userLandmarkRepository.delete(landmark);
+    }
 }

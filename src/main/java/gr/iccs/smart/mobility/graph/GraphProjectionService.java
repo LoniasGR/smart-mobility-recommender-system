@@ -1,5 +1,7 @@
 package gr.iccs.smart.mobility.graph;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.core.Neo4jClient;
@@ -30,11 +32,11 @@ public class GraphProjectionService {
         client.query(query).run();
     }
 
-    public void shortestPaths(String projName, String username) {
+    public Map<String, Object> shortestPaths(String projName, String username) {
         String query = """
-                MATCH (start:UserStartLandmark)<-[IS_TRAVELLING]-(u:User{id: '$username'})
-                MATCH (finish:UserDestinationLandmark)<-[IS_TRAVELLING]-(u:User{id: '$username'})
-                CALL gds.shortestPath.dijkstra.stream($name, {
+                MATCH (start:UserStartLandmark)<-[r1:IS_TRAVELLING]-(u:User{id: '$username'})
+                MATCH (finish:UserDestinationLandmark)<-[r2:IS_TRAVELLING]-(u:User{id: '$username'})
+                CALL gds.shortestPath.dijkstra.stream('$name', {
                         sourceNode:start,
                         TargetNode:finish,
                         relationshipWeightProperty: 'distance'
@@ -47,8 +49,12 @@ public class GraphProjectionService {
                     costs as costs;
                 """.replace("$name", projName)
                 .replace("$username", username);
-        var res = client.query(query).run();
-        log.info("Result is: {}", res);
+        var res = client.query(query).fetch().first();
+        if (res.isPresent()) {
+            log.info("Result is: {}", res);
+            return res.get();
+        }
+        return null;
     }
 
     public void destroyGraph(String projName) {

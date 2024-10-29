@@ -1,5 +1,6 @@
 package gr.iccs.smart.mobility.geojson;
 
+import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import org.neo4j.driver.types.Point;
@@ -20,7 +21,7 @@ public class GeoJSONUtils {
         f.getProperties().put("id", v.id().toString());
         switch (v.type()) {
             case SEA_VESSEL:
-                f.getProperties().put("marker-symbol", "racetrack-boat");
+                f.getProperties().put("marker-symbol", "ferry");
                 f.getProperties().put("marker-color", "#5fd60f");
                 break;
             case CAR:
@@ -35,12 +36,24 @@ public class GeoJSONUtils {
         return f;
     }
 
+    public static Feature createBoatStopFeature(Point point) {
+        return GeoJSONUtils.createPointFeature(point, "harbor", "#121daf");
+    }
+
     public static Feature createPointFeature(Point point) {
         return createPointFeature(point, null, null);
     }
 
     public static Feature createPointFeature(Point point, String symbol) {
         return createPointFeature(point, symbol, null);
+    }
+
+    public static Feature createStartingPointFeature(Point p) {
+        return GeoJSONUtils.createPointFeature(p, "arrow", "#07694c");
+    }
+
+    public static Feature createDestinationPointFeature(Point p) {
+        return GeoJSONUtils.createPointFeature(p, "circle-stroked", "#bd0000");
     }
 
     public static Feature createPointFeature(Point p, String symbol, String color) {
@@ -53,6 +66,15 @@ public class GeoJSONUtils {
         if (color != null) {
             f.getProperties().put("marker-color", color);
         }
+        return f;
+    }
+
+    public static Feature createLine(Point a, Point b) {
+        Feature f = new Feature();
+        LineString line = new LineString();
+        line.add(new LngLatAlt(a.y(), a.x()));
+        line.add(new LngLatAlt(b.y(), b.x()));
+        f.setGeometry(line);
         return f;
     }
 }

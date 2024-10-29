@@ -12,7 +12,7 @@ import gr.iccs.smart.mobility.user.User;
 public class UserLandmark {
     @Id
     @GeneratedValue
-    private String id;
+    private Long id;
 
     private UserLandmarkType type;
     private Point location;
@@ -26,11 +26,11 @@ public class UserLandmark {
         this.user = user;
     }
 
-    public String getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

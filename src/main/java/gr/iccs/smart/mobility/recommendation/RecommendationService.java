@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.neo4j.driver.internal.InternalNode;
 import org.neo4j.driver.types.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.database.DatabaseService;
+import gr.iccs.smart.mobility.geojson.Feature;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
@@ -35,6 +41,7 @@ import gr.iccs.smart.mobility.vehicle.VehicleType;
 // TODO: Maybe create a controller for this class?
 @Service
 public class RecommendationService {
+    private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
     @Autowired
     private BoatStopService boatStopService;
@@ -66,8 +73,8 @@ public class RecommendationService {
         var vehicles = recommend(startingPoint, finishingPoint);
         FeatureCollection geoJSON = new FeatureCollection();
 
-        var startingPointFeature = GeoJSONUtils.createPointFeature(startingPoint, "arrow", "#07694c");
-        var endingPointFeature = GeoJSONUtils.createPointFeature(finishingPoint, "circle-stroked", "#bd0000");
+        var startingPointFeature = GeoJSONUtils.createStartingPointFeature(startingPoint);
+        var endingPointFeature = GeoJSONUtils.createDestinationPointFeature(finishingPoint);
 
         geoJSON.getFeatures().add(startingPointFeature);
         geoJSON.getFeatures().add(endingPointFeature);
@@ -224,7 +231,7 @@ public class RecommendationService {
         }
     }
 
-    public void recommendationV2(Point start, Point finish, User user) {
+    public FeatureCollection recommendationV2(Point start, Point finish, User user) {
         var startLandmark = new UserStartLandmark(start, null, user);
         var destLandmark = new UserDestinationLandmark(finish, user);
         userLandmarkService.save(destLandmark);
@@ -234,8 +241,40 @@ public class RecommendationService {
         createEndLandmarkConnections(destLandmark);
 
         final String projection = "smart-mobility";
-        graphProjectionService.generateGraph(projection);
-        graphProjectionService.shortestPaths(projection, user.getUsername());
-        graphProjectionService.destroyGraph(projection);
+        Map<String, Object> data = null;
+        try {
+            graphProjectionService.generateGraph(projection);
+            data = graphProjectionService.shortestPaths(projection, user.getUsername());
+        } finally {
+            graphProjectionService.destroyGraph(projection);
+            userLandmarkService.delete(destLandmark);
+            userLandmarkService.delete(startLandmark);
+        }
+
+        if (data.isEmpty() || Objects.isNull(data)) {
+            // There should be an error here.
+            return null;
+        }
+        if (data.get("path") instanceof List<?> list) {
+            FeatureCollection fc = new FeatureCollection();
+            Point lineStart = null;
+            Point lineEnd;
+            for (var i : list) {
+                if (i instanceof InternalNode node) {
+                    Feature f = RecommendationUtils.visualiseNode(node);
+                    if (fc.getFeatures().size() > 0) {
+                        lineEnd = RecommendationUtils.getNodeLocation(node);
+                        var line = GeoJSONUtils.createLine(lineStart, lineEnd);
+                        fc.getFeatures().add(line);
+                        lineStart = RecommendationUtils.getNodeLocation(node);
+                    } else {
+                        lineStart = RecommendationUtils.getNodeLocation(node);
+                    }
+                    fc.getFeatures().add(f);
+                }
+            }
+            return fc;
+        }
+        return null;
     }
 }
