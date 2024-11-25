@@ -49,7 +49,7 @@ public class BoatStopService {
         return boatStopRepository.findByLocationNear(location);
     }
 
-    public List<BoatStop> getByLocationNear(Point location, Long distance) {
+    public List<BoatStop> getByLocationNear(Point location, Double distance) {
         var range = new Distance(distance, Metrics.KILOMETERS);
         return boatStopRepository.findByLocationNear(location, range);
     }

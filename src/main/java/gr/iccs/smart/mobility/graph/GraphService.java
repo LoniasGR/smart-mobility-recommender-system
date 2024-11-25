@@ -38,7 +38,7 @@ public class GraphService {
         return startVehicle;
     }
 
-    private LandVehicle createConnectionWithBoatStops(LandVehicle vehicle, Long range) {
+    private LandVehicle createConnectionWithBoatStops(LandVehicle vehicle, Double range) {
         List<BoatStop> boatStops;
         if (range == null) {
             boatStops = boatStopService.getAllWithOneLevelConnection();

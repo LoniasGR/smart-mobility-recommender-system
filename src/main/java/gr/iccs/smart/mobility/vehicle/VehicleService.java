@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
@@ -124,13 +125,18 @@ public class VehicleService {
     }
 
     public FeatureCollection createGeoJSON() {
-        var vehicles = getAll();
         FeatureCollection geoJSON = new FeatureCollection();
-
-        for (var v : vehicles) {
-            geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
-        }
+        geoJSON = addVehiclesToGeoJSON(geoJSON);
         return geoJSON;
+    }
+
+    public FeatureCollection addVehiclesToGeoJSON(FeatureCollection fc) {
+        var vehicles = getAll();
+        for (var v : vehicles) {
+            fc.getFeatures().add(GeoJSONUtils.createVehicleFeature(v));
+        }
+        return fc;
+
     }
 
     public <T> List<T> getAllLandVehicles(Class<T> type) {
@@ -141,12 +147,14 @@ public class VehicleService {
         return vehicleRepository.findAllLandVehiclesWithOneLevelConnection();
     }
 
-    public List<LandVehicle> findLandVehicleWithOneLevelConnectionNearLocation(Point point, Long max) {
-        return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationNear(point, max);
+    public List<LandVehicle> findLandVehicleWithOneLevelConnectionNearLocation(Point point, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationAround(point, range);
     }
 
-    public List<LandVehicle> findLandVehicleNoConnectionByNearLocation(Point point, Long max) {
-        return vehicleRepository.findLandVehicleNoConnectionByLocationNear(point, max);
+    public List<LandVehicle> findLandVehicleNoConnectionByNearLocation(Point point, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return vehicleRepository.findLandVehicleNoConnectionByLocationAround(point, range);
     }
 
     public List<LandVehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {

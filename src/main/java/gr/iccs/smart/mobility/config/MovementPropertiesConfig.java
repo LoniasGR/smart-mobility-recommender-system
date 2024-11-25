@@ -6,22 +6,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("distances")
 public class MovementPropertiesConfig {
-    private Long maxWalkingDistance;
-    private Long maxScooterDistance;
+    private Double maxWalkingDistance;
+    private Double maxScooterDistance;
 
-    public Long getMaxWalkingDistance() {
+    public Double getMaxWalkingDistance() {
         return maxWalkingDistance;
     }
 
-    public void setMaxWalkingDistance(Long maxwalkingdistance) {
+    public void setMaxWalkingDistance(Double maxwalkingdistance) {
         this.maxWalkingDistance = maxwalkingdistance;
     }
 
-    public Long getMaxScooterDistance() {
+    public Double getMaxScooterDistance() {
         return maxScooterDistance;
     }
 
-    public void setMaxScooterDistance(Long maxscooterdistance) {
+    public void setMaxScooterDistance(Double maxscooterdistance) {
         this.maxScooterDistance = maxscooterdistance;
     }
 

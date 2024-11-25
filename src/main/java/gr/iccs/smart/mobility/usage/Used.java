@@ -16,7 +16,6 @@ public class Used {
 
     private UseStatus status;
     private LocalDateTime startingTime;
-
     private Point startingLocation;
 
     private LocalDateTime endingTime;
@@ -46,7 +45,6 @@ public class Used {
     public void setEndingTime(LocalDateTime endingTime) {
         this.endingTime = endingTime;
     }
-
 
     public String getId() {
         return id;
@@ -85,4 +83,3 @@ public class Used {
     }
 
 }
-
