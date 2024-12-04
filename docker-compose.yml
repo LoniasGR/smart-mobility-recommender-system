@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 services:
   neo4j:
     image: neo4j:5
@@ -59,12 +58,10 @@ services:
       # See the ors-config.env file for more options.
       # To have a configuration file-less container, uncomment at least the following properties.
       # The values are examples and provide the default configuration.
-      ors.engine.source_file: /home/ors/files/turkey-latest.osm.pbf
-      #ors.engine.graphs_root_path: /home/ors/graphs
-      #ors.engine.elevation.cache_path: /home/ors/elevation_cache
-      ors.engine.profiles.car.enabled: true
-      # ors.engine.profiles.bike-electric.enabled: true
-      # ors.engine.profiles.walking.enabled: true
+      ors.engine.profile_default.build.source_file: /home/ors/files/turkey-latest.osm.pbf
+      ors.engine.profiles.driving-car.enabled: true
+      ors.engine.profiles.cycling-electric.enabled: true
+      ors.engine.profiles.foot-walking.enabled: true
     # ----------------- ENV file configuration ------------------- #
     # Too many variables for your 'environment:' section?
     # Use an env_file with the ENV properties instead and define everything in there:
