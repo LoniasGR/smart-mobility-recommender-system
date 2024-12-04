@@ -27,7 +27,7 @@ public class Base {
 
         var clientBuilder = RestClient.builder()
                 .defaultHeader("Accept",
-                        "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8")
+                        "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8");
         client = addApiKey(clientBuilder).build();
     }
 }
