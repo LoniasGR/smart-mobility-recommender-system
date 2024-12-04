@@ -17,3 +17,6 @@ application.properties
 
 #### ORS Related ###
 ors-docker/
+
+## Env files ##
+.env

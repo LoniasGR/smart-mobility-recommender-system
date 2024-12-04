@@ -4,7 +4,7 @@ services:
     container_name: neo4j
     environment:
       TZ: Europe/Athens
-      NEO4J_AUTH: "neo4j/develop-colombo-clara-sponsor-erosion-6500"
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD}"
       NEO4J_PLUGINS: '["graph-data-science"]'
     ports:
       - "7474:7474"
@@ -23,15 +23,12 @@ services:
       - server.port=8000
       - spring.neo4j.uri=bolt://neo4j:7687
       - spring.neo4j.authentication.username=neo4j
-      - spring.neo4j.authentication.password=develop-colombo-clara-sponsor-erosion-6500
+      - spring.neo4j.authentication.password=${NEO4J_PASSWORD}
       - spring.data.neo4j.database=neo4j
       - openrouteservice.host=http://openrouteservice:8082/ors
       - openrouteservice.apiversion=v2
   openrouteservice:
     container_name: openrouteservice
-    ports:
-      - "8082:8082"
-      - "9005:9001"
     image: openrouteservice/openrouteservice:latest
     # Advanced option! If you different ids to 0:0 and 1000:1000, you have to rebuild the container with the build args UID,GID.
     # The user command is useful if you want easier bind mount access or better security.
