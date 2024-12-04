@@ -1,10 +1,10 @@
 package gr.iccs.smart.mobility.geojson;
 
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
-import gr.iccs.smart.mobility.vehicle.Vehicle;
-import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
+
+import gr.iccs.smart.mobility.vehicle.Vehicle;
+import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 
 @Service
 public class GeoJSONUtils {
