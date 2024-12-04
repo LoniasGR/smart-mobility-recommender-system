@@ -6,16 +6,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("openrouteservice")
 public class OrsPropertiesConfig {
-    private String apiKey;
+    private String apiKey = "";
     private String host;
     private String apiVersion;
-    private Integer rateLimit;
+    private Integer rateLimit = 0;
 
     public Integer getRateLimit() {
         return this.rateLimit;
     }
 
     public void setRateLimit(Integer ratelimit) {
+        if (ratelimit == null) {
+            this.rateLimit = 0;
+        }
         this.rateLimit = ratelimit;
     }
 
@@ -24,6 +27,10 @@ public class OrsPropertiesConfig {
     }
 
     public void setAPIKey(String apikey) {
+        if (apikey == null || apikey.isBlank() || apikey.isEmpty()) {
+            this.apiKey = "";
+            return;
+        }
         this.apiKey = apikey;
     }
 

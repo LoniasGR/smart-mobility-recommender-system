@@ -1,6 +1,7 @@
 services:
   neo4j:
     image: neo4j:5
+    container_name: neo4j
     environment:
       TZ: Europe/Athens
       NEO4J_AUTH: "neo4j/develop-colombo-clara-sponsor-erosion-6500"
@@ -17,6 +18,14 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - server.port=8000
+      - spring.neo4j.uri=bolt://neo4j:7687
+      - spring.neo4j.authentication.username=neo4j
+      - spring.neo4j.authentication.password=develop-colombo-clara-sponsor-erosion-6500
+      - spring.data.neo4j.database=neo4j
+      - openrouteservice.host=http://openrouteservice:8081/ors
+      - openrouteservice.apiversion=v2
   openrouteservice:
     container_name: openrouteservice
     ports:
@@ -26,21 +35,12 @@ services:
     # Advanced option! If you different ids to 0:0 and 1000:1000, you have to rebuild the container with the build args UID,GID.
     # The user command is useful if you want easier bind mount access or better security.
     #user: "1000:1000" # Run "mkdir -p ors-docker/config ors-docker/elevation_cache ors-docker/files ors-docker/graphs ors-docker/logs && sudo chown -R 1000:1000 ors" before starting the container!
-    volumes: # Mount relative directories. ONLY for local container runtime. To switch to docker managed volumes see 'Docker Volumes configuration' section below.
-      - ./ors-docker:/home/ors # Mount the ORS application directory (for logs, graphs, elevation_cache, etc.) into its own directory
-      #- ./graphs:/home/ors/graphs  # Mount graphs directory individually
-      #- ./elevation_cache:/home/ors/elevation_cache  # Mount elevation cache directory individually
-      #- ./config:/home/ors/config  # Mount configuration directory individually
-      #- ./logs:/home/ors/logs  # Mount logs directory individually
-      #- ./files:/home/ors/files  # Mount files directory individually
+    volumes:
+      - ./ors-docker:/home/ors
     environment:
       TZ: Europe/Athens
       REBUILD_GRAPHS: False # Set to True to rebuild graphs on container start.
       CONTAINER_LOG_LEVEL: INFO # Log level for the container. Possible values: DEBUG, INFO, WARNING, ERROR, CRITICAL
-      # If you don't want the default ors-config.yml you can specify a custom file name, that should match the file in
-      # your 'config' volume mount.
-      ORS_CONFIG_LOCATION: /home/ors/config/ors-config.yml # Location of your ORS configuration file in the docker container
-
       # ------------------ JAVA OPTS ------------------ #
       # Configure the memory settings for JAVA or pass additional opts
       # Fore more available ENV properties see Prepare CATALINA_OPTS and JAVA_OPTS

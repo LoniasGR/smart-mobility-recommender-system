@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("distances")
 public class MovementPropertiesConfig {
-    private Double maxWalkingDistance;
-    private Double maxScooterDistance;
+    private Double maxWalkingDistance = 2.0;
+    private Double maxScooterDistance = 5.0;
 
     public Double getMaxWalkingDistance() {
         return maxWalkingDistance;

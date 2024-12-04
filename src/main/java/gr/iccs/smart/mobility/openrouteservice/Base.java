@@ -12,15 +12,22 @@ public class Base {
     protected static String APIKey;
     protected String baseURL;
 
+    private RestClient.Builder addApiKey(RestClient.Builder client) {
+        if (!APIKey.isEmpty()) {
+            return client.defaultHeader("Authorization", APIKey);
+
+        }
+        return client;
+    }
+
     public Base(OrsPropertiesConfig config) {
         APIKey = config.getAPIKey();
         baseURL = config.getHost() + "/" + config.getAPIVersion();
         rateLimit = config.getRateLimit();
 
-        client = RestClient.builder()
-                .defaultHeader("Authorization", APIKey)
+        var clientBuilder = RestClient.builder()
                 .defaultHeader("Accept",
                         "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8")
-                .build();
+        client = addApiKey(clientBuilder).build();
     }
 }
