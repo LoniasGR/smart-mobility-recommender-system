@@ -16,6 +16,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    container_name: smart-mobility-app
     ports:
       - "8000:8000"
     environment:
