@@ -13,7 +13,9 @@ import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.connection.StartingNode;
 
 @Node
-public final class LandVehicle extends Vehicle implements ReachableNode, StartingNode {
+public sealed class LandVehicle extends Vehicle implements ReachableNode, StartingNode
+        permits Car, Scooter {
+
     public LandVehicle(UUID id, VehicleType type, List<Connection> connections) {
         super(id, type);
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);

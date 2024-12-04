@@ -1,11 +1,13 @@
 package gr.iccs.smart.mobility.recommendation;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.neo4j.driver.internal.InternalNode;
 import org.neo4j.driver.types.Point;
 
 import gr.iccs.smart.mobility.geojson.Feature;
+import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
@@ -54,5 +56,26 @@ public class RecommendationUtils {
 
     protected static Point getNodeLocation(InternalNode node) {
         return node.get("location").asPoint();
+    }
+
+    protected static FeatureCollection createPathFeatureCollection(List<?> points) {
+        FeatureCollection fc = new FeatureCollection();
+        Point lineStart = null;
+        Point lineEnd;
+        for (var i : points) {
+            if (i instanceof InternalNode node) {
+                Feature f = RecommendationUtils.visualiseNode(node);
+                if (fc.getFeatures().size() > 0) {
+                    lineEnd = RecommendationUtils.getNodeLocation(node);
+                    var line = GeoJSONUtils.createLine(lineStart, lineEnd);
+                    fc.getFeatures().add(line);
+                    lineStart = RecommendationUtils.getNodeLocation(node);
+                } else {
+                    lineStart = RecommendationUtils.getNodeLocation(node);
+                }
+                fc.getFeatures().add(f);
+            }
+        }
+        return fc;
     }
 }

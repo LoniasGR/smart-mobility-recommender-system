@@ -19,16 +19,17 @@ public class GraphProjectionService {
         this.client = dbClientProvider.getClient();
     }
 
-    public void generateGraph(String projName) {
+    public void generateGraph(String projName, String nodes) {
         String query = """
                 CALL gds.graph.project(
                         '$name',
-                        ['LandVehicle', 'UserLandmark', 'BoatStop'],
+                        $nodes,
                         ['CONNECTS_TO'],
                         {
                             relationshipProperties: ['distance', 'time']
                         });
-                """.replace("$name", projName);
+                """.replace("$name", projName)
+                .replace("$nodes", nodes);
         client.query(query).run();
     }
 

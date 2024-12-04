@@ -180,11 +180,11 @@ public class VehicleService {
 
     public void createScenarioVehicles() {
         for (int i = 0; i < 5; i++) {
-            var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.CAR, null);
+            var vehicle = new Car(UUID.randomUUID(), VehicleType.CAR, null);
             create(vehicle);
         }
         for (int i = 0; i < 5; i++) {
-            var vehicle = new LandVehicle(UUID.randomUUID(), VehicleType.SCOOTER, null);
+            var vehicle = new Scooter(UUID.randomUUID(), VehicleType.SCOOTER, null);
             create(vehicle);
         }
         for (int i = 0; i < 10; i++) {

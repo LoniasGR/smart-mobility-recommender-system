@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.neo4j.driver.internal.InternalNode;
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.database.DatabaseService;
-import gr.iccs.smart.mobility.geojson.Feature;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
@@ -231,7 +229,7 @@ public class RecommendationService {
         }
     }
 
-    public FeatureCollection recommendationV2(Point start, Point finish, User user) {
+    public FeatureCollection recommendationV2(Point start, Point finish, User user, RecommendationOptions options) {
         var startLandmark = new UserStartLandmark(start, null, user);
         var destLandmark = new UserDestinationLandmark(finish, user);
         userLandmarkService.save(destLandmark);
@@ -243,7 +241,14 @@ public class RecommendationService {
         final String projection = "smart-mobility";
         Map<String, Object> data = null;
         try {
-            graphProjectionService.generateGraph(projection);
+            String nodes = "['LandVehicle', 'UserLandmark', 'BoatStop']";
+            // for (var vt : VehicleType.values()) {
+            // if (!options.requestOptions().ignoreTypes().contains(vt)) {
+            // nodes += ",'" + vt.toString() + "'";
+            // }
+            // }
+            // nodes += "]";
+            graphProjectionService.generateGraph(projection, nodes);
             data = graphProjectionService.shortestPaths(projection, user.getUsername());
         } finally {
             graphProjectionService.destroyGraph(projection);
@@ -256,25 +261,14 @@ public class RecommendationService {
             return null;
         }
         if (data.get("path") instanceof List<?> list) {
-            FeatureCollection fc = new FeatureCollection();
-            Point lineStart = null;
-            Point lineEnd;
-            for (var i : list) {
-                if (i instanceof InternalNode node) {
-                    Feature f = RecommendationUtils.visualiseNode(node);
-                    if (fc.getFeatures().size() > 0) {
-                        lineEnd = RecommendationUtils.getNodeLocation(node);
-                        var line = GeoJSONUtils.createLine(lineStart, lineEnd);
-                        fc.getFeatures().add(line);
-                        lineStart = RecommendationUtils.getNodeLocation(node);
-                    } else {
-                        lineStart = RecommendationUtils.getNodeLocation(node);
-                    }
-                    fc.getFeatures().add(f);
-                }
+            var fc = RecommendationUtils.createPathFeatureCollection(list);
+            if (options.wholeMap()) {
+                vehicleService.addVehiclesToGeoJSON(fc);
             }
             return fc;
         }
+
+        // This should be an error or unreachable
         return null;
     }
 }

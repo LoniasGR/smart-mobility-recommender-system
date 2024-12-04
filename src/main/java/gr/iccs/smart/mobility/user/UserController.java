@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationService;
+import gr.iccs.smart.mobility.recommendation.RecommendationRouteDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
 import jakarta.validation.Valid;
@@ -72,7 +73,8 @@ public class UserController {
     }
 
     @PostMapping("{username}/recommend")
-    public List<List<RecommendationDTO>> suggestRoute(@PathVariable String username, @RequestBody UserRouteDTO route) {
+    public List<List<RecommendationDTO>> suggestRoute(@PathVariable String username,
+            @RequestBody RecommendationRouteDTO route) {
         log.debug("User API: suggest route for user{} with data {}", username, route);
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
@@ -80,7 +82,8 @@ public class UserController {
     }
 
     @PostMapping("{username}/recommendation/visualize")
-    public FeatureCollection visualizeRecommendation(@PathVariable String username, @RequestBody UserRouteDTO route) {
+    public FeatureCollection visualizeRecommendation(@PathVariable String username,
+            @RequestBody RecommendationRouteDTO route) {
         log.debug("User API: visualize suggested route for user{} with data {}", username, route);
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
