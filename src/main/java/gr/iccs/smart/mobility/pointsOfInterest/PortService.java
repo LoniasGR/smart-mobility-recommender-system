@@ -3,7 +3,6 @@ package gr.iccs.smart.mobility.pointsOfInterest;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class PortService {
         return portRepository.getAllByOneLevelConnection();
     }
 
-    public Optional<Port> getByID(UUID id) {
+    public Optional<Port> getByID(String id) {
         return portRepository.findById(id);
     }
 
@@ -110,7 +109,7 @@ public class PortService {
 
     public void createPortScenario() {
         for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
-            var port = new Port(UUID.randomUUID(), IstanbulLocations.coastLocations.get(i).toPoint(), null);
+            var port = new Port("port_" + i, IstanbulLocations.coastLocations.get(i).toPoint(), null);
             create(port);
         }
     }

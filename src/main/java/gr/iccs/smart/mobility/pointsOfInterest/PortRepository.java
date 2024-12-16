@@ -9,7 +9,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
-public interface PortRepository extends Neo4jRepository<Port, UUID> {
+public interface PortRepository extends Neo4jRepository<Port, String> {
     List<Port> findByLocationNear(Point point);
 
     @Query("""
@@ -26,10 +26,10 @@ public interface PortRepository extends Neo4jRepository<Port, UUID> {
     List<Port> getAllByOneLevelConnection();
 
     @Query("MATCH p=(n:Port{id: $portID})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
-    Port getOneByOneLevelConnection(UUID portID);
+    Port getOneByOneLevelConnection(String portID);
 
     // TODO: Investigate if we could do this with what the ORM offers alone
     @Query("MATCH (bs:Port{id: $portID})-[p:PARKED_IN]-(v:Vehicle{id: $vehicleID}) " +
             "DETACH DELETE p")
-    public void deleteParkedIn(UUID portID, UUID vehicleID);
+    public void deleteParkedIn(String portID, UUID vehicleID);
 }

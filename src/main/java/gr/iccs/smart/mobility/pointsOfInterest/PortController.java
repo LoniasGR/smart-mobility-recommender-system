@@ -1,13 +1,18 @@
 package gr.iccs.smart.mobility.pointsOfInterest;
 
-import gr.iccs.smart.mobility.location.LocationDTO;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.UUID;
+import gr.iccs.smart.mobility.location.LocationDTO;
 
 @RestController
 @RequestMapping("api/boat-stop")
@@ -42,7 +47,7 @@ public class PortController {
     @GetMapping("/{id}")
     public Port getById(@PathVariable String id) {
         log.debug("Port API:Get by id {}", id);
-        var port = portService.getByID(UUID.fromString(id));
+        var port = portService.getByID(id);
         if (port.isEmpty()) {
             throw new InvalidPortException("The boat stop does not exist.");
         }

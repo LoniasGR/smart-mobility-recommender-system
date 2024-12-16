@@ -3,9 +3,9 @@ package gr.iccs.smart.mobility.pointsOfInterest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.neo4j.driver.types.Point;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -15,10 +15,15 @@ import gr.iccs.smart.mobility.connection.StartingNode;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
 @Node
-public final class Port extends PointOfInterest implements ReachableNode, StartingNode {
+public final class Port implements ReachableNode, StartingNode {
+    @Id
+    private final String id;
 
-    public Port(UUID id, Point location, List<Connection> connections) {
-        super(id, location);
+    private Point location;
+
+    public Port(String id, Point location, List<Connection> connections) {
+        this.id = id;
+        this.location = location;
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
     }
 
@@ -32,6 +37,18 @@ public final class Port extends PointOfInterest implements ReachableNode, Starti
      * GETTERS & SETTERS
      **************************************************************************
      */
+
+    public String getId() {
+        return id;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point location) {
+        this.location = location;
+    }
 
     public List<Vehicle> getParkedVehicles() {
         return parkedVehicles;
