@@ -20,8 +20,8 @@ import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.Port;
+import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 
 @Service
 public class VehicleService {
@@ -32,7 +32,7 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
 
     @Autowired
-    private BoatStopService boatStopService;
+    private PortService portService;
 
     @Autowired
     private ConnectionService connectionService;
@@ -70,11 +70,11 @@ public class VehicleService {
         }
         var vehicle = oldVehicle.get();
         var newLocation = Values.point(4326, vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()).asPoint();
-        var boatStops = boatStopService.getAll();
-        validateLocation(newLocation, boatStops, vehicle.getType());
+        var ports = portService.getAll();
+        validateLocation(newLocation, ports, vehicle.getType());
 
         if (vehicle.getType() == VehicleType.SEA_VESSEL) {
-            updateRelatedBoatStops(newLocation, boatStops, vehicle);
+            updateRelatedPorts(newLocation, ports, vehicle);
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
@@ -91,10 +91,10 @@ public class VehicleService {
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
     }
 
-    private void validateLocation(Point newLocation, List<BoatStop> boatStops, VehicleType vehicleType) {
+    private void validateLocation(Point newLocation, List<Port> ports, VehicleType vehicleType) {
         var isSeaLocation = LocationDTO
                 .istanbulLocation(newLocation) == IstanbulLocations.IstanbulLocationDescription.SEA;
-        var isCoastLocation = boatStops.stream().anyMatch(bs -> bs.getLocation().equals(newLocation));
+        var isCoastLocation = ports.stream().anyMatch(bs -> bs.getLocation().equals(newLocation));
 
         // Check if the location provided is valid for a sea vessel
         if (vehicleType == VehicleType.SEA_VESSEL && !(isSeaLocation || isCoastLocation)) {
@@ -107,20 +107,20 @@ public class VehicleService {
         }
     }
 
-    private void updateRelatedBoatStops(Point newLocation, List<BoatStop> boatStops, Vehicle vehicle) {
-        var coastLocation = boatStops.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
+    private void updateRelatedPorts(Point newLocation, List<Port> ports, Vehicle vehicle) {
+        var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
         // If the sea vessel is parked in a boat stop, add it to the list of boats in
         // the stop
         if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
-            boatStopService.update(coastLocation.get());
+            portService.update(coastLocation.get());
         }
         // Otherwise remove it if it's leaving a boat stop
         else {
-            boatStopService
+            portService
                     .getByExactLocation(vehicle.getLocation())
-                    .ifPresent(boatStop -> boatStopService.removeVehicle(boatStop, vehicle));
+                    .ifPresent(port -> portService.removeVehicle(port, vehicle));
         }
     }
 
@@ -170,8 +170,8 @@ public class VehicleService {
         return vehicleRepository.findVehicleByTypeAndLocationNear(type.name(), point, max);
     }
 
-    public List<Vehicle> findSeaVesselsParkedInBoatStop(UUID uuid) {
-        return vehicleRepository.findSeaVesselsParkedInBoatStop(uuid);
+    public List<Vehicle> findSeaVesselsParkedInPort(UUID uuid) {
+        return vehicleRepository.findSeaVesselsParkedInPort(uuid);
     }
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {

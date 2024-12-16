@@ -24,8 +24,8 @@ import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
 import gr.iccs.smart.mobility.location.LocationDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.Port;
+import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.user.User;
 import gr.iccs.smart.mobility.userLandmark.UserDestinationLandmark;
 import gr.iccs.smart.mobility.userLandmark.UserLandmarkService;
@@ -42,7 +42,7 @@ public class RecommendationService {
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
     @Autowired
-    private BoatStopService boatStopService;
+    private PortService portService;
 
     @Autowired
     private VehicleService vehicleService;
@@ -78,9 +78,9 @@ public class RecommendationService {
         geoJSON.getFeatures().add(endingPointFeature);
 
         if (!sameSide) {
-            var endingBoatStop = boatStopService.getByLocationNear(finishingPoint).getFirst();
-            var endingBoatStopFeature = GeoJSONUtils.createPointFeature(endingBoatStop.getLocation(), "harbor");
-            geoJSON.getFeatures().add(endingBoatStopFeature);
+            var endingPort = portService.getByLocationNear(finishingPoint).getFirst();
+            var endingPortFeature = GeoJSONUtils.createPointFeature(endingPort.getLocation(), "harbor");
+            geoJSON.getFeatures().add(endingPortFeature);
         }
 
         for (List<RecommendationDTO> rl : vehicles) {
@@ -114,9 +114,9 @@ public class RecommendationService {
      * @return A list of options. Each option is a list of recommended steps.
      */
     private List<List<RecommendationDTO>> multiSideRecommendation(Point startingPoint, Point finishingPoint) {
-        var startingBoatStops = boatStopService.getByLocationNear(startingPoint);
-        var endingBoatStop = boatStopService.getByLocationNear(finishingPoint).getFirst();
-        var startingSeaVessels = findClosestSeaVessels(startingBoatStops);
+        var startingPorts = portService.getByLocationNear(startingPoint);
+        var endingPorts = portService.getByLocationNear(finishingPoint).getFirst();
+        var startingSeaVessels = findClosestSeaVessels(startingPorts);
         if (startingSeaVessels.isEmpty()) {
             return Collections.emptyList();
         }
@@ -133,11 +133,11 @@ public class RecommendationService {
                     LocationDTO.fromGeographicPoint(seaVessel.getLocation())));
         }
         suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(seaVessel),
-                LocationDTO.fromGeographicPoint(endingBoatStop.getLocation())));
+                LocationDTO.fromGeographicPoint(endingPorts.getLocation())));
 
-        var boatStopFinishingPointDistance = databaseService.distance(endingBoatStop.getLocation(), finishingPoint);
-        var lastVehicle = vehicleService.findLandVesselsByLocationAround(endingBoatStop.getLocation(),
-                new Distance(boatStopFinishingPointDistance, Metrics.KILOMETERS), 1);
+        var PortFinishingPointDistance = databaseService.distance(endingPorts.getLocation(), finishingPoint);
+        var lastVehicle = vehicleService.findLandVesselsByLocationAround(endingPorts.getLocation(),
+                new Distance(PortFinishingPointDistance, Metrics.KILOMETERS), 1);
         if (!lastVehicle.isEmpty()
                 && RecommendationUtils.areSameIstanbulSide(lastVehicle.getFirst().getLocation(), finishingPoint)) {
             suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(lastVehicle.getFirst()),
@@ -167,11 +167,11 @@ public class RecommendationService {
         return Optional.empty();
     }
 
-    private List<Vehicle> findClosestSeaVessels(List<BoatStop> boatStops) {
-        for (BoatStop b : boatStops) {
-            var seaVesselsInBoatStop = vehicleService.findSeaVesselsParkedInBoatStop(b.getId());
-            if (!seaVesselsInBoatStop.isEmpty()) {
-                return seaVesselsInBoatStop;
+    private List<Vehicle> findClosestSeaVessels(List<Port> ports) {
+        for (Port b : ports) {
+            var seaVesselsInPort = vehicleService.findSeaVesselsParkedInPort(b.getId());
+            if (!seaVesselsInPort.isEmpty()) {
+                return seaVesselsInPort;
             }
         }
         return Collections.emptyList();
@@ -192,9 +192,9 @@ public class RecommendationService {
             startLandmark.addConnection(conn);
         }
 
-        var nearbyBoatStops = boatStopService.getByLocationNear(startLandmark.getLocation(),
+        var nearbyPorts = portService.getByLocationNear(startLandmark.getLocation(),
                 config.getMaxWalkingDistance());
-        for (var b : nearbyBoatStops) {
+        for (var b : nearbyPorts) {
             var conn = connectionService.generateConnection(startLandmark, b);
             startLandmark.addConnection(conn);
         }
@@ -203,11 +203,11 @@ public class RecommendationService {
     }
 
     private void createEndLandmarkConnections(UserDestinationLandmark destLandmark) {
-        var boatStops = boatStopService.getAllWithOneLevelConnection();
-        for (var b : boatStops) {
+        var ports = portService.getAllWithOneLevelConnection();
+        for (var b : ports) {
             if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= config
                     .getMaxWalkingDistance()) {
-                boatStopService.createConnectionTo(b, destLandmark);
+                portService.createConnectionTo(b, destLandmark);
             }
         }
 
@@ -241,7 +241,7 @@ public class RecommendationService {
         final String projection = "smart-mobility";
         Map<String, Object> data = null;
         try {
-            String nodes = "['LandVehicle', 'UserLandmark', 'BoatStop']";
+            String nodes = "['LandVehicle', 'UserLandmark', 'Port']";
             // for (var vt : VehicleType.values()) {
             // if (!options.requestOptions().ignoreTypes().contains(vt)) {
             // nodes += ",'" + vt.toString() + "'";

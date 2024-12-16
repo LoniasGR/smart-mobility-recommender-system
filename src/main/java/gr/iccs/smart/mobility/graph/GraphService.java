@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStop;
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.Port;
+import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.vehicle.LandVehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
@@ -25,7 +25,7 @@ public class GraphService {
     private ConnectionService connectionService;
 
     @Autowired
-    private BoatStopService boatStopService;
+    private PortService portService;
 
     private LandVehicle createConnectionWithVehicles(LandVehicle startVehicle,
             List<LandVehicle> otherVehicles) {
@@ -38,14 +38,14 @@ public class GraphService {
         return startVehicle;
     }
 
-    private LandVehicle createConnectionWithBoatStops(LandVehicle vehicle, Double range) {
-        List<BoatStop> boatStops;
+    private LandVehicle createConnectionWithPorts(LandVehicle vehicle, Double range) {
+        List<Port> ports;
         if (range == null) {
-            boatStops = boatStopService.getAllWithOneLevelConnection();
+            ports = portService.getAllWithOneLevelConnection();
         } else {
-            boatStops = boatStopService.getByLocationNear(vehicle.getLocation(), range);
+            ports = portService.getByLocationNear(vehicle.getLocation(), range);
         }
-        for (var b : boatStops) {
+        for (var b : ports) {
             vehicle = vehicleService.createConnectionTo(vehicle, b);
         }
         return vehicle;
@@ -58,36 +58,36 @@ public class GraphService {
                 scooter.getLocation(),
                 maxSooterDistance);
         scooter = createConnectionWithVehicles(scooter, surroundingVehicles);
-        scooter = createConnectionWithBoatStops(scooter, maxSooterDistance);
+        scooter = createConnectionWithPorts(scooter, maxSooterDistance);
     }
 
     private void createCarConnections(LandVehicle car) {
         // var otherVehicles =
         // vehicleService.getAllLandVehiclesWithOneLevelConnection();
         // createConnectionWithVehicles(car, otherVehicles);
-        createConnectionWithBoatStops(car, null);
+        createConnectionWithPorts(car, null);
     }
 
-    private void createBoatStopConnections(BoatStop boatStop, List<BoatStop> boatStops) {
+    private void createPortConnections(Port port, List<Port> ports) {
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
-                boatStop.getLocation(),
+                port.getLocation(),
                 config.getMaxWalkingDistance());
 
         for (var v : surroundingVehicles) {
-            boatStop = boatStopService.createConnectionTo(boatStop, v);
+            port = portService.createConnectionTo(port, v);
         }
 
         // TODO: Make this more complex
-        for (var bb : boatStops) {
-            if (!bb.getId().equals(boatStop.getId()))
-                boatStop = boatStopService.createConnectionTo(boatStop, bb);
+        for (var bb : ports) {
+            if (!bb.getId().equals(port.getId()))
+                port = portService.createConnectionTo(port, bb);
         }
     }
 
     public void graphPreCalculation() {
-        var boatStops = boatStopService.getAllWithOneLevelConnection();
-        for (var b : boatStops) {
-            createBoatStopConnections(b, boatStops);
+        var ports = portService.getAllWithOneLevelConnection();
+        for (var b : ports) {
+            createPortConnections(b, ports);
         }
 
         // First we calculate connections for all the cars

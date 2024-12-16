@@ -15,9 +15,9 @@ import gr.iccs.smart.mobility.connection.StartingNode;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
 @Node
-public final class BoatStop extends PointOfInterest implements ReachableNode, StartingNode {
+public final class Port extends PointOfInterest implements ReachableNode, StartingNode {
 
-    public BoatStop(UUID id, Point location, List<Connection> connections) {
+    public Port(UUID id, Point location, List<Connection> connections) {
         super(id, location);
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
     }

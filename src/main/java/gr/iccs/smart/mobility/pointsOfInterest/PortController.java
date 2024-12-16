@@ -1,0 +1,58 @@
+package gr.iccs.smart.mobility.pointsOfInterest;
+
+import gr.iccs.smart.mobility.location.LocationDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("api/boat-stop")
+public class PortController {
+    private static final Logger log = LoggerFactory.getLogger(PortController.class);
+
+    @Autowired
+    private PortService portService;
+
+    @GetMapping
+    public List<Port> getAll() {
+        log.debug("Port API: Get All");
+        return portService.getAll();
+    }
+
+    @PostMapping("/locate")
+    public List<Port> getByLocationNear(@RequestBody LocationDTO location) {
+        log.debug("Port API: getByLocationNear");
+        return portService.getByLocationNear(location.toPoint());
+    }
+
+    @PostMapping("/exact-location")
+    public Port getByLocationExact(@RequestBody LocationDTO location) {
+        log.debug("Port API: getByLocationExact");
+        var port = portService.getByExactLocation(location.toPoint());
+        if (port.isEmpty()) {
+            throw new InvalidPortException("The boat stop does not exist.");
+        }
+        return port.get();
+    }
+
+    @GetMapping("/{id}")
+    public Port getById(@PathVariable String id) {
+        log.debug("Port API:Get by id {}", id);
+        var port = portService.getByID(UUID.fromString(id));
+        if (port.isEmpty()) {
+            throw new InvalidPortException("The boat stop does not exist.");
+        }
+        return port.get();
+    }
+
+    @PostMapping
+    public Port create(@RequestBody Port port) {
+        log.debug("Port API: create");
+        return portService.create(port);
+    }
+
+}

@@ -1,6 +1,6 @@
 package gr.iccs.smart.mobility.scenario;
 
-import gr.iccs.smart.mobility.pointsOfInterest.BoatStopService;
+import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
@@ -26,7 +26,7 @@ public class ScenarioController {
     private VehicleService vehicleService;
 
     @Autowired
-    private BoatStopService boatStopService;
+    private PortService portService;
 
     @Autowired
     private UserService userService;
@@ -36,8 +36,8 @@ public class ScenarioController {
         if (!vehicleService.getAll().isEmpty()) {
             throw new ScenarioException("The database is not empty, cannot create scenario.");
         }
-        log.debug("Creating Boat Stops");
-        boatStopService.createBoatStopScenario();
+        log.debug("Creating Port Stops");
+        portService.createPortScenario();
 
         log.debug("Creating vehicles");
         vehicleService.createScenarioVehicles();

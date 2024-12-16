@@ -49,7 +49,7 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")
         List<Vehicle> findVehicleByTypeAndLocationNear(String type, Point point, Integer limit);
 
-        @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:BoatStop{id: $uuid}) RETURN v")
-        List<Vehicle> findSeaVesselsParkedInBoatStop(UUID uuid);
+        @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:Port{id: $uuid}) RETURN v")
+        List<Vehicle> findSeaVesselsParkedInPort(UUID uuid);
 
 }

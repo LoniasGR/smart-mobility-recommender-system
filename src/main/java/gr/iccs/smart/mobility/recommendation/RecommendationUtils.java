@@ -47,8 +47,8 @@ public class RecommendationUtils {
                     Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
             f = GeoJSONUtils.createVehicleFeature(vehicle);
         }
-        if (node.labels().contains("BoatStop")) {
-            f = GeoJSONUtils.createBoatStopFeature(location);
+        if (node.labels().contains("Port")) {
+            f = GeoJSONUtils.createPortFeature(location);
         }
 
         return f;

@@ -19,6 +19,16 @@
       "name": "openrouteservice.apiversion",
       "type": "java.lang.String",
       "description": "The API Version to be used (should probably always be `v2`"
+    },
+    {
+      "name": "distances.maxscooterdistance",
+      "type": "java.lang.Double",
+      "description": "The max distance a scooter could travel on full battery"
+    },
+    {
+      "name": "distances.maxwalkingdistance",
+      "type": "java.lang.Double",
+      "description": "The max distance we would want the user to walk"
     }
   ]
 }

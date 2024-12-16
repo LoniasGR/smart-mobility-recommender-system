@@ -7,7 +7,7 @@ import org.neo4j.driver.types.Point;
 
 import gr.iccs.smart.mobility.connection.ConnectionDTO;
 
-public interface BoatStopWithOneLevelConnection {
+public interface PortWithOneLevelConnection {
     public UUID getId();
 
     public Point getLocation();

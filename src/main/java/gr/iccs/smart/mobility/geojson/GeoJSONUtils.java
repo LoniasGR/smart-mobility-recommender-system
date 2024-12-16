@@ -36,7 +36,7 @@ public class GeoJSONUtils {
         return f;
     }
 
-    public static Feature createBoatStopFeature(Point point) {
+    public static Feature createPortFeature(Point point) {
         return GeoJSONUtils.createPointFeature(point, "harbor", "#121daf");
     }
 
