@@ -9,16 +9,34 @@ import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 @Service
 public class GeoJSONUtils {
 
+    /**
+     * Same as {@link #createVehicleFeature(VehicleDTO v)
+     * createVehicleFeature(VehicleDTO v)},
+     * but takes
+     * a vehicle as arguement.
+     * 
+     * @param v Vehicle
+     * @return geoJSON feature for a vehicle
+     */
     public static Feature createVehicleFeature(Vehicle v) {
         return createVehicleFeature(VehicleDTO.fromVehicle(v));
     }
 
+    /**
+     * Maps vehicle properties to Feature properties.
+     * 
+     * @param v Vehicle
+     * @return geoJSON Feature
+     */
     public static Feature createVehicleFeature(VehicleDTO v) {
         Feature f = new Feature();
         f.setGeometry(new gr.iccs.smart.mobility.geojson.Point(v.location().y(), v.location().x()));
 
         f.getProperties().put("type", v.type().toString());
         f.getProperties().put("id", v.id().toString());
+        f.getProperties().put("battery", v.battery().toString());
+        f.getProperties().put("is_dummy", v.dummy().toString());
+
         switch (v.type()) {
             case SEA_VESSEL:
                 f.getProperties().put("marker-symbol", "ferry");
