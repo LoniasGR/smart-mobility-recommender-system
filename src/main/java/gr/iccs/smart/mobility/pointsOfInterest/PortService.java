@@ -13,6 +13,8 @@ import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import gr.iccs.smart.mobility.config.DataFileConfig;
 import gr.iccs.smart.mobility.connection.Connection;
 import gr.iccs.smart.mobility.connection.ConnectionService;
@@ -107,21 +109,30 @@ public class PortService {
         return portRepository.getOneByOneLevelConnection(port.getId());
     }
 
-    public void createPortScenario() {
+    public void createRandomPorts() {
         for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
-            var port = new Port("port_" + i, IstanbulLocations.coastLocations.get(i).toPoint(), null);
+            var port = new Port("port_" + i, "Port " + i, IstanbulLocations.coastLocations.get(i).toPoint(), null);
             create(port);
         }
     }
 
-    public void createScenarioFromFile() {
+    public void createPortScenario() {
         String filePath = dataFileConfig.getPortLocations();
         try {
-            resourceReader.readResource(filePath);
-        } catch (FileNotFoundException e) {
-            log.warn("File %s not found, randomly generating Ports", filePath);
-            createPortScenario();
-            return;
+            ObjectMapper mapper = new ObjectMapper();
+            var stream = resourceReader.readResource(filePath);
+            var portDTOs = mapper.readValue(stream, PortWrapper.class);
+            for (var p : portDTOs.getPorts()) {
+                create(p.toPort());
+            }
+        } catch (Exception e) {
+            if (e instanceof FileNotFoundException) {
+                log.warn("File %s not found, randomly generating Ports", filePath);
+                createRandomPorts();
+                return;
+            } else {
+                throw new RuntimeException(e);
+            }
         }
 
     }

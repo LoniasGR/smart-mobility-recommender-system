@@ -1,14 +1,13 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
-public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
+public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
 
         List<Vehicle> findByLocationNear(Point point, Distance max);
 
@@ -19,7 +18,7 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
         List<LandVehicle> findAllLandVehiclesWithOneLevelConnection();
 
         @Query("MATCH p=(n:LandVehicle{id: $vehicleId})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
-        LandVehicle findLandVehicleWithOneLevelConnection(UUID vehicleId);
+        LandVehicle findLandVehicleWithOneLevelConnection(String vehicleId);
 
         @Query("MATCH (v:Vehicle) RETURN v")
         List<VehicleDTO> findAllVehiclesNoConnections();
@@ -49,7 +48,7 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, UUID> {
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")
         List<Vehicle> findVehicleByTypeAndLocationNear(String type, Point point, Integer limit);
 
-        @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:Port{id: $uuid}) RETURN v")
-        List<Vehicle> findSeaVesselsParkedInPort(UUID uuid);
+        @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:Port{id: $portId}) RETURN v")
+        List<Vehicle> findSeaVesselsParkedInPort(String portId);
 
 }

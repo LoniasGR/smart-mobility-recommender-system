@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties("dataFiles")
+@ConfigurationProperties("datafiles")
 public class DataFileConfig {
     private String carLocations;
     private String portLocations;
@@ -21,7 +21,7 @@ public class DataFileConfig {
         return this.carLocations;
     }
 
-    public void setFilename(String carLocations) {
+    public void setCarLocations(String carLocations) {
         this.carLocations = carLocations;
     }
 }

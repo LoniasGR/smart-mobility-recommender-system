@@ -1,7 +1,6 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class VehicleController {
     }
 
     @GetMapping(value = "/{id}")
-    public VehicleDTO getById(@PathVariable UUID id) {
+    public VehicleDTO getById(@PathVariable String id) {
         log.debug("Vehicle API: Get By ID " + id);
         return VehicleDTO.fromVehicle(vehicleService.getById(id));
     }
@@ -47,7 +46,7 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/{id}")
-    public VehicleDTO updateStatus(@PathVariable UUID id, @RequestBody VehicleInfoDTO vehicle) {
+    public VehicleDTO updateStatus(@PathVariable String id, @RequestBody VehicleInfoDTO vehicle) {
         log.debug("Vehicle API: updateStatus for" + id + " with data " + vehicle);
         return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
     }

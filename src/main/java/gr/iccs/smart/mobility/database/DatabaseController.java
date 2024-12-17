@@ -2,6 +2,7 @@ package gr.iccs.smart.mobility.database;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,7 +16,8 @@ public class DatabaseController {
 
     @PostMapping("delete")
     @ResponseStatus(HttpStatus.OK)
-    public void postMethodName() {
-        databaseService.clearDatabase();
+    public ResponseEntity<String> clearDatabase() {
+        var info = databaseService.clearDatabase();
+        return new ResponseEntity<String>(info, HttpStatus.OK);
     }
 }

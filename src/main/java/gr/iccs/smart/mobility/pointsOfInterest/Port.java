@@ -18,11 +18,12 @@ import gr.iccs.smart.mobility.vehicle.Vehicle;
 public final class Port implements ReachableNode, StartingNode {
     @Id
     private final String id;
-
+    private final String name;
     private Point location;
 
-    public Port(String id, Point location, List<Connection> connections) {
+    public Port(String id, String name, Point location, List<Connection> connections) {
         this.id = id;
+        this.name = name;
         this.location = location;
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
     }
@@ -64,6 +65,10 @@ public final class Port implements ReachableNode, StartingNode {
 
     public void addConnection(Connection conn) {
         this.connections.add(conn);
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     @Override

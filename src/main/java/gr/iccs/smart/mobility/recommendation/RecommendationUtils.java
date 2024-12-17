@@ -1,7 +1,6 @@
 package gr.iccs.smart.mobility.recommendation;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.neo4j.driver.internal.InternalNode;
 import org.neo4j.driver.types.Point;
@@ -40,9 +39,10 @@ public class RecommendationUtils {
         }
         if (node.labels().contains("LandVehicle")) {
             var vehicle = new VehicleDTO(
-                    UUID.fromString(node.get("id").asString()),
+                    node.get("id").asString(),
                     Enum.valueOf(VehicleType.class, node.get("type").asString()),
-                    node.get("battery").asDouble(),
+                    node.get("battery").asLong(),
+                    node.get("dummy").asBoolean(),
                     location,
                     Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
             f = GeoJSONUtils.createVehicleFeature(vehicle);

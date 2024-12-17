@@ -2,7 +2,6 @@ package gr.iccs.smart.mobility.pointsOfInterest;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
@@ -31,5 +30,5 @@ public interface PortRepository extends Neo4jRepository<Port, String> {
     // TODO: Investigate if we could do this with what the ORM offers alone
     @Query("MATCH (bs:Port{id: $portID})-[p:PARKED_IN]-(v:Vehicle{id: $vehicleID}) " +
             "DETACH DELETE p")
-    public void deleteParkedIn(String portID, UUID vehicleID);
+    public void deleteParkedIn(String portID, String vehicleID);
 }

@@ -17,12 +17,15 @@ public class DatabaseService {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseService.class);
 
-    public void clearDatabase() {
+    public String clearDatabase() {
         var summary = dbClientProvider.getClient().query("MATCH (n) DETACH DELETE n").run();
         var counters = summary.counters();
 
-        log.info("{} nodes have been deleted", counters.nodesDeleted());
-        log.info("{} relationships have been deleted", counters.relationshipsDeleted());
+        var info = String.format("%d nodes have been deleted \n%d relationships have been deleted",
+                counters.nodesDeleted(), counters.relationshipsDeleted());
+
+        log.info("\n" + info);
+        return info;
     }
 
     public Double distance(Point p1, Point p2) {

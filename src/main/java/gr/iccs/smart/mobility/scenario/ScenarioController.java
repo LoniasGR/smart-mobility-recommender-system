@@ -45,9 +45,6 @@ public class ScenarioController {
         log.debug("Creating users");
         userService.createScenarioUsers();
 
-        log.debug("Positioning vehicles");
-        vehicleService.createScenarioLocations();
-
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
 

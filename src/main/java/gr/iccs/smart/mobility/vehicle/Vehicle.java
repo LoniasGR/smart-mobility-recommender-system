@@ -1,11 +1,10 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import jakarta.validation.constraints.NotNull;
 import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Vehicle info + current status
@@ -14,8 +13,9 @@ import java.util.UUID;
 public abstract sealed class Vehicle permits Boat, LandVehicle {
     @Id
     @NotNull(message = "id cannot be empty")
-    private final UUID id;
+    private final String id;
     private final VehicleType type;
+    private final Boolean dummy;
 
     /*
      * TODO:
@@ -23,13 +23,20 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
      * https://neo4j.com/docs/cypher-manual/current/functions/spatial/
      */
     private Point location;
-    private Double battery;
+
+    private Long battery;
 
     private VehicleStatus status;
 
-    public Vehicle(UUID id, VehicleType type) {
+    public Vehicle(String id, VehicleType type, Boolean dummy) {
         this.id = id;
         this.type = type;
+        this.dummy = dummy;
+    }
+
+    public Vehicle(String id, VehicleType type, Boolean dummy, Long battery) {
+        this(id, type, dummy);
+        this.battery = battery;
     }
 
     /*
@@ -41,7 +48,7 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
         return type;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -53,11 +60,11 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
         this.status = status;
     }
 
-    public Double getBattery() {
+    public Long getBattery() {
         return battery;
     }
 
-    public void setBattery(Double battery) {
+    public void setBattery(Long battery) {
         this.battery = battery;
     }
 
@@ -67,6 +74,10 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
 
     public void setLocation(Point location) {
         this.location = location;
+    }
+
+    public Boolean getDummy() {
+        return this.dummy;
     }
 
     public boolean isLandVehicle() {

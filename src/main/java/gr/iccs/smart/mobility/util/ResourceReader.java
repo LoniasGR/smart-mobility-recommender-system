@@ -1,27 +1,26 @@
 package gr.iccs.smart.mobility.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.InputStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.core.io.Resource;
 
 @Component
 public class ResourceReader {
+    private static final Logger log = LoggerFactory.getLogger(ResourceReader.class);
 
-    @Autowired
-    private ResourceLoader resourceLoader;
+    public InputStream readResource(String resourcePath) throws FileNotFoundException {
 
-    public File readResource(String resourcePath) throws FileNotFoundException {
-        Resource resource = resourceLoader.getResource("classpath:" + resourcePath);
         try {
-            File file = resource.getFile();
-            return file;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return getClass().getResourceAsStream(resourcePath);
+        } catch (Exception e) {
+            if (e instanceof FileNotFoundException) {
+                throw e;
+            } else {
+                throw new RuntimeException(e);
+            }
         }
 
     }

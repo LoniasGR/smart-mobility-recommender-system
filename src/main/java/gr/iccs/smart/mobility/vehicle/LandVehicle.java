@@ -3,7 +3,6 @@ package gr.iccs.smart.mobility.vehicle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -16,8 +15,8 @@ import gr.iccs.smart.mobility.connection.StartingNode;
 public sealed class LandVehicle extends Vehicle implements ReachableNode, StartingNode
         permits Car, Scooter {
 
-    public LandVehicle(UUID id, VehicleType type, List<Connection> connections) {
-        super(id, type);
+    public LandVehicle(String id, VehicleType type, Boolean dummy, List<Connection> connections) {
+        super(id, type, dummy);
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
     }
 
