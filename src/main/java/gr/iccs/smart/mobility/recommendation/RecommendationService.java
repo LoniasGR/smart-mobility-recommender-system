@@ -36,7 +36,6 @@ import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
 
-// TODO: Maybe create a controller for this class?
 @Service
 public class RecommendationService {
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
@@ -64,118 +63,6 @@ public class RecommendationService {
 
     @Autowired
     private GraphProjectionService graphProjectionService;
-
-    public FeatureCollection createRecommendationGeoJSON(Point startingPoint, Point finishingPoint) {
-        var sameSide = RecommendationUtils.areSameIstanbulSide(startingPoint, finishingPoint);
-
-        var vehicles = recommend(startingPoint, finishingPoint);
-        FeatureCollection geoJSON = new FeatureCollection();
-
-        var startingPointFeature = GeoJSONUtils.createStartingPointFeature(startingPoint);
-        var endingPointFeature = GeoJSONUtils.createDestinationPointFeature(finishingPoint);
-
-        geoJSON.getFeatures().add(startingPointFeature);
-        geoJSON.getFeatures().add(endingPointFeature);
-
-        if (!sameSide) {
-            var endingPort = portService.getByLocationNear(finishingPoint).getFirst();
-            var endingPortFeature = GeoJSONUtils.createPointFeature(endingPort.getLocation(), "harbor");
-            geoJSON.getFeatures().add(endingPortFeature);
-        }
-
-        for (List<RecommendationDTO> rl : vehicles) {
-            for (RecommendationDTO r : rl) {
-                geoJSON.getFeatures().add(GeoJSONUtils.createVehicleFeature(r.vehicle()));
-            }
-        }
-        return geoJSON;
-    }
-
-    public List<List<RecommendationDTO>> recommend(Point startingPoint, Point finishingPoint) {
-        var sameSide = RecommendationUtils.areSameIstanbulSide(startingPoint, finishingPoint);
-
-        if (sameSide) {
-            // Scenario A, we only need one vehicle
-            return sameSideRecommendation(startingPoint, finishingPoint);
-
-        } else {
-            // Scenario B, we need more than one vehicle
-            return multiSideRecommendation(startingPoint, finishingPoint);
-        }
-    }
-
-    /**
-     * Handles the recommendation for moving from one side of Istanbul to the other.
-     * <br>
-     * TODO: Maybe split this into multiple methods?
-     *
-     * @param startingPoint  The location of the starting point of the user
-     * @param finishingPoint The location of the end of the user's trip
-     * @return A list of options. Each option is a list of recommended steps.
-     */
-    private List<List<RecommendationDTO>> multiSideRecommendation(Point startingPoint, Point finishingPoint) {
-        var startingPorts = portService.getByLocationNear(startingPoint);
-        var endingPorts = portService.getByLocationNear(finishingPoint).getFirst();
-        var startingSeaVessels = findClosestSeaVessels(startingPorts);
-        if (startingSeaVessels.isEmpty()) {
-            return Collections.emptyList();
-        }
-        var seaVessel = startingSeaVessels.getFirst();
-        List<List<RecommendationDTO>> suggestedVehicles = new ArrayList<>();
-        suggestedVehicles.add(new ArrayList<>());
-
-        var userSeaVesselDistance = databaseService.distance(seaVessel.getLocation(), startingPoint);
-        var firstVehicle = vehicleService.findLandVesselsByLocationAround(startingPoint,
-                new Distance(userSeaVesselDistance, Metrics.KILOMETERS), 1);
-        if (!firstVehicle.isEmpty()
-                && RecommendationUtils.areSameIstanbulSide(firstVehicle.getFirst().getLocation(), startingPoint)) {
-            suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(firstVehicle.getFirst()),
-                    LocationDTO.fromGeographicPoint(seaVessel.getLocation())));
-        }
-        suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(seaVessel),
-                LocationDTO.fromGeographicPoint(endingPorts.getLocation())));
-
-        var PortFinishingPointDistance = databaseService.distance(endingPorts.getLocation(), finishingPoint);
-        var lastVehicle = vehicleService.findLandVesselsByLocationAround(endingPorts.getLocation(),
-                new Distance(PortFinishingPointDistance, Metrics.KILOMETERS), 1);
-        if (!lastVehicle.isEmpty()
-                && RecommendationUtils.areSameIstanbulSide(lastVehicle.getFirst().getLocation(), finishingPoint)) {
-            suggestedVehicles.getFirst().add(new RecommendationDTO(VehicleDTO.fromVehicle(lastVehicle.getFirst()),
-                    LocationDTO.fromGeographicPoint(finishingPoint)));
-        }
-        return suggestedVehicles;
-    }
-
-    private List<List<RecommendationDTO>> sameSideRecommendation(Point startingPoint, Point finishingPoint) {
-        var car = findVehicleByTypeAndLocationOnSameSide(VehicleType.CAR, startingPoint);
-        var scooter = findVehicleByTypeAndLocationOnSameSide(VehicleType.SCOOTER, startingPoint);
-
-        List<Optional<Vehicle>> maybeRecommendation = List.of(car, scooter);
-
-        return maybeRecommendation.stream().filter(Optional::isPresent).map(Optional::get)
-                .sorted(Comparator.comparing(v -> databaseService.distance(v.getLocation(), startingPoint)))
-                .map(v -> List.of(new RecommendationDTO(VehicleDTO.fromVehicle(v),
-                        LocationDTO.fromGeographicPoint(finishingPoint))))
-                .toList();
-    }
-
-    private Optional<Vehicle> findVehicleByTypeAndLocationOnSameSide(VehicleType type, Point point) {
-        var vehicle = vehicleService.findVehicleByTypeAndLocationNear(type, point, 1).getFirst();
-        if (RecommendationUtils.areSameIstanbulSide(vehicle.getLocation(), point)) {
-            return Optional.of(vehicle);
-        }
-        return Optional.empty();
-    }
-
-    private List<Vehicle> findClosestSeaVessels(List<Port> ports) {
-        for (Port b : ports) {
-            var seaVesselsInPort = vehicleService.findSeaVesselsParkedInPort(b.getId());
-            if (!seaVesselsInPort.isEmpty()) {
-                return seaVesselsInPort;
-            }
-        }
-        return Collections.emptyList();
-    }
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
         if (databaseService.distance(startLandmark.getLocation(), destLandmark.getLocation()) < config

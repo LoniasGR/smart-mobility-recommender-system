@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import gr.iccs.smart.mobility.geojson.FeatureCollection;
-import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
-import gr.iccs.smart.mobility.recommendation.RecommendationService;
-import gr.iccs.smart.mobility.recommendation.RecommendationRouteDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.util.EmptyJsonResponse;
 import jakarta.validation.Valid;
@@ -31,9 +27,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RecommendationService recommendationService;
 
     @GetMapping
     public List<UserDTO> getAll() {
@@ -70,23 +63,5 @@ public class UserController {
             return new ResponseEntity<>(new EmptyJsonResponse(), HttpStatus.OK);
         }
         return new ResponseEntity<>(status.get(), HttpStatus.OK);
-    }
-
-    @PostMapping("{username}/recommend")
-    public List<List<RecommendationDTO>> suggestRoute(@PathVariable String username,
-            @RequestBody RecommendationRouteDTO route) {
-        log.debug("User API: suggest route for user{} with data {}", username, route);
-        var start = route.startingLocation().toPoint();
-        var finish = route.endingLocation().toPoint();
-        return recommendationService.recommend(start, finish);
-    }
-
-    @PostMapping("{username}/recommendation/visualize")
-    public FeatureCollection visualizeRecommendation(@PathVariable String username,
-            @RequestBody RecommendationRouteDTO route) {
-        log.debug("User API: visualize suggested route for user{} with data {}", username, route);
-        var start = route.startingLocation().toPoint();
-        var finish = route.endingLocation().toPoint();
-        return recommendationService.createRecommendationGeoJSON(start, finish);
     }
 }
