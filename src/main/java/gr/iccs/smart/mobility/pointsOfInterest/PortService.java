@@ -93,13 +93,20 @@ public class PortService {
         portRepository.deleteParkedIn(port.getId(), v.getId());
     }
 
-    public Port createConnectionTo(Port port, ReachableNode destination) {
+    public Port createConnectionFrom(Port port, ReachableNode destination, Double maxDistanceMeters) {
         Connection connection;
-        if (!(destination instanceof Port)) {
-            connection = connectionService.generateConnection(port, destination);
-        } else {
+        // If the reachable node is a port, we are using a boat.
+        if (destination instanceof Port) {
             Double distance = databaseService.distance(port.getLocation(), destination.getLocation());
             connection = connectionService.createConnection(destination, distance, distance);
+        } else {
+            // If it's anything else, the user will have to walk to the reachable node.
+            connection = connectionService.generateConnection(port, destination);
+            // We don't want to create connections that are actually longer than the walking
+            // distance.
+            if (connection.getDistance() > maxDistanceMeters) {
+                return port;
+            }
         }
 
         port.addConnection(connection);
@@ -116,7 +123,13 @@ public class PortService {
         }
     }
 
-    public void createPortScenario() {
+    public void createPortScenario(Boolean randomize) {
+        if (randomize) {
+            createRandomPorts();
+            return;
+        }
+
+        // We use a given file to create the random ports
         String filePath = dataFileConfig.getPortLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -127,14 +140,9 @@ public class PortService {
             }
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
-                log.warn("File %s not found, randomly generating Ports", filePath);
-                createRandomPorts();
-                return;
-            } else {
-                throw new RuntimeException(e);
+                log.warn("File %s not found, stopping...", filePath);
             }
+            throw new RuntimeException(e);
         }
-
     }
-
 }

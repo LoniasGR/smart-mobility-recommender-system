@@ -1,19 +1,14 @@
 package gr.iccs.smart.mobility.recommendation;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,18 +16,13 @@ import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
-import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
-import gr.iccs.smart.mobility.location.LocationDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.user.User;
 import gr.iccs.smart.mobility.userLandmark.UserDestinationLandmark;
 import gr.iccs.smart.mobility.userLandmark.UserLandmarkService;
 import gr.iccs.smart.mobility.userLandmark.UserStartLandmark;
 import gr.iccs.smart.mobility.userLandmark.UserStartLandmarkDTO;
-import gr.iccs.smart.mobility.vehicle.Vehicle;
-import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
 
@@ -94,7 +84,7 @@ public class RecommendationService {
         for (var b : ports) {
             if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= config
                     .getMaxWalkingDistance()) {
-                portService.createConnectionTo(b, destLandmark);
+                portService.createConnectionFrom(b, destLandmark);
             }
         }
 
@@ -116,7 +106,8 @@ public class RecommendationService {
         }
     }
 
-    public FeatureCollection recommendationV2(Point start, Point finish, User user, RecommendationOptions options) {
+    public List<FeatureCollection> recommendationV2(Point start, Point finish, User user,
+            RecommendationOptions options) {
         var startLandmark = new UserStartLandmark(start, null, user);
         var destLandmark = new UserDestinationLandmark(finish, user);
         userLandmarkService.save(destLandmark);
@@ -126,36 +117,48 @@ public class RecommendationService {
         createEndLandmarkConnections(destLandmark);
 
         final String projection = "smart-mobility";
-        Map<String, Object> data = null;
+        List<Map<String, Object>> data = null;
+
+        // Generate the nodes we need to add to the graph projection
+        String nodes = "['UserLandmark', 'Port'";
+        for (var vt : VehicleType.values()) {
+            if (Objects.isNull(options.requestOptions().ignoreTypes())
+                    || !options.requestOptions().ignoreTypes().contains(vt)) {
+                nodes += ",'" + VehicleType.nodeOf(vt) + "'";
+            }
+        }
+        nodes += "]";
+
         try {
-            String nodes = "['LandVehicle', 'UserLandmark', 'Port']";
-            // for (var vt : VehicleType.values()) {
-            // if (!options.requestOptions().ignoreTypes().contains(vt)) {
-            // nodes += ",'" + vt.toString() + "'";
-            // }
-            // }
-            // nodes += "]";
+            // Ensure recommendation paths exists
+            var recommendationPaths = options.requestOptions().recommendationPaths();
+            if (Objects.isNull(recommendationPaths)) {
+                recommendationPaths = 1;
+            }
+
             graphProjectionService.generateGraph(projection, nodes);
-            data = graphProjectionService.shortestPaths(projection, user.getUsername());
+            data = graphProjectionService.shortestPaths(projection, user.getUsername(),
+                    recommendationPaths);
         } finally {
             graphProjectionService.destroyGraph(projection);
             userLandmarkService.delete(destLandmark);
             userLandmarkService.delete(startLandmark);
         }
 
-        if (data.isEmpty() || Objects.isNull(data)) {
-            // There should be an error here.
-            return null;
-        }
-        if (data.get("path") instanceof List<?> list) {
-            var fc = RecommendationUtils.createPathFeatureCollection(list);
-            if (options.wholeMap()) {
-                vehicleService.addVehiclesToGeoJSON(fc);
-            }
-            return fc;
+        if (Objects.isNull(data) || data.isEmpty()) {
+            throw new NoRouteFoundException("No viable route between origin and destination");
         }
 
-        // This should be an error or unreachable
-        return null;
+        List<FeatureCollection> collections = new ArrayList<>();
+        for (var d : data) {
+            if (d.get("path") instanceof List<?> list) {
+                var fc = RecommendationUtils.createPathFeatureCollection(list);
+                if (options.wholeMap()) {
+                    vehicleService.addVehiclesToGeoJSON(fc);
+                }
+                collections.add(fc);
+            }
+        }
+        return collections;
     }
 }

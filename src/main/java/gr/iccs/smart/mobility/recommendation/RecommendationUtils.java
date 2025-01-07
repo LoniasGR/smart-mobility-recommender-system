@@ -11,6 +11,7 @@ import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
+import gr.iccs.smart.mobility.pointsOfInterest.PortDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
@@ -48,7 +49,9 @@ public class RecommendationUtils {
             f = GeoJSONUtils.createVehicleFeature(vehicle);
         }
         if (node.labels().contains("Port")) {
-            f = GeoJSONUtils.createPortFeature(location);
+            var port = new PortDTO(node.get("id").asString(), node.get("name").asString(),
+                    LocationDTO.fromGeographicPoint(location));
+            f = GeoJSONUtils.createPortFeature(port);
         }
 
         return f;

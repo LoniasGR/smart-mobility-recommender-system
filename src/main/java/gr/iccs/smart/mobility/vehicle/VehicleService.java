@@ -28,6 +28,7 @@ import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.util.ResourceReader;
+import net.datafaker.providers.base.Bool;
 
 @Service
 public class VehicleService {
@@ -190,7 +191,12 @@ public class VehicleService {
         return vehicleRepository.findByLocationNear(point, maxDistance);
     }
 
-    private void createScenarioCars() {
+    private void createScenarioCars(Boolean randomize) {
+        if (randomize) {
+            var cars = createRandomCars().stream().map(c -> VehicleDTO.fromVehicle(c)).toList();
+            createScenarioLocations(cars);
+            return;
+        }
         String filePath = dataFileConfig.getCarLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -201,13 +207,9 @@ public class VehicleService {
             }
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
-                log.warn("File %s not found, randomly generating Ports", filePath);
-                var cars = createRandomCars().stream().map(c -> VehicleDTO.fromVehicle(c)).toList();
-                createScenarioLocations(cars);
-                return;
-            } else {
-                throw new RuntimeException(e);
+                log.warn("File %s not found, terminating...", filePath);
             }
+            throw new RuntimeException(e);
         }
     }
 
@@ -240,8 +242,8 @@ public class VehicleService {
         return boats;
     }
 
-    public void createScenarioVehicles() {
-        createScenarioCars();
+    public void createScenarioVehicles(Boolean randomize) {
+        createScenarioCars(randomize);
         var scooters = createRandomScooters().stream().map(s -> VehicleDTO.fromVehicle(s)).toList();
         createScenarioLocations(scooters);
         var boats = createRandomBoats().stream().map(b -> VehicleDTO.fromVehicle(b)).toList();

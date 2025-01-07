@@ -74,13 +74,13 @@ public class GraphService {
                 config.getMaxWalkingDistance());
 
         for (var v : surroundingVehicles) {
-            port = portService.createConnectionTo(port, v);
+            port = portService.createConnectionFrom(port, v, config.getMaxWalkingDistance() * 1000);
         }
 
         // TODO: Make this more complex
         for (var bb : ports) {
             if (!bb.getId().equals(port.getId()))
-                port = portService.createConnectionTo(port, bb);
+                port = portService.createConnectionFrom(port, bb, null);
         }
     }
 

@@ -93,6 +93,7 @@ public class Directions extends Base {
 
         ResponseEntity<FeatureCollection> entity;
         try {
+            log.debug(("Calling URL:" + uri));
             entity = client.get().uri(uri)
                     .retrieve()
                     .toEntity(FeatureCollection.class);

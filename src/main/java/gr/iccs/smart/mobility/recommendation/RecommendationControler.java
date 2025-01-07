@@ -1,5 +1,9 @@
 package gr.iccs.smart.mobility.recommendation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,16 +26,17 @@ public class RecommendationControler {
     private UserService userService;
 
     @PostMapping("/{username}")
-    public FeatureCollection suggestRoute(
+    public List<FeatureCollection> suggestRoute(
             @PathVariable String username,
             @RequestBody RecommendationRouteDTO route,
-            @RequestParam(required = false) Boolean wholeMap) {
+            @RequestParam(required = false) Boolean wholeMap,
+            @RequestParam(required = false) Boolean previewGraph) {
         var user = userService.getById(username);
-        var options = new RecommendationOptions(wholeMap, route.options());
+        var recommendationOptions = new RecommendationOptions(wholeMap, previewGraph, route.options());
 
         var start = route.startingLocation().toPoint();
         var finish = route.endingLocation().toPoint();
 
-        return recommendationService.recommendationV2(start, finish, user, options);
+        return recommendationService.recommendationV2(start, finish, user, recommendationOptions);
     }
 }

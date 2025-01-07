@@ -32,15 +32,16 @@ public class ScenarioController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> createScenario() {
+    public ResponseEntity<String> createScenario(
+            @RequestParam(required = false) Boolean randomize) {
         if (!vehicleService.getAll().isEmpty()) {
             throw new ScenarioException("The database is not empty, cannot create scenario.");
         }
         log.debug("Creating Port Stops");
-        portService.createPortScenario();
+        portService.createPortScenario(randomize);
 
         log.debug("Creating vehicles");
-        vehicleService.createScenarioVehicles();
+        vehicleService.createScenarioVehicles(randomize);
 
         log.debug("Creating users");
         userService.createScenarioUsers();

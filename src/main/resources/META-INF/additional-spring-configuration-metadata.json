@@ -23,12 +23,12 @@
     {
       "name": "distances.maxscooterdistance",
       "type": "java.lang.Double",
-      "description": "The max distance a scooter could travel on full battery"
+      "description": "The max distance a scooter could travel on full battery (in km)"
     },
     {
       "name": "distances.maxwalkingdistance",
       "type": "java.lang.Double",
-      "description": "The max distance we would want the user to walk"
+      "description": "The max distance we would want the user to walk (in km)"
     }
   ]
 }

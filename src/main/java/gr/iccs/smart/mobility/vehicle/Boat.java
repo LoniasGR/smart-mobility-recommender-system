@@ -2,7 +2,7 @@ package gr.iccs.smart.mobility.vehicle;
 
 import org.springframework.data.neo4j.core.schema.Node;
 
-@Node
+@Node(primaryLabel = "Sea Vessel")
 public final class Boat extends Vehicle {
     private Integer capacity;
 
