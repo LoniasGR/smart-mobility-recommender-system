@@ -5,6 +5,7 @@ target/
 
 ### Configuration files ###
 application.properties
+application.yml
 
 ### IntelliJ IDEA ###
 .idea

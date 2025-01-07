@@ -12,3 +12,9 @@ openrouteservice.apikey=
 openrouteservice.host=https://api.openrouteservice.org
 openrouteservice.apiversion=v2
 openrouteservice.ratelimit=40
+
+distances.maxwalkingdistance=2.0
+distances.maxscooterdistance=5.0
+
+datafiles.carLocations=/preload/CarLocations.json
+datafiles.portLocations=/preload/PortLocations.json
