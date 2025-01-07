@@ -84,7 +84,7 @@ public class RecommendationService {
         for (var b : ports) {
             if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= config
                     .getMaxWalkingDistance()) {
-                portService.createConnectionFrom(b, destLandmark);
+                portService.createConnectionFrom(b, destLandmark, config.getMaxWalkingDistance() * 1000);
             }
         }
 

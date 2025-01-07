@@ -1,12 +1,9 @@
 package gr.iccs.smart.mobility.graph;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.neo4j.driver.internal.InternalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.core.Neo4jClient;

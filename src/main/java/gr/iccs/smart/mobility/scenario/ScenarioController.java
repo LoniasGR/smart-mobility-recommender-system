@@ -33,15 +33,28 @@ public class ScenarioController {
 
     @PostMapping
     public ResponseEntity<String> createScenario(
-            @RequestParam(required = false) Boolean randomize) {
+            @RequestParam(defaultValue = "true") Boolean randomize,
+            @RequestBody(required = false) ScenarioDTO scenario) {
         if (!vehicleService.getAll().isEmpty()) {
             throw new ScenarioException("The database is not empty, cannot create scenario.");
         }
+
+        if (scenario == null) {
+            log.info("Creating default scenario, this will fail if randomize is set to false");
+        } else {
+            log.info("Using scenario data");
+            randomize = false;
+        }
         log.debug("Creating Port Stops");
-        portService.createPortScenario(randomize);
+        portService.createPortScenario(randomize, scenario == null ? null : scenario.ports());
 
         log.debug("Creating vehicles");
-        vehicleService.createScenarioVehicles(randomize);
+        log.debug("Creating cars");
+        vehicleService.createScenarioCars(randomize, scenario == null ? null : scenario.cars());
+        log.debug("Creating scooters");
+        vehicleService.createScenarioScooters(randomize, scenario == null ? null : scenario.scooters());
+        log.debug("Creating boats");
+        vehicleService.createScenarioBoats(randomize, scenario == null ? null : scenario.boats());
 
         log.debug("Creating users");
         userService.createScenarioUsers();

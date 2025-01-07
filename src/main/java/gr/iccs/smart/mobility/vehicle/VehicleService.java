@@ -191,20 +191,12 @@ public class VehicleService {
         return vehicleRepository.findByLocationNear(point, maxDistance);
     }
 
-    private void createScenarioCars(Boolean randomize) {
-        if (randomize) {
-            var cars = createRandomCars().stream().map(c -> VehicleDTO.fromVehicle(c)).toList();
-            createScenarioLocations(cars);
-            return;
-        }
+    private CarWrapper createCarsFromResourceFile() {
         String filePath = dataFileConfig.getCarLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
             var stream = resourceReader.readResource(filePath);
-            var cars = mapper.readValue(stream, CarWrapper.class);
-            for (var p : cars.getCars()) {
-                create(p.toCar());
-            }
+            return mapper.readValue(stream, CarWrapper.class);
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
                 log.warn("File %s not found, terminating...", filePath);
@@ -213,44 +205,82 @@ public class VehicleService {
         }
     }
 
-    private List<Car> createRandomCars() {
+    private void createRandomCars() {
         List<Car> cars = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             var vehicle = new Car(UUID.randomUUID().toString(), VehicleType.CAR, true, null);
             cars.add((Car) create(vehicle));
         }
-        return cars;
+        createRandomVehicleInfo(cars.stream().map(s -> VehicleDTO.fromVehicle(s)).toList());
     }
 
-    private List<Scooter> createRandomScooters() {
+    public void createScenarioCars(Boolean randomize, List<CarDTO> cars) {
+        if (randomize) {
+            createRandomCars();
+            return;
+        }
+
+        if (cars == null) {
+            return;
+            // cars = createCarsFromResourceFile().getCars();
+        }
+
+        for (var p : cars) {
+            create(p.toCar());
+        }
+    }
+
+    public void createRandomScooters() {
         List<Scooter> scooters = new ArrayList<>();
 
         for (int i = 0; i < 5; i++) {
             var vehicle = new Scooter(UUID.randomUUID().toString(), VehicleType.SCOOTER, true, null);
             scooters.add((Scooter) create(vehicle));
         }
-        return scooters;
+        createRandomVehicleInfo(scooters.stream().map(s -> VehicleDTO.fromVehicle(s)).toList());
     }
 
-    public List<Boat> createRandomBoats() {
+    public void createScenarioScooters(Boolean randomize, List<ScooterDTO> scooters) {
+        if (randomize) {
+            createRandomScooters();
+            return;
+        }
+
+        if (scooters == null) {
+            return;
+        }
+
+        for (var p : scooters) {
+            create(p.toScooter());
+        }
+    }
+
+    public void createRandomBoats() {
         List<Boat> boats = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             var vehicle = new Boat(UUID.randomUUID().toString(), VehicleType.SEA_VESSEL, true, 10);
             boats.add((Boat) create(vehicle));
         }
-        return boats;
+        createRandomVehicleInfo(boats.stream().map(b -> VehicleDTO.fromVehicle(b)).toList());
     }
 
-    public void createScenarioVehicles(Boolean randomize) {
-        createScenarioCars(randomize);
-        var scooters = createRandomScooters().stream().map(s -> VehicleDTO.fromVehicle(s)).toList();
-        createScenarioLocations(scooters);
-        var boats = createRandomBoats().stream().map(b -> VehicleDTO.fromVehicle(b)).toList();
-        createScenarioLocations(boats);
+    public void createScenarioBoats(Boolean randomize, List<BoatDTO> boats) {
+        if (randomize) {
+            createRandomBoats();
+            return;
+        }
+
+        if (boats == null) {
+            return;
+        }
+
+        for (var p : boats) {
+            create(p.toBoat());
+        }
     }
 
-    public void createScenarioLocations(List<VehicleDTO> vehicles) {
+    public void createRandomVehicleInfo(List<VehicleDTO> vehicles) {
         var ports = portService.getAll();
         for (var v : vehicles) {
             LocationDTO newLocation;

@@ -116,33 +116,41 @@ public class PortService {
         return portRepository.getOneByOneLevelConnection(port.getId());
     }
 
-    public void createRandomPorts() {
+    private void createRandomPorts() {
         for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
             var port = new Port("port_" + i, "Port " + i, IstanbulLocations.coastLocations.get(i).toPoint(), null);
             create(port);
         }
     }
 
-    public void createPortScenario(Boolean randomize) {
-        if (randomize) {
-            createRandomPorts();
-            return;
-        }
-
-        // We use a given file to create the random ports
+    private PortWrapper creatPortWrapperFromFile() {
         String filePath = dataFileConfig.getPortLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
             var stream = resourceReader.readResource(filePath);
-            var portDTOs = mapper.readValue(stream, PortWrapper.class);
-            for (var p : portDTOs.getPorts()) {
-                create(p.toPort());
-            }
+            return mapper.readValue(stream, PortWrapper.class);
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
                 log.warn("File %s not found, stopping...", filePath);
             }
             throw new RuntimeException(e);
         }
+    }
+
+    public void createPortScenario(Boolean randomize, List<PortDTO> ports) {
+        if (randomize) {
+            createRandomPorts();
+            return;
+        }
+
+        if (ports == null) {
+            return;
+            // ports = creatPortWrapperFromFile().getPorts();
+        }
+
+        for (var p : ports) {
+            create(p.toPort());
+        }
+
     }
 }
