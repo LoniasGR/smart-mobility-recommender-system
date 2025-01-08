@@ -69,18 +69,22 @@ public class GraphService {
     }
 
     private void createPortConnections(Port port, List<Port> ports) {
+        // Find all land vehicles around the port
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 port.getLocation(),
                 config.getMaxWalkingDistance());
 
+        // Connect the port with all the vehicles around it (if close enough)
         for (var v : surroundingVehicles) {
             port = portService.createConnectionFrom(port, v, config.getMaxWalkingDistance() * 1000);
         }
 
-        // TODO: Make this more complex
-        for (var bb : ports) {
-            if (!bb.getId().equals(port.getId()))
-                port = portService.createConnectionFrom(port, bb, null);
+        // Create connections with other ports if there are boats parked
+        if (port.getParkedVehicles().size() > 0) {
+            for (var otherPort : ports) {
+                if (!otherPort.getId().equals(port.getId()))
+                    port = portService.createConnectionFrom(port, otherPort, null);
+            }
         }
     }
 

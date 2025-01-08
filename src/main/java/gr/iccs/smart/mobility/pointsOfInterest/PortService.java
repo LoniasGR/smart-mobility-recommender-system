@@ -123,7 +123,7 @@ public class PortService {
         }
     }
 
-    private PortWrapper creatPortWrapperFromFile() {
+    public PortWrapper creatPortWrapperFromFile() {
         String filePath = dataFileConfig.getPortLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
