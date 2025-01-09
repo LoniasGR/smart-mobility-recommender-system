@@ -13,6 +13,10 @@ public class MovementPropertiesConfig {
         return maxWalkingDistance;
     }
 
+    public Double getMaxWalkingDistanceKilometers() {
+        return maxWalkingDistance * 1000;
+    }
+
     public void setMaxWalkingDistance(Double maxwalkingdistance) {
         this.maxWalkingDistance = maxwalkingdistance;
     }
@@ -23,6 +27,10 @@ public class MovementPropertiesConfig {
 
     public void setMaxScooterDistance(Double maxscooterdistance) {
         this.maxScooterDistance = maxscooterdistance;
+    }
+
+    public Double getMaxScooterDistanceKilometers() {
+        return maxScooterDistance * 1000;
     }
 
 }

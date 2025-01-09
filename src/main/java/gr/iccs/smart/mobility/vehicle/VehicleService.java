@@ -28,7 +28,6 @@ import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.util.ResourceReader;
-import net.datafaker.providers.base.Bool;
 
 @Service
 public class VehicleService {
@@ -97,8 +96,11 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public LandVehicle createConnectionTo(LandVehicle vehicle, ReachableNode destination) {
+    public LandVehicle createConnectionTo(LandVehicle vehicle, ReachableNode destination, Double maxDistance) {
         var connection = connectionService.generateConnection(vehicle, destination);
+        if (maxDistance != null && connection.getDistance() > maxDistance) {
+            return vehicle;
+        }
         vehicle.addConnection(connection);
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
@@ -117,6 +119,14 @@ public class VehicleService {
         // Check if location provided is valid for other vehicles
         if (vehicleType != VehicleType.SEA_VESSEL && isSeaLocation) {
             throw new BadVehicleRequest("A land vehicle cannot go in the sea");
+        }
+    }
+
+    private void assignRelatedPort(List<Port> ports, Vehicle vehicle) {
+        var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
+        if (coastLocation.isPresent()) {
+            coastLocation.get().getParkedVehicles().add(vehicle);
+            portService.update(coastLocation.get());
         }
     }
 
@@ -191,7 +201,7 @@ public class VehicleService {
         return vehicleRepository.findByLocationNear(point, maxDistance);
     }
 
-    private CarWrapper createCarsFromResourceFile() {
+    public CarWrapper createCarsFromResourceFile() {
         String filePath = dataFileConfig.getCarLocations();
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -226,7 +236,9 @@ public class VehicleService {
         }
 
         for (var p : cars) {
-            create(p.toCar());
+            var car = p.toCar();
+            car.setStatus(VehicleStatus.IDLE);
+            create(car);
         }
     }
 
@@ -251,7 +263,9 @@ public class VehicleService {
         }
 
         for (var p : scooters) {
-            create(p.toScooter());
+            var scooter = p.toScooter();
+            scooter.setStatus(VehicleStatus.IDLE);
+            create(scooter);
         }
     }
 
@@ -276,7 +290,11 @@ public class VehicleService {
         }
 
         for (var p : boats) {
-            create(p.toBoat());
+            var boat = p.toBoat();
+            boat.setStatus(VehicleStatus.IDLE);
+            // Return type of create is Vehicle, so we need to cast it to Boat
+            boat = (Boat) create(boat);
+            assignRelatedPort(portService.getAll(), boat);
         }
     }
 

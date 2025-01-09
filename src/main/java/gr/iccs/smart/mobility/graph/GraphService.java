@@ -28,12 +28,12 @@ public class GraphService {
     private PortService portService;
 
     private LandVehicle createConnectionWithVehicles(LandVehicle startVehicle,
-            List<LandVehicle> otherVehicles) {
+            List<LandVehicle> otherVehicles, Double maxDistance) {
         for (LandVehicle v : otherVehicles) {
             if (v.getId().equals(startVehicle.getId())) {
                 continue;
             }
-            startVehicle = vehicleService.createConnectionTo(startVehicle, v);
+            startVehicle = vehicleService.createConnectionTo(startVehicle, v, maxDistance);
         }
         return startVehicle;
     }
@@ -46,18 +46,18 @@ public class GraphService {
             ports = portService.getByLocationNear(vehicle.getLocation(), range);
         }
         for (var b : ports) {
-            vehicle = vehicleService.createConnectionTo(vehicle, b);
+            vehicle = vehicleService.createConnectionTo(vehicle, b, range);
         }
         return vehicle;
     }
 
     private void createScooterConnections(LandVehicle scooter) {
-        var maxSooterDistance = config.getMaxScooterDistance();
+        var maxSooterDistance = config.getMaxScooterDistanceKilometers();
 
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 scooter.getLocation(),
                 maxSooterDistance);
-        scooter = createConnectionWithVehicles(scooter, surroundingVehicles);
+        scooter = createConnectionWithVehicles(scooter, surroundingVehicles, maxSooterDistance);
         scooter = createConnectionWithPorts(scooter, maxSooterDistance);
     }
 
@@ -80,6 +80,7 @@ public class GraphService {
         }
 
         // Create connections with other ports if there are boats parked
+
         if (port.getParkedVehicles().size() > 0) {
             for (var otherPort : ports) {
                 if (!otherPort.getId().equals(port.getId()))
