@@ -17,6 +17,7 @@ import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
+import gr.iccs.smart.mobility.graph.WeightType;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.user.User;
 import gr.iccs.smart.mobility.userLandmark.UserDestinationLandmark;
@@ -56,7 +57,7 @@ public class RecommendationService {
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
         if (databaseService.distance(startLandmark.getLocation(), destLandmark.getLocation()) < config
-                .getMaxWalkingDistance()) {
+                .getMaxWalkingDistanceKilometers()) {
             var connection = connectionService.generateConnection(startLandmark, destLandmark);
             startLandmark.getConnections().add(connection);
         }
@@ -83,8 +84,8 @@ public class RecommendationService {
         var ports = portService.getAllWithOneLevelConnection();
         for (var b : ports) {
             if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= config
-                    .getMaxWalkingDistance()) {
-                portService.createConnectionFrom(b, destLandmark, config.getMaxWalkingDistance() * 1000);
+                    .getMaxWalkingDistanceKilometers()) {
+                portService.createConnectionFrom(b, destLandmark, config.getMaxWalkingDistanceKilometers());
             }
         }
 
@@ -92,12 +93,12 @@ public class RecommendationService {
         for (var v : landVehicles) {
             switch (v.getType()) {
                 case VehicleType.CAR:
-                    vehicleService.createConnectionTo(v, destLandmark);
+                    vehicleService.createConnectionTo(v, destLandmark, null);
                     break;
                 case VehicleType.SCOOTER:
                     if (databaseService.distance(v.getLocation(),
-                            destLandmark.getLocation()) <= config.getMaxScooterDistance()) {
-                        vehicleService.createConnectionTo(v, destLandmark);
+                            destLandmark.getLocation()) <= config.getMaxScooterDistanceKilometers()) {
+                        vehicleService.createConnectionTo(v, destLandmark, config.getMaxScooterDistanceKilometers());
                     }
                     break;
                 default:
@@ -136,8 +137,17 @@ public class RecommendationService {
                 recommendationPaths = 1;
             }
 
+            // Ensure weight type exists
+            var weightType = options.requestOptions().weightType();
+            if (Objects.isNull(weightType)) {
+                weightType = WeightType.distance;
+            }
+
             graphProjectionService.generateGraph(projection, nodes);
-            data = graphProjectionService.shortestPaths(projection, user.getUsername(),
+            data = graphProjectionService.shortestPaths(
+                    projection,
+                    user.getUsername(),
+                    weightType,
                     recommendationPaths);
         } finally {
             graphProjectionService.destroyGraph(projection);

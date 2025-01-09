@@ -35,14 +35,15 @@ public class GraphProjectionService {
         client.query(query).run();
     }
 
-    public List<Map<String, Object>> shortestPaths(String projName, String username, Integer paths) {
+    public List<Map<String, Object>> shortestPaths(String projName, String username, WeightType weightType,
+            Integer paths) {
         String query = """
                 MATCH (start:UserStartLandmark)<-[r1:IS_TRAVELLING]-(u:User{id: '$username'})
                 MATCH (finish:UserDestinationLandmark)<-[r2:IS_TRAVELLING]-(u:User{id: '$username'})
                 CALL gds.shortestPath.yens.stream('$name', {
                         sourceNode:start,
                         TargetNode:finish,
-                        relationshipWeightProperty: 'distance',
+                        relationshipWeightProperty: '$weight',
                         k: $paths
                     })
                 YIELD index, sourceNode, targetNode, totalCost, path, nodeIds,  costs
@@ -57,7 +58,8 @@ public class GraphProjectionService {
                 ORDER BY index;
                 """.replace("$name", projName)
                 .replace("$username", username)
-                .replace("$paths", paths.toString());
+                .replace("$paths", paths.toString())
+                .replace("$weight", weightType.toString());
         var res = client.query(query).fetch().all();
 
         if (res.isEmpty()) {
