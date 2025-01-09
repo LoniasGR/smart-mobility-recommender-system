@@ -1,0 +1,88 @@
+{
+  "ports": [
+    {
+      "port_id": "port_1",
+      "name": "Haliç",
+      "location": {
+        "latitude": 41.0282142,
+        "longitude": 28.9664811
+      }
+    },
+    {
+      "port_id": "port_2",
+      "name": "Fener",
+      "location": {
+        "latitude": 41.0302268,
+        "longitude": 28.9528899
+      }
+    }
+  ],
+  "passenger_cars": [
+    {
+      "car_id": "vehicle_1",
+      "location": {
+        "longitude": 29.45669231356099,
+        "latitude": 40.78935875093352
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "vehicle_2",
+      "location": {
+        "longitude": 29.45514146558105,
+        "latitude": 40.7886726277024
+      },
+      "battery": {
+        "level": 65
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "vehicle_3",
+      "location": {
+        "longitude": 29.45501154756698,
+        "latitude": 40.78797631707293
+      },
+      "battery": {
+        "level": 55
+      },
+      "is_dummy": false
+    },
+    {
+      "car_id": "vehicle_4",
+      "location": {
+        "longitude": 29.45839023688535,
+        "latitude": 40.78883399655327
+      },
+      "battery": {
+        "level": 75
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "vehicle_5",
+      "location": {
+        "longitude": 29.45387168747299,
+        "latitude": 40.78850089491554
+      },
+      "battery": {
+        "level": 80
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "vehicle_6",
+      "location": {
+        "longitude": 29.45325265921764,
+        "latitude": 40.78941334596003
+      },
+      "battery": {
+        "level": 97
+      },
+      "is_dummy": true
+    }
+  ]
+}

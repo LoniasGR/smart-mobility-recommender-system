@@ -17,4 +17,9 @@ the longest part of the trip happens in the car.
 
 ## Long distance 2 
 
-Very similar to the above, but now the scooter is further away so it's never
+Very similar to the above, but now the scooter is further away so it's never used.
+
+## Boat Trip
+
+This is also a very long distance trip that depending on wether we chose distance or time as weight
+we end up using different means of transportation.
