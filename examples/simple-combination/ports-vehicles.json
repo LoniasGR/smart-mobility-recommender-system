@@ -1,0 +1,47 @@
+{
+  "ports": [
+    {
+      "port_id": "port_1",
+      "name": "Test1",
+      "location": {
+        "latitude": 41.0163544,
+        "longitude": 28.9766619
+      }
+    },
+
+    {
+      "port_id": "port_2",
+      "name": "Test2",
+      "location": {
+        "latitude": 41.0219298,
+        "longitude": 28.9767732
+      }
+    }
+  ],
+  "scooters": [
+    {
+      "scooter_id": "vehicle_1",
+      "location": {
+        "longitude": 28.9783,
+        "latitude": 41.0119
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
+  ],
+  "sea_vessels": [
+    {
+      "sea_vessel_id": "vehicle_2",
+      "location": {
+        "longitude": 28.9766619,
+        "latitude": 41.0163544
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
+  ]
+}

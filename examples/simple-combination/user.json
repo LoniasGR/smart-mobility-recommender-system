@@ -1,0 +1,14 @@
+{
+  "startingLocation": {
+    "latitude": 41.01094,
+    "longitude": 28.9781
+  },
+  "endingLocation": {
+    "latitude": 41.0231,
+    "longitude": 28.978
+  },
+  "options": {
+    "recommendationPaths": 1,
+    "weightType": "time"
+  }
+}
