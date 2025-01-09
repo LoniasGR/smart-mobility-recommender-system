@@ -10,6 +10,6 @@ public record PortDTO(
                 LocationDTO location) {
 
         public Port toPort() {
-                return new Port(id(), name(), location().toPoint(), null);
+                return new Port(id(), name(), location().toPoint(), null, null);
         }
 }

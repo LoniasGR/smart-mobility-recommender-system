@@ -118,7 +118,8 @@ public class PortService {
 
     private void createRandomPorts() {
         for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
-            var port = new Port("port_" + i, "Port " + i, IstanbulLocations.coastLocations.get(i).toPoint(), null);
+            var port = new Port("port_" + i, "Port " + i, IstanbulLocations.coastLocations.get(i).toPoint(), null,
+                    null);
             create(port);
         }
     }

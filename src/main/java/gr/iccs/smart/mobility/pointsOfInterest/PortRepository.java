@@ -21,10 +21,10 @@ public interface PortRepository extends Neo4jRepository<Port, String> {
 
     Optional<Port> findByLocation(Point point);
 
-    @Query("MATCH p=(n:Port)-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
+    @Query("MATCH p=(q)-[:PARKED_IN*0..1]->(n:Port)-[*0..1]->(m) RETURN collect(q), n, collect(relationships(p)), collect(m)")
     List<Port> getAllByOneLevelConnection();
 
-    @Query("MATCH p=(n:Port{id: $portID})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
+    @Query("MATCH p=(q)-[:PARKED_IN*0..1]->(n:Port{id: $portID})-[*0..1]->(m) RETURN collect(q), n, collect(relationships(p)), collect(m)")
     Port getOneByOneLevelConnection(String portID);
 
     // TODO: Investigate if we could do this with what the ORM offers alone

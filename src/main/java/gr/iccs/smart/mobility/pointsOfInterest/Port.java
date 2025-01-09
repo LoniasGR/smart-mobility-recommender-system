@@ -21,15 +21,16 @@ public final class Port implements ReachableNode, StartingNode {
     private final String name;
     private Point location;
 
-    public Port(String id, String name, Point location, List<Connection> connections) {
+    public Port(String id, String name, Point location, List<Vehicle> parkedVehicles, List<Connection> connections) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
+        this.parkedVehicles = Objects.requireNonNullElseGet(parkedVehicles, ArrayList::new);
     }
 
     @Relationship(type = "PARKED_IN", direction = Relationship.Direction.INCOMING)
-    private List<Vehicle> parkedVehicles = new ArrayList<>();
+    private final List<Vehicle> parkedVehicles;
 
     @Relationship(type = "CONNECTS_TO", direction = Relationship.Direction.OUTGOING)
     private final List<Connection> connections;
@@ -53,10 +54,6 @@ public final class Port implements ReachableNode, StartingNode {
 
     public List<Vehicle> getParkedVehicles() {
         return parkedVehicles;
-    }
-
-    public void setParkedVehicles(List<Vehicle> parkedVehicles) {
-        this.parkedVehicles = parkedVehicles;
     }
 
     public List<Connection> getConnections() {
