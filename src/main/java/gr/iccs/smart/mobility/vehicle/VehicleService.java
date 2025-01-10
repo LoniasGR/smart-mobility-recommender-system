@@ -27,6 +27,7 @@ import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
+import gr.iccs.smart.mobility.scenario.ScenarioDTO;
 import gr.iccs.smart.mobility.util.ResourceReader;
 
 @Service
@@ -224,15 +225,21 @@ public class VehicleService {
         createRandomVehicleInfo(cars.stream().map(s -> VehicleDTO.fromVehicle(s)).toList());
     }
 
-    public void createScenarioCars(Boolean randomize, List<CarDTO> cars) {
+    public void createScenarioCars(Boolean randomize, ScenarioDTO scenario) {
         if (randomize) {
             createRandomCars();
             return;
         }
 
+        List<CarDTO> cars = null;
+        if (scenario == null) {
+            cars = createCarsFromResourceFile().getCars();
+        } else {
+            cars = scenario.cars();
+        }
+
         if (cars == null) {
             return;
-            // cars = createCarsFromResourceFile().getCars();
         }
 
         for (var p : cars) {

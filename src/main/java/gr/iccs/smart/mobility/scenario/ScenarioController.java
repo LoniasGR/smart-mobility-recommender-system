@@ -1,21 +1,27 @@
 package gr.iccs.smart.mobility.scenario;
 
-import gr.iccs.smart.mobility.pointsOfInterest.PortService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/scenario")
@@ -26,7 +32,7 @@ public class ScenarioController {
     private VehicleService vehicleService;
 
     @Autowired
-    private PortService portService;
+    private ScenarioService scenarioService;
 
     @Autowired
     private UserService userService;
@@ -35,30 +41,11 @@ public class ScenarioController {
     public ResponseEntity<String> createScenario(
             @RequestParam(defaultValue = "true") Boolean randomize,
             @RequestBody(required = false) ScenarioDTO scenario) {
-        if (!vehicleService.getAll().isEmpty()) {
-            throw new ScenarioException("The database is not empty, cannot create scenario.");
-        }
 
-        if (scenario == null) {
-            log.info("Creating default scenario, this will fail if randomize is set to false");
-        } else {
-            log.info("Using scenario data");
-            randomize = false;
-        }
-        log.debug("Creating Port Stops");
-        portService.createPortScenario(randomize, scenario == null ? null : scenario.ports());
+        log.debug("Called createScenario with randomize: " + randomize.toString() + " and " +
+                (Objects.isNull(scenario) ? "provided" : "no") + " scenario");
 
-        log.debug("Creating vehicles");
-        log.debug("Creating cars");
-        vehicleService.createScenarioCars(randomize, scenario == null ? null : scenario.cars());
-        log.debug("Creating scooters");
-        vehicleService.createScenarioScooters(randomize, scenario == null ? null : scenario.scooters());
-        log.debug("Creating boats");
-        vehicleService.createScenarioBoats(randomize, scenario == null ? null : scenario.boats());
-
-        log.debug("Creating users");
-        userService.createScenarioUsers();
-
+        scenarioService.createScenario(scenario, randomize);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
 

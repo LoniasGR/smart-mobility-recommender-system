@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: develop-colombo-clara-sponsor-erosion-6500
+  data:
+    neo4j:
+      database: neo4j
+
+logging:
+  level:
+    "[org.springframework.data.neo4j.cypher]": trace
+
+openrouteservice:
+  apikey:
+  host: https://openrouteservice.org
+  apiversion: v2
+  ratelimit: 0
+
+distances:
+  maxscooterdistance: 5.0
+  maxwalkingdistance: 2.0
+
+speeds:
+  boatspeed: 15.0
+
+datafiles:
+  carLocations: /preload/CarLocations.json
+  portLocations: /preload/PortLocations.json

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
+import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
@@ -19,7 +19,7 @@ public class GraphService {
     private VehicleService vehicleService;
 
     @Autowired
-    private MovementPropertiesConfig config;
+    private TransportationPropertiesConfig config;
 
     @Autowired
     private ConnectionService connectionService;
@@ -52,7 +52,7 @@ public class GraphService {
     }
 
     private void createScooterConnections(LandVehicle scooter) {
-        var maxSooterDistance = config.getMaxScooterDistanceKilometers();
+        var maxSooterDistance = config.getDistances().getMaxScooterDistanceKilometers();
 
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 scooter.getLocation(),
@@ -72,11 +72,11 @@ public class GraphService {
         // Find all land vehicles around the port
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 port.getLocation(),
-                config.getMaxWalkingDistance());
+                config.getDistances().getMaxWalkingDistance());
 
         // Connect the port with all the vehicles around it (if close enough)
         for (var v : surroundingVehicles) {
-            port = portService.createConnectionFrom(port, v, config.getMaxWalkingDistance() * 1000);
+            port = portService.createConnectionFrom(port, v, config.getDistances().getMaxWalkingDistanceKilometers());
         }
 
         // Create connections with other ports if there are boats parked

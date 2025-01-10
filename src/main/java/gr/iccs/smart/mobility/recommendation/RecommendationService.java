@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
-import gr.iccs.smart.mobility.config.MovementPropertiesConfig;
+import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
@@ -44,7 +44,7 @@ public class RecommendationService {
     private ConnectionService connectionService;
 
     @Autowired
-    private MovementPropertiesConfig config;
+    private TransportationPropertiesConfig config;
 
     @Autowired
     private Neo4jTemplate neo4jTemplate;
@@ -56,14 +56,15 @@ public class RecommendationService {
     private GraphProjectionService graphProjectionService;
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
-        if (databaseService.distance(startLandmark.getLocation(), destLandmark.getLocation()) < config
-                .getMaxWalkingDistanceKilometers()) {
+        var maxWalkingDistanceKilometers = config.getDistances().getMaxWalkingDistanceKilometers();
+        if (databaseService.distance(startLandmark.getLocation(),
+                destLandmark.getLocation()) < maxWalkingDistanceKilometers) {
             var connection = connectionService.generateConnection(startLandmark, destLandmark);
             startLandmark.getConnections().add(connection);
         }
 
         var nearbyVehicles = vehicleService.findLandVehicleNoConnectionByNearLocation(startLandmark.getLocation(),
-                config.getMaxWalkingDistance());
+                config.getDistances().getMaxWalkingDistance());
 
         for (var v : nearbyVehicles) {
             var conn = connectionService.generateConnection(startLandmark, v);
@@ -71,7 +72,7 @@ public class RecommendationService {
         }
 
         var nearbyPorts = portService.getByLocationNear(startLandmark.getLocation(),
-                config.getMaxWalkingDistance());
+                config.getDistances().getMaxWalkingDistance());
         for (var b : nearbyPorts) {
             var conn = connectionService.generateConnection(startLandmark, b);
             startLandmark.addConnection(conn);
@@ -81,11 +82,12 @@ public class RecommendationService {
     }
 
     private void createEndLandmarkConnections(UserDestinationLandmark destLandmark) {
+        var maxWalkingDistanceKilometers = config.getDistances().getMaxWalkingDistanceKilometers();
+        var maxScooterDistanceKilometers = config.getDistances().getMaxScooterDistanceKilometers();
         var ports = portService.getAllWithOneLevelConnection();
         for (var b : ports) {
-            if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= config
-                    .getMaxWalkingDistanceKilometers()) {
-                portService.createConnectionFrom(b, destLandmark, config.getMaxWalkingDistanceKilometers());
+            if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= maxWalkingDistanceKilometers) {
+                portService.createConnectionFrom(b, destLandmark, maxWalkingDistanceKilometers);
             }
         }
 
@@ -97,8 +99,8 @@ public class RecommendationService {
                     break;
                 case VehicleType.SCOOTER:
                     if (databaseService.distance(v.getLocation(),
-                            destLandmark.getLocation()) <= config.getMaxScooterDistanceKilometers()) {
-                        vehicleService.createConnectionTo(v, destLandmark, config.getMaxScooterDistanceKilometers());
+                            destLandmark.getLocation()) <= maxScooterDistanceKilometers) {
+                        vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceKilometers);
                     }
                     break;
                 default:

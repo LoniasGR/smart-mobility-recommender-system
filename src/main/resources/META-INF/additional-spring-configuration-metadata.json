@@ -21,14 +21,29 @@
       "description": "The API Version to be used (should probably always be `v2`"
     },
     {
-      "name": "distances.maxscooterdistance",
+      "name": "transportation.distances.maxscooterdistance",
       "type": "java.lang.Double",
       "description": "The max distance a scooter could travel on full battery (in km)"
     },
     {
-      "name": "distances.maxwalkingdistance",
+      "name": "transportation.distances.maxwalkingdistance",
       "type": "java.lang.Double",
       "description": "The max distance we would want the user to walk (in km)"
+    },
+    {
+      "name": "transportation.speeds.boatspeed",
+      "type": "java.lang.Double",
+      "description": "The average sea taxi speed (in kn)"
+    },
+    {
+      "name": "datafiles.carLocations",
+      "type": "java.lang.String",
+      "description": "A JSON file containing the locations of the cars to preload"
+    },
+    {
+      "name": "datafiles.portLocations",
+      "type": "java.lang.String",
+      "description": "A JSON file containing the locations of the ports to preload"
     }
   ]
 }

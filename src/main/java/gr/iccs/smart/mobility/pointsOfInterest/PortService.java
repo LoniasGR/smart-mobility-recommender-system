@@ -16,11 +16,13 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gr.iccs.smart.mobility.config.DataFileConfig;
+import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.Connection;
 import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
+import gr.iccs.smart.mobility.scenario.ScenarioDTO;
 import gr.iccs.smart.mobility.util.ResourceReader;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
@@ -41,6 +43,9 @@ public class PortService {
 
     @Autowired
     private DatabaseService databaseService;
+
+    @Autowired
+    private TransportationPropertiesConfig transportPropertiesConfig;
 
     @Autowired
     private Neo4jTemplate neo4jTemplate;
@@ -98,7 +103,8 @@ public class PortService {
         // If the reachable node is a port, we are using a boat.
         if (destination instanceof Port) {
             Double distance = databaseService.distance(port.getLocation(), destination.getLocation());
-            connection = connectionService.createConnection(destination, distance, distance);
+            Double time = distance / transportPropertiesConfig.getSpeeds().getBoatSpeedMetersPerSecond();
+            connection = connectionService.createConnection(destination, distance, time);
         } else {
             // If it's anything else, the user will have to walk to the reachable node.
             connection = connectionService.generateConnection(port, destination);
@@ -138,15 +144,21 @@ public class PortService {
         }
     }
 
-    public void createPortScenario(Boolean randomize, List<PortDTO> ports) {
+    public void createPortScenario(Boolean randomize, ScenarioDTO scenario) {
         if (randomize) {
             createRandomPorts();
             return;
         }
 
+        List<PortDTO> ports = null;
+        if (scenario == null) {
+            ports = creatPortWrapperFromFile().getPorts();
+        } else {
+            ports = scenario.ports();
+        }
+
         if (ports == null) {
             return;
-            // ports = creatPortWrapperFromFile().getPorts();
         }
 
         for (var p : ports) {
