@@ -2,6 +2,7 @@ package gr.iccs.smart.mobility.scenario;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -39,13 +40,15 @@ public class ScenarioController {
 
     @PostMapping
     public ResponseEntity<String> createScenario(
-            @RequestParam(defaultValue = "true") Boolean randomize,
+            @RequestParam Map<String, String> allParams,
             @RequestBody(required = false) ScenarioDTO scenario) {
 
-        log.debug("Called createScenario with randomize: " + randomize.toString() + " and " +
+        var randomScenario = new RandomScenario(allParams);
+
+        log.debug("Called createScenario with randomScenario: " + randomScenario.toString() + " and " +
                 (Objects.isNull(scenario) ? "provided" : "no") + " scenario");
 
-        scenarioService.createScenario(scenario, randomize);
+        scenarioService.createScenario(scenario, randomScenario);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
 

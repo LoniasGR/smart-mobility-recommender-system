@@ -1,7 +1,6 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -27,6 +26,7 @@ import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.pointsOfInterest.PortService;
+import gr.iccs.smart.mobility.scenario.RandomScenario;
 import gr.iccs.smart.mobility.scenario.ScenarioDTO;
 import gr.iccs.smart.mobility.util.ResourceReader;
 
@@ -216,18 +216,17 @@ public class VehicleService {
         }
     }
 
-    private void createRandomCars() {
-        List<Car> cars = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            var vehicle = new Car(UUID.randomUUID().toString(), VehicleType.CAR, true, null);
-            cars.add((Car) create(vehicle));
+    private void createRandomCars(Integer n) {
+        for (int i = 0; i < n; i++) {
+            var vehicle = new Car("car_" + i, VehicleType.CAR, true, null);
+            var car = create(vehicle);
+            createRandomVehicleInfo(car);
         }
-        createRandomVehicleInfo(cars.stream().map(s -> VehicleDTO.fromVehicle(s)).toList());
     }
 
-    public void createScenarioCars(Boolean randomize, ScenarioDTO scenario) {
-        if (randomize) {
-            createRandomCars();
+    public void createScenarioCars(RandomScenario randomScenario, ScenarioDTO scenario) {
+        if (randomScenario.randomize()) {
+            createRandomCars(randomScenario.cars());
             return;
         }
 
@@ -249,19 +248,17 @@ public class VehicleService {
         }
     }
 
-    public void createRandomScooters() {
-        List<Scooter> scooters = new ArrayList<>();
-
-        for (int i = 0; i < 5; i++) {
-            var vehicle = new Scooter(UUID.randomUUID().toString(), VehicleType.SCOOTER, true, null);
-            scooters.add((Scooter) create(vehicle));
+    public void createRandomScooters(Integer n) {
+        for (int i = 0; i < n; i++) {
+            var vehicle = new Scooter("scooter_" + i, VehicleType.SCOOTER, true, null);
+            var scooter = create(vehicle);
+            createRandomVehicleInfo(scooter);
         }
-        createRandomVehicleInfo(scooters.stream().map(s -> VehicleDTO.fromVehicle(s)).toList());
     }
 
-    public void createScenarioScooters(Boolean randomize, List<ScooterDTO> scooters) {
-        if (randomize) {
-            createRandomScooters();
+    public void createScenarioScooters(RandomScenario randomScenario, List<ScooterDTO> scooters) {
+        if (randomScenario.randomize()) {
+            createRandomScooters(randomScenario.scooters());
             return;
         }
 
@@ -276,19 +273,18 @@ public class VehicleService {
         }
     }
 
-    public void createRandomBoats() {
-        List<Boat> boats = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            var vehicle = new Boat(UUID.randomUUID().toString(), VehicleType.SEA_VESSEL, true, 10);
-            boats.add((Boat) create(vehicle));
+    public void createRandomBoats(Integer n) {
+        var ports = portService.getAll();
+        for (int i = 0; i < n; i++) {
+            var vehicle = new Boat("boat_" + i, VehicleType.SEA_VESSEL, true, 10);
+            var boat = (Boat) create(vehicle);
+            createRandomBoatInfo(boat, ports);
         }
-        createRandomVehicleInfo(boats.stream().map(b -> VehicleDTO.fromVehicle(b)).toList());
     }
 
-    public void createScenarioBoats(Boolean randomize, List<BoatDTO> boats) {
-        if (randomize) {
-            createRandomBoats();
+    public void createScenarioBoats(RandomScenario randomScenario, List<BoatDTO> boats) {
+        if (randomScenario.randomize()) {
+            createRandomBoats(randomScenario.boats());
             return;
         }
 
@@ -305,21 +301,23 @@ public class VehicleService {
         }
     }
 
-    public void createRandomVehicleInfo(List<VehicleDTO> vehicles) {
-        var ports = portService.getAll();
-        for (var v : vehicles) {
-            LocationDTO newLocation;
-            if (v.type() == VehicleType.SEA_VESSEL) {
-                newLocation = LocationDTO.fromGeographicPoint(ports.get(RANDOM.nextInt(ports.size())).getLocation());
-            } else {
-                newLocation = IstanbulLocations.randomLandLocation();
-            }
-            VehicleInfoDTO vehicleInfo = new VehicleInfoDTO(
-                    new Battery(RANDOM.nextLong(100)),
-                    newLocation.latitude(),
-                    newLocation.longitude(),
-                    VehicleStatus.IDLE);
-            updateVehicleStatus(v.id(), vehicleInfo);
-        }
+    private void createRandomBoatInfo(Boat boat, List<Port> ports) {
+        LocationDTO newLocation = LocationDTO
+                .fromGeographicPoint(ports.get(RANDOM.nextInt(ports.size())).getLocation());
+        updateVehicleStatus(boat.getId(), generateRandomVehicleInfoDTO(newLocation));
     }
+
+    private void createRandomVehicleInfo(Vehicle vehicle) {
+        LocationDTO newLocation = IstanbulLocations.randomLandLocation();
+        updateVehicleStatus(vehicle.getId(), generateRandomVehicleInfoDTO(newLocation));
+    }
+
+    private VehicleInfoDTO generateRandomVehicleInfoDTO(LocationDTO newLocation) {
+        return new VehicleInfoDTO(
+                new Battery(RANDOM.nextLong(100)),
+                newLocation.latitude(),
+                newLocation.longitude(),
+                VehicleStatus.IDLE);
+    }
+
 }

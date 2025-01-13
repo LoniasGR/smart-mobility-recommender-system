@@ -22,7 +22,9 @@ import gr.iccs.smart.mobility.connection.ConnectionService;
 import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
+import gr.iccs.smart.mobility.scenario.RandomScenario;
 import gr.iccs.smart.mobility.scenario.ScenarioDTO;
+import gr.iccs.smart.mobility.scenario.ScenarioException;
 import gr.iccs.smart.mobility.util.ResourceReader;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
@@ -122,8 +124,12 @@ public class PortService {
         return portRepository.getOneByOneLevelConnection(port.getId());
     }
 
-    private void createRandomPorts() {
-        for (int i = 0; i < IstanbulLocations.coastLocations.size(); i++) {
+    private void createRandomPorts(Integer n) {
+        if (n > IstanbulLocations.coastLocations.size()) {
+            throw new ScenarioException("Cannot create more ports than the number of coast locations");
+        }
+        // TODO: Improve this to create ports in random locations
+        for (int i = 0; i < n; i++) {
             var port = new Port("port_" + i, "Port " + i, IstanbulLocations.coastLocations.get(i).toPoint(), null,
                     null);
             create(port);
@@ -144,9 +150,9 @@ public class PortService {
         }
     }
 
-    public void createPortScenario(Boolean randomize, ScenarioDTO scenario) {
-        if (randomize) {
-            createRandomPorts();
+    public void createPortScenario(RandomScenario randomScenario, ScenarioDTO scenario) {
+        if (randomScenario.randomize()) {
+            createRandomPorts(randomScenario.ports());
             return;
         }
 

@@ -26,31 +26,35 @@ public class ScenarioService {
 
     private static final Logger log = LoggerFactory.getLogger(ScenarioService.class);
 
-    public void createScenario(ScenarioDTO scenario, boolean randomize) {
+    public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario) {
 
         if (!vehicleService.getAll().isEmpty()) {
             throw new ScenarioException("The database is not empty, cannot create scenario.");
         }
 
+        if (scenario != null && randomScenario.randomize()) {
+            throw new ScenarioException("Cannot combine both a predifined and a random scenario");
+        }
+
         if (scenario == null) {
-            log.info("Creating default scenario, this will fail if randomize is set to false");
+            log.info("Creating default scenario");
         } else {
             log.info("Using scenario data");
-            randomize = false;
         }
+
         log.debug("Creating Ports");
-        portService.createPortScenario(randomize, scenario);
+        portService.createPortScenario(randomScenario, scenario);
 
         log.debug("Creating Vehicles");
 
         log.debug("Creating Cars");
-        vehicleService.createScenarioCars(randomize, scenario);
+        vehicleService.createScenarioCars(randomScenario, scenario);
 
         log.debug("Creating Scooters");
-        vehicleService.createScenarioScooters(randomize, scenario == null ? null : scenario.scooters());
+        vehicleService.createScenarioScooters(randomScenario, scenario == null ? null : scenario.scooters());
 
         log.debug("Creating Boats");
-        vehicleService.createScenarioBoats(randomize, scenario == null ? null : scenario.boats());
+        vehicleService.createScenarioBoats(randomScenario, scenario == null ? null : scenario.boats());
 
         log.debug("Creating users");
         userService.createScenarioUsers();
