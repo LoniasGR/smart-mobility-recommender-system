@@ -1,5 +1,8 @@
 # Examples
 
+_Keep in mind_: Currently boats are considered to go with a speed of 1m/s, meaning they are really slow.
+We should probably upgrade this to something closer to 20kn which is the maximum speed a sea taxi can go.
+
 This directory contains a list of examples that can be used to test the recommendation service.
 
 The list contains the following examples:
@@ -9,6 +12,7 @@ The list contains the following examples:
 A simple demonstration of how the weight selection affects results. Boats are way slower than 
 scooters, so when selecting time as weight, the recommendation is to take the scooter for the whole trip,
 while when selecting distance, the recommendation changes to using the boat. 
+
 
 ## Long distance
 

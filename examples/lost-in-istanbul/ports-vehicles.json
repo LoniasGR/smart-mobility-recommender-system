@@ -1,0 +1,103 @@
+{
+  "ports": [
+    {
+      "port_id": "port_1",
+      "name": "Test1",
+      "location": {
+        "latitude": 41.0163544,
+        "longitude": 28.9766619
+      }
+    },
+    {
+      "port_id": "port_2",
+      "name": "Test2",
+      "location": {
+        "latitude": 41.0219298,
+        "longitude": 28.9767732
+      }
+    }
+  ],
+  "scooters": [
+    {
+      "scooter_id": "scooter_1",
+      "location": {
+        "longitude": 28.977005,
+        "latitude": 41.023911
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
+  ],
+  "passenger_cars": [
+    {
+      "car_id": "car_1",
+      "location": {
+        "longitude": 28.9781,
+        "latitude": 41.024893
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_2",
+      "location": {
+        "longitude": 28.974149,
+        "latitude": 41.010191
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_3",
+      "location": {
+        "longitude": 28.96408,
+        "latitude": 41.01511
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_4",
+      "location": {
+        "longitude": 29.012246,
+        "latitude": 41.024122
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
+  ],
+  "sea_vessels": [
+    {
+      "sea_vessel_id": "sea_vessel_1",
+      "location": {
+        "longitude": 28.9766619,
+        "latitude": 41.0163544
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "sea_vessel_id": "sea_vessel_2",
+      "location": {
+        "latitude": 41.0219298,
+        "longitude": 28.9767732
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
+  ]
+}
