@@ -56,15 +56,15 @@ public class RecommendationService {
     private GraphProjectionService graphProjectionService;
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
-        var maxWalkingDistanceKilometers = config.getDistances().getMaxWalkingDistanceKilometers();
+        var maxWalkingDistanceMeters = config.getDistances().getMaxWalkingDistanceMeters();
         if (databaseService.distance(startLandmark.getLocation(),
-                destLandmark.getLocation()) < maxWalkingDistanceKilometers) {
+                destLandmark.getLocation()) < maxWalkingDistanceMeters) {
             var connection = connectionService.generateConnection(startLandmark, destLandmark);
             startLandmark.getConnections().add(connection);
         }
 
         var nearbyVehicles = vehicleService.findLandVehicleNoConnectionByNearLocation(startLandmark.getLocation(),
-                config.getDistances().getMaxWalkingDistance());
+                config.getDistances().getMaxWalkingDistanceKms());
 
         for (var v : nearbyVehicles) {
             var conn = connectionService.generateConnection(startLandmark, v);
@@ -72,7 +72,7 @@ public class RecommendationService {
         }
 
         var nearbyPorts = portService.getByLocationNear(startLandmark.getLocation(),
-                config.getDistances().getMaxWalkingDistance());
+                config.getDistances().getMaxWalkingDistanceKms());
         for (var b : nearbyPorts) {
             var conn = connectionService.generateConnection(startLandmark, b);
             startLandmark.addConnection(conn);
@@ -82,12 +82,13 @@ public class RecommendationService {
     }
 
     private void createEndLandmarkConnections(UserDestinationLandmark destLandmark) {
-        var maxWalkingDistanceKilometers = config.getDistances().getMaxWalkingDistanceKilometers();
-        var maxScooterDistanceKilometers = config.getDistances().getMaxScooterDistanceKilometers();
+        var maxWalkingDistanceMeters = config.getDistances().getMaxWalkingDistanceMeters();
+        var maxScooterDistanceMeters = config.getDistances().getMaxScooterDistanceMeters();
         var ports = portService.getAllWithOneLevelConnection();
         for (var b : ports) {
-            if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= maxWalkingDistanceKilometers) {
-                portService.createConnectionFrom(b, destLandmark, maxWalkingDistanceKilometers);
+            if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= maxWalkingDistanceMeters) {
+                portService.createConnectionFrom(b, destLandmark, maxWalkingDistanceMeters);
+                b = portService.saveAndGet(b);
             }
         }
 
@@ -95,12 +96,13 @@ public class RecommendationService {
         for (var v : landVehicles) {
             switch (v.getType()) {
                 case VehicleType.CAR:
-                    vehicleService.createConnectionTo(v, destLandmark, null);
+                    vehicleService.saveAndGet(vehicleService.createConnectionTo(v, destLandmark, null));
                     break;
                 case VehicleType.SCOOTER:
                     if (databaseService.distance(v.getLocation(),
-                            destLandmark.getLocation()) <= maxScooterDistanceKilometers) {
-                        vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceKilometers);
+                            destLandmark.getLocation()) <= maxScooterDistanceMeters) {
+                        vehicleService.saveAndGet(
+                                vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
                     }
                     break;
                 default:

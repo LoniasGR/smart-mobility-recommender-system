@@ -29,11 +29,11 @@ public class TransportationPropertiesConfig {
         private Double maxWalkingDistance = 2.0;
         private Double maxScooterDistance = 5.0;
 
-        public Double getMaxWalkingDistance() {
+        public Double getMaxWalkingDistanceKms() {
             return maxWalkingDistance;
         }
 
-        public Double getMaxWalkingDistanceKilometers() {
+        public Double getMaxWalkingDistanceMeters() {
             return maxWalkingDistance * 1000;
         }
 
@@ -41,7 +41,7 @@ public class TransportationPropertiesConfig {
             this.maxWalkingDistance = maxwalkingdistance;
         }
 
-        public Double getMaxScooterDistance() {
+        public Double getMaxScooterDistanceKms() {
             return maxScooterDistance;
         }
 
@@ -49,7 +49,7 @@ public class TransportationPropertiesConfig {
             this.maxScooterDistance = maxscooterdistance;
         }
 
-        public Double getMaxScooterDistanceKilometers() {
+        public Double getMaxScooterDistanceMeters() {
             return maxScooterDistance * 1000;
         }
     }

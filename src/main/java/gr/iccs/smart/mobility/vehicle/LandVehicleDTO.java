@@ -1,12 +1,10 @@
 package gr.iccs.smart.mobility.vehicle;
 
-import java.util.UUID;
-
 import org.neo4j.driver.types.Point;
 
 public interface LandVehicleDTO {
 
-    UUID getId();
+    String getId();
 
     VehicleType getType();
 

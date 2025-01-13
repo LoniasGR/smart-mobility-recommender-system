@@ -118,8 +118,11 @@ public class PortService {
         }
 
         port.addConnection(connection);
-        neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
+        return port;
+    }
 
+    public Port saveAndGet(Port port) {
+        neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
         // We need to update the boat stop to get the new connection info
         return portRepository.getOneByOneLevelConnection(port.getId());
     }

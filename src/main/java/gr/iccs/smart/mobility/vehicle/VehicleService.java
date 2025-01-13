@@ -103,8 +103,13 @@ public class VehicleService {
             return vehicle;
         }
         vehicle.addConnection(connection);
+        return vehicle;
+    }
+
+    public LandVehicle saveAndGet(LandVehicle vehicle) {
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
+
     }
 
     private void validateLocation(Point newLocation, List<Port> ports, VehicleType vehicleType) {

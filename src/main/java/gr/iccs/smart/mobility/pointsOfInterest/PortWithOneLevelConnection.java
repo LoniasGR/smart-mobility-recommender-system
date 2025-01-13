@@ -8,7 +8,7 @@ import org.neo4j.driver.types.Point;
 import gr.iccs.smart.mobility.connection.ConnectionDTO;
 
 public interface PortWithOneLevelConnection {
-    public UUID getId();
+    public String getId();
 
     public Point getLocation();
 
