@@ -28,6 +28,105 @@
         "level": 70
       },
       "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_2",
+      "location": {
+        "longitude": 29.03498,
+        "latitude": 41.027155
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_3",
+      "location": {
+        "longitude": 29.000128,
+        "latitude": 41.0424819
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_4",
+      "location": {
+        "longitude": 28.93882,
+        "latitude": 41.029152
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_5",
+      "location": {
+        "longitude": 28.910907,
+        "latitude": 41.0091069
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_6",
+      "location": {
+        "longitude": 28.94962,
+        "latitude": 41.011598
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_7",
+      "location": {
+        "longitude": 28.957864,
+        "latitude": 41.0128099
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_8",
+      "location": {
+        "longitude": 28.97505,
+        "latitude": 41.004217
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_9",
+      "location": {
+        "longitude": 28.98584,
+        "latitude": 41.01623
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "scooter_id": "scooter_10",
+      "location": {
+        "longitude": 29.02357,
+        "latitude": 41.004211
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
     }
   ],
   "passenger_cars": [
@@ -74,6 +173,72 @@
         "level": 70
       },
       "is_dummy": true
+    },
+    {
+      "car_id": "car_5",
+      "location": {
+        "longitude": 28.9643,
+        "latitude": 41.005059
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_6",
+      "location": {
+        "longitude": 29.017423,
+        "latitude": 41.010379
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_7",
+      "location": {
+        "longitude": 28.9857,
+        "latitude": 41.0314
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_8",
+      "location": {
+        "longitude": 29.01479,
+        "latitude": 41.0155
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_9",
+      "location": {
+        "longitude": 29.01514,
+        "latitude": 41.020512
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "car_id": "car_10",
+      "location": {
+        "longitude": 28.97911,
+        "latitude": 41.005602
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
     }
   ],
   "sea_vessels": [
@@ -93,6 +258,39 @@
       "location": {
         "latitude": 41.0219298,
         "longitude": 28.9767732
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "sea_vessel_id": "sea_vessel_3",
+      "location": {
+        "latitude": 41.0219298,
+        "longitude": 28.9767732
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "sea_vessel_id": "sea_vessel_4",
+      "location": {
+        "longitude": 28.9766619,
+        "latitude": 41.0163544
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "sea_vessel_id": "sea_vessel_5",
+      "location": {
+        "longitude": 28.9766619,
+        "latitude": 41.0163544
       },
       "battery": {
         "level": 70
