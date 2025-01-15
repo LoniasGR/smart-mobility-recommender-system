@@ -44,6 +44,11 @@
       "name": "datafiles.portLocations",
       "type": "java.lang.String",
       "description": "A JSON file containing the locations of the ports to preload"
+    },
+    {
+      "name": "transportation.distances.maxcardistance",
+      "type": "java.lang.Double",
+      "description": "The max distance a car could travel on full battery (in km)"
     }
   ]
 }

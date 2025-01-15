@@ -3,7 +3,6 @@ package gr.iccs.smart.mobility.vehicle;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Point;
@@ -24,8 +23,8 @@ import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
+import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
 import gr.iccs.smart.mobility.pointsOfInterest.Port;
-import gr.iccs.smart.mobility.pointsOfInterest.PortService;
 import gr.iccs.smart.mobility.scenario.RandomScenario;
 import gr.iccs.smart.mobility.scenario.ScenarioDTO;
 import gr.iccs.smart.mobility.util.ResourceReader;
@@ -39,7 +38,7 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
 
     @Autowired
-    private PortService portService;
+    private PointOfInterestService pointOfInterestService;
 
     @Autowired
     private ConnectionService connectionService;
@@ -60,6 +59,10 @@ public class VehicleService {
     public Vehicle create(Vehicle vehicle) {
         if (vehicle.getType() == null) {
             throw new BadVehicleRequest("vehicle type is missing");
+        }
+
+        if (vehicle.getId() == null) {
+            throw new BadVehicleRequest("Vehicle id is missing");
         }
 
         if (vehicleRepository.existsById(vehicle.getId())) {
@@ -83,7 +86,7 @@ public class VehicleService {
         }
         var vehicle = oldVehicle.get();
         var newLocation = Values.point(4326, vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()).asPoint();
-        var ports = portService.getAll();
+        var ports = pointOfInterestService.getAllPorts();
         validateLocation(newLocation, ports, vehicle.getType());
 
         if (vehicle.getType() == VehicleType.SEA_VESSEL) {
@@ -132,7 +135,7 @@ public class VehicleService {
         var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
         if (coastLocation.isPresent()) {
             coastLocation.get().getParkedVehicles().add(vehicle);
-            portService.update(coastLocation.get());
+            pointOfInterestService.update(coastLocation.get());
         }
     }
 
@@ -143,13 +146,13 @@ public class VehicleService {
         // the stop
         if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
-            portService.update(coastLocation.get());
+            pointOfInterestService.update(coastLocation.get());
         }
         // Otherwise remove it if it's leaving a boat stop
         else {
-            portService
+            pointOfInterestService
                     .getByExactLocation(vehicle.getLocation())
-                    .ifPresent(port -> portService.removeVehicle(port, vehicle));
+                    .ifPresent(port -> pointOfInterestService.removeVehicle(port, vehicle));
         }
     }
 
@@ -279,7 +282,7 @@ public class VehicleService {
     }
 
     public void createRandomBoats(Integer n) {
-        var ports = portService.getAll();
+        var ports = pointOfInterestService.getAllPorts();
         for (int i = 0; i < n; i++) {
             var vehicle = new Boat("boat_" + i, VehicleType.SEA_VESSEL, true, 10);
             var boat = (Boat) create(vehicle);
@@ -302,7 +305,7 @@ public class VehicleService {
             boat.setStatus(VehicleStatus.IDLE);
             // Return type of create is Vehicle, so we need to cast it to Boat
             boat = (Boat) create(boat);
-            assignRelatedPort(portService.getAll(), boat);
+            assignRelatedPort(pointOfInterestService.getAllPorts(), boat);
         }
     }
 

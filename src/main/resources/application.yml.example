@@ -24,7 +24,7 @@ openrouteservice:
 distances:
   maxscooterdistance: 5.0
   maxwalkingdistance: 2.0
-
+  maxcardistance: 10.0
 speeds:
   boatspeed: 15.0
 

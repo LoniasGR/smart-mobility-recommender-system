@@ -18,7 +18,7 @@ import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
 import gr.iccs.smart.mobility.graph.WeightType;
-import gr.iccs.smart.mobility.pointsOfInterest.PortService;
+import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
 import gr.iccs.smart.mobility.user.User;
 import gr.iccs.smart.mobility.userLandmark.UserDestinationLandmark;
 import gr.iccs.smart.mobility.userLandmark.UserLandmarkService;
@@ -32,7 +32,7 @@ public class RecommendationService {
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
     @Autowired
-    private PortService portService;
+    private PointOfInterestService pointOfInterestService;
 
     @Autowired
     private VehicleService vehicleService;
@@ -56,6 +56,7 @@ public class RecommendationService {
     private GraphProjectionService graphProjectionService;
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
+        log.info("Creating start landmark connections");
         var maxWalkingDistanceMeters = config.getDistances().getMaxWalkingDistanceMeters();
         if (databaseService.distance(startLandmark.getLocation(),
                 destLandmark.getLocation()) < maxWalkingDistanceMeters) {
@@ -71,9 +72,16 @@ public class RecommendationService {
             startLandmark.addConnection(conn);
         }
 
-        var nearbyPorts = portService.getByLocationNear(startLandmark.getLocation(),
+        var nearbyPorts = pointOfInterestService.getPortsByLocationNear(startLandmark.getLocation(),
                 config.getDistances().getMaxWalkingDistanceKms());
         for (var b : nearbyPorts) {
+            var conn = connectionService.generateConnection(startLandmark, b);
+            startLandmark.addConnection(conn);
+        }
+
+        var nearbyBusStops = pointOfInterestService.getBusStopsByLocationNear(startLandmark.getLocation(),
+                config.getDistances().getMaxWalkingDistanceKms());
+        for (var b : nearbyBusStops) {
             var conn = connectionService.generateConnection(startLandmark, b);
             startLandmark.addConnection(conn);
         }
@@ -84,26 +92,24 @@ public class RecommendationService {
     private void createEndLandmarkConnections(UserDestinationLandmark destLandmark) {
         var maxWalkingDistanceMeters = config.getDistances().getMaxWalkingDistanceMeters();
         var maxScooterDistanceMeters = config.getDistances().getMaxScooterDistanceMeters();
-        var ports = portService.getAllWithOneLevelConnection();
+        var maxCarDistanceMeters = config.getDistances().getMaxCarDistanceMeters();
+        // TODO: We should probably do it the other way around
+        var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
         for (var b : ports) {
-            if (databaseService.distance(b.getLocation(), destLandmark.getLocation()) <= maxWalkingDistanceMeters) {
-                portService.createConnectionFrom(b, destLandmark, maxWalkingDistanceMeters);
-                b = portService.saveAndGet(b);
-            }
+            pointOfInterestService.createConnectionFrom(b, destLandmark, maxWalkingDistanceMeters);
+            b = pointOfInterestService.saveAndGet(b);
         }
 
         var landVehicles = vehicleService.getAllLandVehiclesWithOneLevelConnection();
         for (var v : landVehicles) {
             switch (v.getType()) {
                 case VehicleType.CAR:
-                    vehicleService.saveAndGet(vehicleService.createConnectionTo(v, destLandmark, null));
+                    vehicleService.saveAndGet(vehicleService.createConnectionTo(v, destLandmark, maxCarDistanceMeters));
                     break;
                 case VehicleType.SCOOTER:
-                    if (databaseService.distance(v.getLocation(),
-                            destLandmark.getLocation()) <= maxScooterDistanceMeters) {
-                        vehicleService.saveAndGet(
-                                vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
-                    }
+                    vehicleService.saveAndGet(
+                            vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
+
                     break;
                 default:
                     continue;
@@ -125,7 +131,7 @@ public class RecommendationService {
         List<Map<String, Object>> data = null;
 
         // Generate the nodes we need to add to the graph projection
-        String nodes = "['UserLandmark', 'Port'";
+        String nodes = "['UserLandmark', 'Port', 'BusStop'";
         for (var vt : VehicleType.values()) {
             if (Objects.isNull(options.requestOptions().ignoreTypes())
                     || !options.requestOptions().ignoreTypes().contains(vt)) {

@@ -44,11 +44,12 @@ public class ScenarioController {
             @RequestBody(required = false) ScenarioDTO scenario) {
 
         var randomScenario = new RandomScenario(allParams);
+        var force = Boolean.parseBoolean(allParams.getOrDefault("force", "false"));
 
-        log.debug("Called createScenario with randomScenario: " + randomScenario.toString() + " and " +
-                (Objects.isNull(scenario) ? "provided" : "no") + " scenario");
+        log.debug("Called createScenario (force: {} randomScenario: {} and {} scenario",
+                force, randomScenario.toString(), (Objects.isNull(scenario) ? "provided" : "no"));
 
-        scenarioService.createScenario(scenario, randomScenario);
+        scenarioService.createScenario(scenario, randomScenario, force);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
 

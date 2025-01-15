@@ -5,8 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.graph.GraphService;
-import gr.iccs.smart.mobility.pointsOfInterest.PortService;
+import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
 import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 
@@ -16,7 +17,7 @@ public class ScenarioService {
     private VehicleService vehicleService;
 
     @Autowired
-    private PortService portService;
+    private PointOfInterestService pointOfInterestService;
 
     @Autowired
     private UserService userService;
@@ -24,12 +25,18 @@ public class ScenarioService {
     @Autowired
     private GraphService graphService;
 
+    @Autowired
+    private DatabaseService databaseService;
+
     private static final Logger log = LoggerFactory.getLogger(ScenarioService.class);
 
-    public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario) {
+    public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario, Boolean force) {
 
-        if (!vehicleService.getAll().isEmpty()) {
-            throw new ScenarioException("The database is not empty, cannot create scenario.");
+        if (!vehicleService.getAll().isEmpty() || !pointOfInterestService.getAll().isEmpty()) {
+            if (!force) {
+                throw new ScenarioException("The database is not empty, cannot create scenario.");
+            }
+            databaseService.clearDatabase();
         }
 
         if (scenario != null && randomScenario.randomize()) {
@@ -42,24 +49,27 @@ public class ScenarioService {
             log.info("Using scenario data");
         }
 
-        log.debug("Creating Ports");
-        portService.createPortScenario(randomScenario, scenario);
+        log.info("Creating Ports");
+        pointOfInterestService.createPortScenario(randomScenario, scenario);
 
-        log.debug("Creating Vehicles");
+        log.info("Creating bus stops");
+        pointOfInterestService.createBusStopScenario(randomScenario, scenario == null ? null : scenario.busStops());
 
-        log.debug("Creating Cars");
+        log.info("Creating Vehicles");
+
+        log.info("Creating Cars");
         vehicleService.createScenarioCars(randomScenario, scenario);
 
-        log.debug("Creating Scooters");
+        log.info("Creating Scooters");
         vehicleService.createScenarioScooters(randomScenario, scenario == null ? null : scenario.scooters());
 
-        log.debug("Creating Boats");
+        log.info("Creating Boats");
         vehicleService.createScenarioBoats(randomScenario, scenario == null ? null : scenario.boats());
 
-        log.debug("Creating users");
+        log.info("Creating users");
         userService.createScenarioUsers();
 
-        log.debug("Creating graph");
+        log.info("Creating graph");
         graphService.graphPreCalculation();
     }
 

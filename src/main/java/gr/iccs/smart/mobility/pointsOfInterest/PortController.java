@@ -20,12 +20,12 @@ public class PortController {
     private static final Logger log = LoggerFactory.getLogger(PortController.class);
 
     @Autowired
-    private PortService portService;
+    private PointOfInterestService portService;
 
     @GetMapping
     public List<Port> getAll() {
         log.debug("Port API: Get All");
-        return portService.getAll();
+        return portService.getAllPorts();
     }
 
     @PostMapping("/locate")
@@ -51,13 +51,13 @@ public class PortController {
         if (port.isEmpty()) {
             throw new InvalidPortException("The boat stop does not exist.");
         }
-        return port.get();
+        return (Port) port.get();
     }
 
     @PostMapping
     public Port create(@RequestBody Port port) {
         log.debug("Port API: create");
-        return portService.create(port);
+        return (Port) portService.create(port);
     }
 
 }

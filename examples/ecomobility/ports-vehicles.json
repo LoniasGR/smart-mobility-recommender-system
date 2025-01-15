@@ -17,6 +17,24 @@
       }
     }
   ],
+  "bus_stops": [
+    {
+      "bus_stop_id": "bus_stop_1",
+      "name": "Gebze Otogar",
+      "location": {
+        "longitude": 29.40956,
+        "latitude": 40.78424
+      }
+    },
+    {
+      "bus_stop_id": "bus_stop_2",
+      "name": "Golden Horn Halic",
+      "location": {
+        "latitude": 41.0237037,
+        "longitude": 28.9713449
+      }
+    }
+  ],
   "passenger_cars": [
     {
       "car_id": "vehicle_1",

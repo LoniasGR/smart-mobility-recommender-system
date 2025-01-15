@@ -11,6 +11,7 @@ import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
+import gr.iccs.smart.mobility.pointsOfInterest.BusStopDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.PortDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleStatus;
@@ -32,29 +33,33 @@ public class RecommendationUtils {
     protected static Feature visualiseNode(InternalNode node) {
         var location = getNodeLocation(node);
         Feature f = null;
-        if (node.labels().contains("UserStartLandmark")) {
-            f = GeoJSONUtils.createStartingPointFeature(location);
+        // There are multiple labels for each node, but only one is relevant
+        for (String label : node.labels()) {
+            switch (label) {
+                case "UserStartLandmark":
+                    return GeoJSONUtils.createStartingPointFeature(location);
+                case "UserDestinationLandmark":
+                    return GeoJSONUtils.createDestinationPointFeature(location);
+                case "LandVehicle":
+                    var vehicle = new VehicleDTO(
+                            node.get("id").asString(),
+                            Enum.valueOf(VehicleType.class, node.get("type").asString()),
+                            node.get("battery").asLong(),
+                            node.get("dummy").asBoolean(),
+                            location,
+                            Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
+                    return GeoJSONUtils.createVehicleFeature(vehicle);
+                case "Port":
+                    var port = new PortDTO(node.get("id").asString(), node.get("name").asString(),
+                            LocationDTO.fromGeographicPoint(location));
+                    return GeoJSONUtils.createPortFeature(port);
+                case "BusStop":
+                    var busStop = new BusStopDTO(node.get("id").asString(), node.get("name").asString(),
+                            LocationDTO.fromGeographicPoint(location));
+                    return GeoJSONUtils.createBusStopFeature(busStop);
+            }
         }
-        if (node.labels().contains("UserDestinationLandmark")) {
-            f = GeoJSONUtils.createDestinationPointFeature(location);
-        }
-        if (node.labels().contains("LandVehicle")) {
-            var vehicle = new VehicleDTO(
-                    node.get("id").asString(),
-                    Enum.valueOf(VehicleType.class, node.get("type").asString()),
-                    node.get("battery").asLong(),
-                    node.get("dummy").asBoolean(),
-                    location,
-                    Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
-            f = GeoJSONUtils.createVehicleFeature(vehicle);
-        }
-        if (node.labels().contains("Port")) {
-            var port = new PortDTO(node.get("id").asString(), node.get("name").asString(),
-                    LocationDTO.fromGeographicPoint(location));
-            f = GeoJSONUtils.createPortFeature(port);
-        }
-
-        return f;
+        throw new IllegalArgumentException("Node with labels: " + node.labels() + " does not have a valid label");
     }
 
     protected static Point getNodeLocation(InternalNode node) {

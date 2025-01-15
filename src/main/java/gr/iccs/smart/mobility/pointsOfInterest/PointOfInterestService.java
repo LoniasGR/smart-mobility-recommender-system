@@ -29,7 +29,7 @@ import gr.iccs.smart.mobility.util.ResourceReader;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
 @Service
-public class PortService {
+public class PointOfInterestService {
 
     @Autowired
     private DataFileConfig dataFileConfig;
@@ -38,7 +38,7 @@ public class PortService {
     private ResourceReader resourceReader;
 
     @Autowired
-    private PortRepository portRepository;
+    private PointOfInterestRepository pointOfInterestRepository;
 
     @Autowired
     private ConnectionService connectionService;
@@ -52,52 +52,71 @@ public class PortService {
     @Autowired
     private Neo4jTemplate neo4jTemplate;
 
-    private static final Logger log = LoggerFactory.getLogger(PortService.class);
+    private static final Logger log = LoggerFactory.getLogger(PointOfInterestService.class);
 
-    public List<Port> getAll() {
-        return portRepository.findAll();
+    public List<PointOfInterest> getAll() {
+        return pointOfInterestRepository.findAll();
     }
 
-    public List<Port> getAllWithOneLevelConnection() {
-        return portRepository.getAllByOneLevelConnection();
+    public List<Port> getAllPorts() {
+        return pointOfInterestRepository.findAllPorts();
     }
 
-    public Optional<Port> getByID(String id) {
-        return portRepository.findById(id);
+    public List<Port> getAllPortsWithOneLevelConnection() {
+        return pointOfInterestRepository.getAllPortsByOneLevelConnection();
+    }
+
+    public List<BusStop> getAllBusStopsWithOneLevelConnection() {
+        return pointOfInterestRepository.getAllBusStopsByOneLevelConnection();
+    }
+
+    public Optional<PointOfInterest> getByID(String id) {
+        return pointOfInterestRepository.findById(id);
     }
 
     public List<Port> getByLocationNear(Point location) {
-        return portRepository.findByLocationNear(location);
+        return pointOfInterestRepository.findByLocationNear(location);
     }
 
-    public List<Port> getByLocationNear(Point location, Double distance) {
+    public List<Port> getPortsByLocationNear(Point location, Double distance) {
         var range = new Distance(distance, Metrics.KILOMETERS);
-        return portRepository.findByLocationNear(location, range);
+        return pointOfInterestRepository.findPortsByLocationNear(location, range);
+    }
+
+    public List<BusStop> getBusStopsByLocationNear(Point location, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return pointOfInterestRepository.findBusStopsByLocationNear(location, range);
     }
 
     public Optional<Port> getByExactLocation(Point location) {
-        return portRepository.findByLocation(location);
+        return pointOfInterestRepository.findByLocation(location);
     }
 
-    public Port create(Port port) {
-        var locationExists = portRepository.findByLocation(port.getLocation());
+    public PointOfInterest create(PointOfInterest poi) {
+        if (poi.getId() == null) {
+            throw new IllegalArgumentException("Id cannot be null on creation");
+        }
+        var locationExists = pointOfInterestRepository.findByLocation(poi.getLocation());
 
         if (locationExists.isPresent()) {
-            throw new IllegalArgumentException("There is already a boat stop at the specified location");
+            if (poi instanceof Port) {
+                throw new IllegalArgumentException("There is already a port at the specified location");
+            }
+            throw new IllegalArgumentException("There is already a bus stop at the specified location");
         }
-        return portRepository.save(port);
+        return pointOfInterestRepository.save(poi);
     }
 
     public Port update(Port newPort) {
-        var oldPort = portRepository.findById(newPort.getId());
+        var oldPort = pointOfInterestRepository.findById(newPort.getId());
         if (oldPort.isEmpty()) {
             throw new IllegalArgumentException("There is no boat stop to update");
         }
-        return portRepository.save(newPort);
+        return pointOfInterestRepository.save(newPort);
     }
 
     public void removeVehicle(Port port, Vehicle v) {
-        portRepository.deleteParkedIn(port.getId(), v.getId());
+        pointOfInterestRepository.deleteParkedIn(port.getId(), v.getId());
     }
 
     public Port createConnectionFrom(Port port, ReachableNode destination, Double maxDistanceMeters) {
@@ -121,10 +140,32 @@ public class PortService {
         return port;
     }
 
+    public BusStop createConnectionFrom(BusStop busStop, ReachableNode destination, Double maxDistanceMeters) {
+        Connection connection;
+        if (destination instanceof BusStop) {
+            Double distance = databaseService.distance(busStop.getLocation(), destination.getLocation());
+            Double time = distance;
+            connection = connectionService.createConnection(destination, distance, time);
+        } else {
+            connection = connectionService.generateConnection(busStop, destination);
+            if (connection.getDistance() > maxDistanceMeters) {
+                return busStop;
+            }
+        }
+        busStop.addConnection(connection);
+        return busStop;
+    }
+
     public Port saveAndGet(Port port) {
         neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
         // We need to update the boat stop to get the new connection info
-        return portRepository.getOneByOneLevelConnection(port.getId());
+        return pointOfInterestRepository.getOnePortByOneLevelConnection(port.getId());
+    }
+
+    public BusStop saveAndGet(BusStop busStop) {
+        neo4jTemplate.saveAs(busStop, BusStopWithOneLevelConnection.class);
+        // We need to update the boat stop to get the new connection info
+        return pointOfInterestRepository.getOneBusStopByOneLevelConnection(busStop.getId());
     }
 
     private void createRandomPorts(Integer n) {
@@ -173,6 +214,28 @@ public class PortService {
         for (var p : ports) {
             create(p.toPort());
         }
+    }
 
+    private void createRandomBusStops(Integer n) {
+        for (int i = 0; i < n; i++) {
+            var newLocation = IstanbulLocations.randomLandLocation();
+            var busStop = new BusStop("bus_stop_" + i, "Bus Stop " + i, newLocation.toPoint(), null);
+            create(busStop);
+        }
+    }
+
+    public void createBusStopScenario(RandomScenario randomScenario, List<BusStopDTO> busStops) {
+        if (randomScenario.randomize()) {
+            createRandomBusStops(randomScenario.busStops());
+            return;
+        }
+
+        if (busStops == null) {
+            return;
+        }
+
+        for (var b : busStops) {
+            create(b.toBusStop());
+        }
     }
 }

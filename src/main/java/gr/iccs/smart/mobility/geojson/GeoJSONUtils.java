@@ -3,6 +3,7 @@ package gr.iccs.smart.mobility.geojson;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
+import gr.iccs.smart.mobility.pointsOfInterest.BusStopDTO;
 import gr.iccs.smart.mobility.pointsOfInterest.PortDTO;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
@@ -57,6 +58,13 @@ public class GeoJSONUtils {
 
     public static Feature createPortFeature(PortDTO port) {
         var f = GeoJSONUtils.createPointFeature(port.location().toPoint(), "harbor", "#121daf");
+        f.getProperties().put("id", port.id());
+        f.getProperties().put("name", port.name());
+        return f;
+    }
+
+    public static Feature createBusStopFeature(BusStopDTO port) {
+        var f = GeoJSONUtils.createPointFeature(port.location().toPoint(), "bus", "#1eff00");
         f.getProperties().put("id", port.id());
         f.getProperties().put("name", port.name());
         return f;

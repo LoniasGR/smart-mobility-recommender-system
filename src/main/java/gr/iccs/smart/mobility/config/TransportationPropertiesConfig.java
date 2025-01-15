@@ -28,6 +28,19 @@ public class TransportationPropertiesConfig {
     public static class Distances {
         private Double maxWalkingDistance = 2.0;
         private Double maxScooterDistance = 5.0;
+        private Double maxCarDistance = null;
+
+        public Double getMaxCarDistanceKms() {
+            return maxCarDistance;
+        }
+
+        public Double getMaxCarDistanceMeters() {
+            return maxCarDistance * 1000;
+        }
+
+        public void setMaxCarDistance(Double maxCarDistance) {
+            this.maxCarDistance = maxCarDistance;
+        }
 
         public Double getMaxWalkingDistanceKms() {
             return maxWalkingDistance;
@@ -56,6 +69,25 @@ public class TransportationPropertiesConfig {
 
     public static class Speeds {
         private Double boatSpeed;
+        private Double maxCarSpeed;
+
+        public Double getMaxCarSpeed() {
+            return maxCarSpeed;
+        }
+
+        public void setMaxCarSpeed(Double maxCarSpeed) {
+            this.maxCarSpeed = maxCarSpeed;
+        }
+
+        public Double getMaxScooterSpeed() {
+            return maxScooterSpeed;
+        }
+
+        public void setMaxScooterSpeed(Double maxScooterSpeed) {
+            this.maxScooterSpeed = maxScooterSpeed;
+        }
+
+        private Double maxScooterSpeed;
 
         public Double getBoatSpeed() {
             return boatSpeed;
