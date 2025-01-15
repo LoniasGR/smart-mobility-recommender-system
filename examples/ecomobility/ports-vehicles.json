@@ -84,5 +84,42 @@
       },
       "is_dummy": true
     }
+  ],
+  "sea_vessels": [
+    {
+      "sea_vessel_id": "vehicle_7",
+      "location": {
+        "latitude": 41.0282142,
+        "longitude": 28.9664811
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    },
+    {
+      "sea_vessel_id": "vehicle_8",
+      "location": {
+        "latitude": 41.0302268,
+        "longitude": 28.9528899
+      },
+      "battery": {
+        "level": 65
+      },
+      "is_dummy": true
+    }
+  ],
+  "scooters": [
+    {
+      "scooter_id": "vehicle_9",
+      "location": {
+        "longitude": 28.95076,
+        "latitude": 41.030812
+      },
+      "battery": {
+        "level": 70
+      },
+      "is_dummy": true
+    }
   ]
 }
