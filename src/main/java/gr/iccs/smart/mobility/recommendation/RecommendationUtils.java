@@ -32,7 +32,6 @@ public class RecommendationUtils {
 
     protected static Feature visualiseNode(InternalNode node) {
         var location = getNodeLocation(node);
-        Feature f = null;
         // There are multiple labels for each node, but only one is relevant
         for (String label : node.labels()) {
             switch (label) {
