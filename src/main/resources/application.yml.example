@@ -17,7 +17,7 @@ logging:
 
 openrouteservice:
   apikey:
-  host: https://openrouteservice.org
+  host: http://localhost:
   apiversion: v2
   ratelimit: 0
 
