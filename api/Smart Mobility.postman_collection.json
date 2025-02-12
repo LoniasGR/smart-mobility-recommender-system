@@ -119,31 +119,19 @@
 					"response": []
 				},
 				{
-					"name": "Vehicle geoJSON",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Update vehicle status",
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{hostname}}/api/vehicles/geojson",
+							"raw": "{{hostname}}/api/vehicles/{id}",
 							"host": [
 								"{{hostname}}"
 							],
 							"path": [
 								"api",
 								"vehicles",
-								"geojson"
+								"{id}"
 							]
 						}
 					},
@@ -155,10 +143,19 @@
 			"name": "Scenarios",
 			"item": [
 				{
-					"name": "Create Scenario",
+					"name": "Create Random Scenario",
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ports\": [\r\n    {\r\n      \"port_id\": \"port_1\",\r\n      \"name\": \"Test1\",\r\n      \"location\": {\r\n        \"latitude\": 41.0163544,\r\n        \"longitude\": 28.9766619\r\n      }\r\n    },\r\n\r\n    {\r\n      \"port_id\": \"port_2\",\r\n      \"name\": \"Test2\",\r\n      \"location\": {\r\n        \"latitude\": 41.0219298,\r\n        \"longitude\": 28.9767732\r\n      }\r\n    }\r\n  ],\r\n  \"scooters\": [\r\n    {\r\n      \"scooter_id\": \"vehicle_1\",\r\n      \"location\": {\r\n        \"longitude\": 28.9783,\r\n        \"latitude\": 41.0119\r\n      },\r\n      \"battery\": {\r\n        \"level\": 70\r\n      },\r\n      \"is_dummy\": true\r\n    }\r\n  ],\r\n  \"sea_vessels\": [\r\n    {\r\n      \"sea_vessel_id\": \"vehicle_2\",\r\n      \"location\": {\r\n        \"longitude\": 28.9766619,\r\n        \"latitude\": 41.0163544\r\n      },\r\n      \"battery\": {\r\n        \"level\": 70\r\n      },\r\n      \"is_dummy\": true\r\n    }\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{hostname}}/api/scenario",
 							"host": [
@@ -173,13 +170,46 @@
 					"response": []
 				},
 				{
+					"name": "Create Custom Scenario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ports\": [\r\n    {\r\n      \"port_id\": \"port_1\",\r\n      \"name\": \"Haliç\",\r\n      \"location\": {\r\n        \"latitude\": 41.0282142,\r\n        \"longitude\": 28.9664811\r\n      }\r\n    },\r\n    {\r\n      \"port_id\": \"port_2\",\r\n      \"name\": \"Fener\",\r\n      \"location\": {\r\n        \"latitude\": 41.0302268,\r\n        \"longitude\": 28.9528899\r\n      }\r\n    }\r\n  ],\r\n  \"bus_stops\": [\r\n    {\r\n      \"bus_stop_id\": \"bus_stop_1\",\r\n      \"name\": \"Gebze Otogar\",\r\n      \"location\": {\r\n        \"longitude\": 29.40956,\r\n        \"latitude\": 40.78424\r\n      }\r\n    },\r\n    {\r\n      \"bus_stop_id\": \"bus_stop_2\",\r\n      \"name\": \"Golden Horn Halic\",\r\n      \"location\": {\r\n        \"latitude\": 41.0237037,\r\n        \"longitude\": 28.9713449\r\n      }\r\n    }\r\n  ],\r\n  \"passenger_cars\": [\r\n    {\r\n      \"car_id\": \"vehicle_1\",\r\n      \"location\": {\r\n        \"longitude\": 29.45669231356099,\r\n        \"latitude\": 40.78935875093352\r\n      },\r\n      \"battery\": {\r\n        \"level\": 70\r\n      },\r\n      \"is_dummy\": true\r\n    },\r\n    {\r\n      \"car_id\": \"vehicle_2\",\r\n      \"location\": {\r\n        \"longitude\": 29.45514146558105,\r\n        \"latitude\": 40.7886726277024\r\n      },\r\n      \"battery\": {\r\n        \"level\": 65\r\n      },\r\n      \"is_dummy\": true\r\n    },\r\n    {\r\n      \"car_id\": \"vehicle_3\",\r\n      \"location\": {\r\n        \"longitude\": 29.45501154756698,\r\n        \"latitude\": 40.78797631707293\r\n      },\r\n      \"battery\": {\r\n        \"level\": 55\r\n      },\r\n      \"is_dummy\": false\r\n    },\r\n    {\r\n      \"car_id\": \"vehicle_4\",\r\n      \"location\": {\r\n        \"longitude\": 29.45839023688535,\r\n        \"latitude\": 40.78883399655327\r\n      },\r\n      \"battery\": {\r\n        \"level\": 75\r\n      },\r\n      \"is_dummy\": true\r\n    },\r\n    {\r\n      \"car_id\": \"vehicle_5\",\r\n      \"location\": {\r\n        \"longitude\": 29.45387168747299,\r\n        \"latitude\": 40.78850089491554\r\n      },\r\n      \"battery\": {\r\n        \"level\": 80\r\n      },\r\n      \"is_dummy\": true\r\n    },\r\n    {\r\n      \"car_id\": \"vehicle_6\",\r\n      \"location\": {\r\n        \"longitude\": 29.45325265921764,\r\n        \"latitude\": 40.78941334596003\r\n      },\r\n      \"battery\": {\r\n        \"level\": 97\r\n      },\r\n      \"is_dummy\": true\r\n    }\r\n  ],\r\n  \"sea_vessels\": [\r\n    {\r\n      \"sea_vessel_id\": \"vehicle_7\",\r\n      \"location\": {\r\n        \"latitude\": 41.0282142,\r\n        \"longitude\": 28.9664811\r\n      },\r\n      \"battery\": {\r\n        \"level\": 70\r\n      },\r\n      \"is_dummy\": true\r\n    },\r\n    {\r\n      \"sea_vessel_id\": \"vehicle_8\",\r\n      \"location\": {\r\n        \"latitude\": 41.0302268,\r\n        \"longitude\": 28.9528899\r\n      },\r\n      \"battery\": {\r\n        \"level\": 65\r\n      },\r\n      \"is_dummy\": true\r\n    }\r\n  ],\r\n  \"scooters\": [\r\n    {\r\n      \"scooter_id\": \"vehicle_9\",\r\n      \"location\": {\r\n        \"longitude\": 28.95076,\r\n        \"latitude\": 41.030812\r\n      },\r\n      \"battery\": {\r\n        \"level\": 70\r\n      },\r\n      \"is_dummy\": true\r\n    }\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/scenario?force=true",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"scenario"
+							],
+							"query": [
+								{
+									"key": "force",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Execute Scenario",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n    {\r\n        \"vehicleID\": \"ca1b51ce-c62f-4b02-b52e-55d5f925a016\",\r\n       \"location\": {\r\n            \"latitude\": 41.0218,\r\n            \"longitude\": 28.9765\r\n        }\r\n    },\r\n    {\r\n        \"vehicleID\": \"b6542eb6-26ec-4919-83ad-14076f1c8cc9\",\r\n        \"location\": {\r\n            \"latitude\":  41.037,\r\n            \"longitude\": 29.0297\r\n                    \r\n        }\r\n    }\r\n]",
+							"raw": "[\r\n    {\r\n        \"vehicle\": {\r\n            \"id\": \"b772961d-080f-4fca-9653-82de33691b4e\",\r\n            \"type\": \"CAR\",\r\n            \"battery\": 27.790367,\r\n            \"location\": {\r\n                \"latitude\": 41.01663225019291,\r\n                \"longitude\": 28.96021892515918\r\n            },\r\n            \"status\": \"IDLE\"\r\n        },\r\n        \"destination\": {\r\n            \"latitude\": 41.02185,\r\n            \"longitude\": 28.9764\r\n        }\r\n    },\r\n    {\r\n        \"vehicle\": {\r\n            \"id\": \"8a963f79-75e0-424e-b052-d1027e910535\",\r\n            \"type\": \"SEA_VESSEL\",\r\n            \"battery\": 23.691303,\r\n            \"location\": {\r\n                \"latitude\": 41.02185,\r\n                \"longitude\": 28.9764\r\n            },\r\n            \"status\": \"IDLE\"\r\n        },\r\n        \"destination\": {\r\n            \"latitude\": 41.037,\r\n            \"longitude\": 29.0297\r\n        }\r\n    }\r\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -272,15 +302,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{hostname}}/api/people/test.user/recommend",
+							"raw": "{{hostname}}/api/recommend/test.user?wholeMap=true",
 							"host": [
 								"{{hostname}}"
 							],
 							"path": [
 								"api",
-								"people",
-								"test.user",
-								"recommend"
+								"recommend",
+								"test.user"
+							],
+							"query": [
+								{
+									"key": "wholeMap",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -301,28 +336,33 @@
 							}
 						},
 						"url": {
-							"raw": "{{hostname}}/api/people/test.user/recommend",
+							"raw": "{{hostname}}/api/recommend/test.user?wholeMap=true",
 							"host": [
 								"{{hostname}}"
 							],
 							"path": [
 								"api",
-								"people",
-								"test.user",
-								"recommend"
+								"recommend",
+								"test.user"
+							],
+							"query": [
+								{
+									"key": "wholeMap",
+									"value": "true"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Vizualize Scenario B",
+					"name": "Recommend route v2",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\":  41.01754351481824,\r\n    \"longitude\": 28.962921245529145\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.034996457365224,\r\n    \"longitude\": 29.03018274272216\r\n    }\r\n}",
+							"raw": "{\r\n  \"startingLocation\": {\r\n    \"latitude\": 40.7895537,\r\n    \"longitude\": 29.454169\r\n  },\r\n  \"endingLocation\": {\r\n    \"latitude\": 41.032821,\r\n    \"longitude\": 28.94907\r\n  },\r\n  \"options\": {\r\n    \"recommendationPaths\": 1,\r\n    \"weightType\": \"time\"\r\n  }\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -330,46 +370,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{hostname}}/api/people/test.user/recommendation/visualize",
+							"raw": "{{hostname}}/api/recommend/test.user?wholeMap=true",
 							"host": [
 								"{{hostname}}"
 							],
 							"path": [
 								"api",
-								"people",
-								"test.user",
-								"recommendation",
-								"visualize"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Visualize Scenario A",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"startingLocation\" : {\r\n    \"latitude\": 41.00570479645032,\r\n    \"longitude\": 28.975557607675057\r\n    },\r\n    \"endingLocation\": {\r\n    \"latitude\": 41.0161,\r\n    \"longitude\": 28.9808\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+								"recommend",
+								"test.user"
+							],
+							"query": [
+								{
+									"key": "wholeMap",
+									"value": "true"
 								}
-							}
-						},
-						"url": {
-							"raw": "{{hostname}}/api/people/test.user/recommendation/visualize",
-							"host": [
-								"{{hostname}}"
-							],
-							"path": [
-								"api",
-								"people",
-								"test.user",
-								"recommendation",
-								"visualize"
 							]
 						}
 					},
@@ -378,55 +392,93 @@
 			]
 		},
 		{
-			"name": "Locations",
+			"name": "Admin",
 			"item": [
 				{
-					"name": "European Side Polygons",
+					"name": "Delete Everything",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{hostname}}/api/locations/european-polygon",
+							"raw": "{{hostname}}/api/admin/delete",
 							"host": [
 								"{{hostname}}"
 							],
 							"path": [
 								"api",
-								"locations",
-								"european-polygon"
+								"admin",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Graph",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/graph/delete",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Graph",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hostname}}/api/graph/create",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"create"
 							]
 						}
 					},
 					"response": []
 				}
 			]
-		},
-		{
-			"name": "Search Location",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"latitude\": 41.015782600380774,\r\n    \"longitude\": 28.959933957206232\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{hostname}}/api/locations",
-					"host": [
-						"{{hostname}}"
-					],
-					"path": [
-						"api",
-						"locations"
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"event": [

@@ -127,7 +127,7 @@ public class RecommendationService {
         createStartLandmarkConnections(startLandmark, destLandmark);
         createEndLandmarkConnections(destLandmark);
 
-        final String projection = "smart-mobility";
+        final String projection = "sm_" + user.getUsername();
         List<Map<String, Object>> data = null;
 
         // Generate the nodes we need to add to the graph projection

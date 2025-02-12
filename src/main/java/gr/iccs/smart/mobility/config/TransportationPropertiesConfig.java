@@ -35,7 +35,7 @@ public class TransportationPropertiesConfig {
         }
 
         public Double getMaxCarDistanceMeters() {
-            return maxCarDistance * 1000;
+            return maxCarDistance == null ? null : maxCarDistance * 1000;
         }
 
         public void setMaxCarDistance(Double maxCarDistance) {

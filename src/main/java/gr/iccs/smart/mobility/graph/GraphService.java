@@ -84,9 +84,11 @@ public class GraphService {
     }
 
     private void createCarConnections(LandVehicle car) {
-        // var otherVehicles =
-        // vehicleService.getAllLandVehiclesWithOneLevelConnection();
-        // createConnectionWithVehicles(car, otherVehicles);
+        if (config.getDistances().getMaxCarDistanceKms() != null) {
+            var otherVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(car.getLocation(),
+                    config.getDistances().getMaxCarDistanceKms());
+            createConnectionWithVehicles(car, otherVehicles, config.getDistances().getMaxCarDistanceMeters());
+        }
         createConnectionWithPorts(car, config.getDistances().getMaxCarDistanceKms());
         createConnectionWithBusStops(car, config.getDistances().getMaxCarDistanceKms());
         vehicleService.saveAndGet(car);
