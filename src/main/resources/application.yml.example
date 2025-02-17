@@ -21,12 +21,13 @@ openrouteservice:
   apiversion: v2
   ratelimit: 0
 
-distances:
-  maxscooterdistance: 5.0
-  maxwalkingdistance: 2.0
-  maxcardistance: 10.0
-speeds:
-  boatspeed: 15.0
+transportation:
+  distances:
+    maxScooterDistance: 5.0
+    maxWalkingDistance: 2.0
+    # maxCarDistance: 10.0
+  speeds:
+    boatspeed: 15.0
 
 datafiles:
   carLocations: /preload/CarLocations.json
