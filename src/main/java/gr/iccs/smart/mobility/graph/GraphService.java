@@ -1,7 +1,11 @@
 package gr.iccs.smart.mobility.graph;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,8 @@ import gr.iccs.smart.mobility.vehicle.VehicleType;
 
 @Service
 public class GraphService {
+    private static final Logger log = LoggerFactory.getLogger(GraphService.class);
+
     @Autowired
     private VehicleService vehicleService;
 
@@ -72,15 +78,35 @@ public class GraphService {
     }
 
     private void createScooterConnections(LandVehicle scooter) {
+        var startTime = Instant.now();
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 scooter.getLocation(),
                 config.getDistances().getMaxScooterDistanceKms());
+        var duration = Duration.between(startTime, Instant.now());
+        log.debug("Finding surrounding vehicles: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
         scooter = createConnectionWithVehicles(scooter,
                 surroundingVehicles,
                 config.getDistances().getMaxScooterDistanceMeters());
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating connections with surrounding vehicles: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
         scooter = createConnectionWithPorts(scooter, config.getDistances().getMaxScooterDistanceKms());
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating connections with ports: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
         scooter = createConnectionWithBusStops(scooter, config.getDistances().getMaxScooterDistanceKms());
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating connections with bus stops: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
         vehicleService.saveAndGet(scooter);
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Saving scooter: " + duration.toMillis() + " ms");
+
     }
 
     private void createCarConnections(LandVehicle car) {
@@ -156,24 +182,48 @@ public class GraphService {
     }
 
     public void graphPreCalculation() {
+        var startTime = Instant.now();
         var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
+        var duration = Duration.between(startTime, Instant.now());
+        log.debug("Getting ports: " + duration.toMillis() + " ms");
 
+        startTime = Instant.now();
         for (var b : ports) {
             createPortConnections(b, ports);
         }
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating ports connections took: " + duration.toMillis() + " ms");
 
+        startTime = Instant.now();
         var busStops = pointOfInterestService.getAllBusStopsWithOneLevelConnection();
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Getting bus stops: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
         for (var b : busStops) {
             createBusStopConnections(b, busStops);
         }
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating bus stop connections took: " + duration.toMillis() + " ms");
 
         // First we calculate connections for all the cars
+        startTime = Instant.now();
         var vehicles = vehicleService.getAllLandVehicles(LandVehicle.class);
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Getting all vehicles took: " + duration.toMillis() + " ms");
+
         for (var startVehicle : vehicles) {
             if (startVehicle.getType().equals(VehicleType.SCOOTER)) {
+                startTime = Instant.now();
                 createScooterConnections(startVehicle);
+                duration = Duration.between(startTime, Instant.now());
+                log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
+
             } else {
+                startTime = Instant.now();
                 createCarConnections(startVehicle);
+                duration = Duration.between(startTime, Instant.now());
+                log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
             }
         }
     }
