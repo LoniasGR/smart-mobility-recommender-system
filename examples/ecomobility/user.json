@@ -1,9 +1,9 @@
 {
-  "startingLocation": {
+  "origin": {
     "latitude": 40.7895537,
     "longitude": 29.454169
   },
-  "endingLocation": {
+  "destination": {
     "latitude": 41.032821,
     "longitude": 28.94907
   },

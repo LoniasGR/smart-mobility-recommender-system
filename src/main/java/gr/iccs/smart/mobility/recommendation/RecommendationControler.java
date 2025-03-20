@@ -32,8 +32,8 @@ public class RecommendationControler {
         var user = userService.getById(username);
         var recommendationOptions = new RecommendationOptions(wholeMap, previewGraph, route.options());
 
-        var start = route.startingLocation().toPoint();
-        var finish = route.endingLocation().toPoint();
+        var start = route.origin().toPoint();
+        var finish = route.destination().toPoint();
 
         return recommendationService.recommendationV2(start, finish, user, recommendationOptions);
     }

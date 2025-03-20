@@ -56,6 +56,9 @@ public class RecommendationUtils {
                     var busStop = new BusStopDTO(node.get("id").asString(), node.get("name").asString(),
                             LocationDTO.fromGeographicPoint(location));
                     return GeoJSONUtils.createBusStopFeature(busStop);
+                case "ReachableNode":
+                case "UserLandmark":
+                    continue;
             }
         }
         throw new IllegalArgumentException("Node with labels: " + node.labels() + " does not have a valid label");
@@ -65,20 +68,49 @@ public class RecommendationUtils {
         return node.get("location").asPoint();
     }
 
+    private static String extractSegmentMode(InternalNode node) {
+        for (String label : node.labels()) {
+            switch (label) {
+                case "UserStartLandmark":
+                    return "walk";
+                case "Car":
+                    return "passenger_car";
+                case "Scooter":
+                    return "e_scooter";
+                case "Port":
+                    return "sea_vessel";
+                case "BusStop":
+                    return "public_transport";
+                case "ReachableNode":
+                case "UserLandmark":
+                case "LandVehicle":
+                case "UserDestinationLandmark":
+                    continue;
+            }
+        }
+        return "";
+    }
+
     protected static FeatureCollection createPathFeatureCollection(List<?> points) {
         FeatureCollection fc = new FeatureCollection();
         Point lineStart = null;
         Point lineEnd;
+        String segmentMode = "walk";
+
         for (var i : points) {
             if (i instanceof InternalNode node) {
                 Feature f = RecommendationUtils.visualiseNode(node);
                 if (fc.getFeatures().size() > 0) {
                     lineEnd = RecommendationUtils.getNodeLocation(node);
                     var line = GeoJSONUtils.createLine(lineStart, lineEnd);
+                    line.getProperties().put("segment_mode", segmentMode);
                     fc.getFeatures().add(line);
                     lineStart = RecommendationUtils.getNodeLocation(node);
+                    segmentMode = RecommendationUtils.extractSegmentMode(node);
                 } else {
                     lineStart = RecommendationUtils.getNodeLocation(node);
+                    segmentMode = RecommendationUtils.extractSegmentMode(node);
+
                 }
                 fc.getFeatures().add(f);
             }

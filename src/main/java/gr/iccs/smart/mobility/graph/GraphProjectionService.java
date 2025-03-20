@@ -84,7 +84,7 @@ public class GraphProjectionService {
 
     public void destroyGraph(String projName) {
         String query = """
-                CALL gds.graph.drop('$name');
+                CALL gds.graph.drop('$name', false) YIELD graphName;
                 """.replace("$name", projName);
 
         client.query(query).run();

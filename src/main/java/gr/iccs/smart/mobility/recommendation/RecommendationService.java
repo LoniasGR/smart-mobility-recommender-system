@@ -131,6 +131,7 @@ public class RecommendationService {
         List<Map<String, Object>> data = null;
 
         // Generate the nodes we need to add to the graph projection
+        // TODO: Make the 'BusStop' optional
         String nodes = "['UserLandmark', 'Port', 'BusStop'";
         for (var vt : VehicleType.values()) {
             if (Objects.isNull(options.requestOptions().ignoreTypes())

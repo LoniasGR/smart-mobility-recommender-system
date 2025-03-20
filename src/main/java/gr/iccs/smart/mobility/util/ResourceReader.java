@@ -14,6 +14,7 @@ public class ResourceReader {
     public InputStream readResource(String resourcePath) throws FileNotFoundException {
 
         try {
+            log.debug("Reading resource: " + resourcePath);
             return getClass().getResourceAsStream(resourcePath);
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
