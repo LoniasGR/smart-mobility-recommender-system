@@ -17,7 +17,7 @@ logging:
 
 openrouteservice:
   apikey:
-  host: http://localhost:
+  host: http://localhost:8082/ors
   apiversion: v2
   ratelimit: 0
 
