@@ -111,7 +111,7 @@ password: develop-colombo-clara-sponsor-erosion-6500
 
 ## Usage
 
-After setting up the project, you can test the provided API by using either the built-in Swagger UI or the Postman collection.
+After setting up the project, you can test the provided API by using either the built-in Swagger UI or the Postman collection. For brevity reasons only the SwaggerUI is documented below, but similar principles apply to the postman collection.
 
 ### Swagger UI
 
@@ -127,7 +127,7 @@ Select the POST `api/scenario` from the scenario controller and add the respecti
 }
 ```
 
-After that, you can request a recommendation path by using the `api/recommend/{username}` by using as username `test.user`, the other two options set to false and as request body the `user.json` file.
+After that, you can request a recommendation path by using the `api/recommend/{username}` by using as username `test.user`, the other two options (`wholeMap`, `previewGraph`) set to `false` and as request body the `user.json` file.
 
 ## API Routes
 
