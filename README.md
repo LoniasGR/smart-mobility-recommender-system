@@ -34,7 +34,7 @@ exposed through a REST API, which currently does not implement any authenticatio
 ## Installation
 
 The best way to install the application and it's dependencies is 
-with the docker compose file. 
+with the docker compose file. This will deploy everything needed to run a local version of the smart-mobility application, i.e. a local Neo4J database, a local openrouteservice API and the smart-service application.
 
 ### All-in-one installation
 
