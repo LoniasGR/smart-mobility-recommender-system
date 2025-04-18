@@ -6,6 +6,7 @@ import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
 
@@ -51,4 +52,6 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:Port{id: $portId}) RETURN v")
         List<Vehicle> findSeaVesselsParkedInPort(String portId);
 
+        @Query("MATCH (n:LandVehicle{id: $vehicleId})-[r:CONNECTS_TO]-() DELETE r")
+        void deleteAllConnectionsOfLandVehicle(String vehicleId);
 }

@@ -27,6 +27,8 @@ public class ConnectionService {
     public Connection generateConnection(StartingNode startingNode, ReachableNode destinationNode) {
         var summary = directions.getDirectionsSummary(startingNode.getOrsProfile(), startingNode.getLocation(),
                 destinationNode.getLocation());
+        log.debug("Received summary: {} for starting node: {} to destination node: {}", summary, startingNode,
+                destinationNode);
         return createConnection(destinationNode, summary.getDistance(), summary.getDuration());
     }
 

@@ -112,7 +112,6 @@ public class VehicleService {
     public LandVehicle saveAndGet(LandVehicle vehicle) {
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
-
     }
 
     private void validateLocation(Point newLocation, List<Port> ports, VehicleType vehicleType) {
@@ -208,6 +207,10 @@ public class VehicleService {
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
         return vehicleRepository.findByLocationNear(point, maxDistance);
+    }
+
+    public void deleteAllConnectionsOfLandVehicle(String vehicleId) {
+        vehicleRepository.deleteAllConnectionsOfLandVehicle(vehicleId);
     }
 
     public CarWrapper createCarsFromResourceFile() {

@@ -6,13 +6,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gr.iccs.smart.mobility.usage.RideStatusUpdateEventPublisher;
+import gr.iccs.smart.mobility.usage.UsageService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
-import gr.iccs.smart.mobility.vehicle.VehicleInfoDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
-import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import net.datafaker.Faker;
 
 @Service
@@ -23,6 +23,12 @@ public class UserService {
 
     @Autowired
     private VehicleService vehicleService;
+
+    @Autowired
+    private UsageService usageService;
+
+    @Autowired
+    private RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher;
 
     private final Faker faker = new Faker();
 
@@ -45,9 +51,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /***
+     * Handles the creation and update of the ride state.
+     * 
+     * @param username
+     * @param useInfo
+     */
     public void manageRide(String username, UseDTO useInfo) {
         Vehicle vehicle = vehicleService.getById(useInfo.vehicle().getId());
-        VehicleStatus vehicleStatus;
 
         var person = getById(username);
         var ride = person.getCurrentRide();
@@ -57,39 +68,17 @@ public class UserService {
             if (useInfo.status().equals(UseStatus.COMPLETED)) {
                 throw new IllegalArgumentException("There is no ride to be completed.");
             }
-            var newRide = createOrUpdateRide(null, useInfo, vehicle);
+            var newRide = usageService.createOrUpdateRide(null, useInfo, vehicle);
             person.getVehiclesUsed().add(newRide);
-            vehicleStatus = VehicleStatus.IN_USE;
-
+            // The user already had an active ride, so this should be terminating it.
         } else {
             if (useInfo.status().equals(UseStatus.ACTIVE)) {
                 throw new IllegalArgumentException("A new ride cannot be started while one is already in use.");
             }
-            createOrUpdateRide(ride.get(), useInfo, null);
-            vehicleStatus = VehicleStatus.IDLE;
+            usageService.createOrUpdateRide(ride.get(), useInfo, null);
         }
-        var vehicleInfo = new VehicleInfoDTO(null,
-                useInfo.location().latitude(),
-                useInfo.location().longitude(),
-                vehicleStatus);
         userRepository.save(person);
-        vehicleService.updateVehicleStatus(vehicle.getId(), vehicleInfo);
-    }
-
-    private Used createOrUpdateRide(Used rideInfo, UseDTO useInfo, Vehicle vehicle) {
-        var location = useInfo.location().toPoint();
-        var ride = rideInfo;
-        if (ride == null) {
-            ride = new Used();
-            ride.setVehicle(vehicle);
-            ride.setStartingLocation(location);
-            ride.setStartingTime(useInfo.time());
-        } else {
-            ride.setEndingLocation(location);
-            ride.setEndingTime(useInfo.time());
-        }
-        ride.setStatus(useInfo.status());
-        return ride;
+        rideStatusUpdateEventPublisher.publishRideStatusUpdateEvent(useInfo, vehicle.getId());
     }
 
     public Optional<Used> rideStatus(String username) {
