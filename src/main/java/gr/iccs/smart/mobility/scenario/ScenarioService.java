@@ -30,7 +30,7 @@ public class ScenarioService {
 
     private static final Logger log = LoggerFactory.getLogger(ScenarioService.class);
 
-    public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario, Boolean force) {
+    public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario, boolean force) {
 
         if (!vehicleService.getAll().isEmpty() || !pointOfInterestService.getAll().isEmpty()) {
             if (!force) {
