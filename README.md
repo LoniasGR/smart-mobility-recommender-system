@@ -60,7 +60,7 @@ with the docker compose file. This will deploy everything needed to run a local 
    ```
 5. Copy `src/main/resoures/application.yml.example` to `src/main/resources/application.yml`
    ```bash
-   cp src/main/resoures/application.yml.example src/main/resources/application.yml
+   cp src/main/resources/application.yml.example src/main/resources/application.yml
    ```
 6. Start neo4j, openroutservice and the application containers by running `docker compose up -d`.
    > **IMPORTANT**: The openrouteservice will take some time to be available, depending on the size of the map file. You can adjust the settings in `docker-compose.yaml` to make it faster by disabling some profiles.
