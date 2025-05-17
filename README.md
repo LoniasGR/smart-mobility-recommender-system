@@ -58,9 +58,9 @@ with the docker compose file. This will deploy everything needed to run a local 
    ```bash
    wget https://download.geofabrik.de/europe/turkey-latest.osm.pbf -O ors-docker/files/turkey-latest.osm.pbf
    ```
-5. Copy `src/main/resoures/application.yaml.example` to `src/main/resources/application.yaml`
+5. Copy `src/main/resoures/application.yml.example` to `src/main/resources/application.yml`
    ```bash
-   cp src/main/resoures/application.yaml.example src/main/resources/application.yaml
+   cp src/main/resoures/application.yml.example src/main/resources/application.yml
    ```
 6. Start neo4j, openroutservice and the application containers by running `docker compose up -d`.
    > **IMPORTANT**: The openrouteservice will take some time to be available, depending on the size of the map file. You can adjust the settings in `docker-compose.yaml` to make it faster by disabling some profiles.
