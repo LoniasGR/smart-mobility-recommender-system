@@ -2,7 +2,6 @@ package gr.iccs.smart.mobility.scenario;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -40,16 +39,22 @@ public class ScenarioController {
 
     @PostMapping
     public ResponseEntity<String> createScenario(
-            @RequestParam Map<String, String> allParams,
+            @RequestParam(required = false) Boolean randomize,
+            @RequestParam(required = false) Integer randomCars,
+            @RequestParam(required = false) Integer randomScooters,
+            @RequestParam(required = false) Integer randomBoats,
+            @RequestParam(required = false) Integer randomPorts,
+            @RequestParam(required = false) Integer randomBusStops,
+            @RequestParam(required = false) Boolean force,
             @RequestBody(required = false) ScenarioDTO scenario) {
 
-        var randomScenario = new RandomScenario(allParams);
-        var force = Boolean.parseBoolean(allParams.getOrDefault("force", "false"));
+        boolean forceBoolean = Boolean.TRUE.equals(force);
+        var randomScenario = new RandomScenario(randomize, randomCars, randomScooters, randomBoats,
+                randomPorts, randomBusStops);
 
-        log.debug("Called createScenario (force: {} randomScenario: {} and {} scenario",
-                force, randomScenario.toString(), (Objects.isNull(scenario) ? "provided" : "no"));
-
-        scenarioService.createScenario(scenario, randomScenario, force);
+        log.info("Called createScenario (force: {} randomScenario: {} and {} scenario",
+                forceBoolean, randomScenario.toString(), (Objects.isNull(scenario) ? "provided" : "no"));
+        scenarioService.createScenario(scenario, randomScenario, forceBoolean);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
 
