@@ -1,7 +1,7 @@
 package gr.iccs.smart.mobility.scenario;
 
-public record RandomScenario(Boolean randomize, Integer ports, Integer busStops, Integer cars, Integer scooters,
-        Integer boats) {
+public record RandomScenario(Boolean randomize, Integer cars, Integer scooters, Integer boats, Integer ports,
+        Integer busStops) {
     public RandomScenario {
         if (randomize == null) {
             randomize = false;

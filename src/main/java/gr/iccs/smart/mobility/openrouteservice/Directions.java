@@ -46,7 +46,7 @@ public class Directions extends Base {
             return 0L;
         }
         var duration = Duration.between(rate.getFirst(), LocalDateTime.now()).toMillis();
-        log.info("Duration is: {}", duration);
+        log.debug("Duration is: {}", duration);
         if (duration > 50000L) {
             return 0L;
         }
@@ -115,12 +115,12 @@ public class Directions extends Base {
      */
     private <T> T executeWithRateLimiting(Supplier<T> callback) {
         if (rate.size() > 2) {
-            log.debug("First element time is: {}, Last element time is: {}, size is: {}", rate.getFirst(),
+            log.warn("First element time is: {}, Last element time is: {}, size is: {}", rate.getFirst(),
                     rate.getLast(), rate.size());
         }
         var waitMillis = timeToWaitForRateLimit();
         if (waitMillis > 0L) {
-            log.info("Waiting for rate limit for {}ms", waitMillis);
+            log.warn("Waiting for rate limit for {}ms", waitMillis);
             waitToRuntimeException(waitMillis);
         }
         T ret;

@@ -31,7 +31,7 @@ public class ScenarioService {
     private static final Logger log = LoggerFactory.getLogger(ScenarioService.class);
 
     public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario, boolean force) {
-
+        databaseService.addVehicleLocationIndex();
         if (!vehicleService.getAll().isEmpty() || !pointOfInterestService.getAll().isEmpty()) {
             if (!force) {
                 throw new ScenarioException("The database is not empty, cannot create scenario.");

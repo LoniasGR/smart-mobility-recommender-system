@@ -50,16 +50,16 @@ public class TransportationPropertiesConfig {
             return maxWalkingDistance * 1000;
         }
 
-        public void setMaxWalkingDistance(Double maxwalkingdistance) {
-            this.maxWalkingDistance = maxwalkingdistance;
+        public void setMaxWalkingDistance(Double maxWalkingDistance) {
+            this.maxWalkingDistance = maxWalkingDistance;
         }
 
         public Double getMaxScooterDistanceKms() {
             return maxScooterDistance;
         }
 
-        public void setMaxScooterDistance(Double maxscooterdistance) {
-            this.maxScooterDistance = maxscooterdistance;
+        public void setMaxScooterDistance(Double maxScooterDistance) {
+            this.maxScooterDistance = maxScooterDistance;
         }
 
         public Double getMaxScooterDistanceMeters() {
