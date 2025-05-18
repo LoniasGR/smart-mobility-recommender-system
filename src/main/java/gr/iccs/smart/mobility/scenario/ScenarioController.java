@@ -21,6 +21,7 @@ import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.user.UserService;
+import gr.iccs.smart.mobility.vehicle.VehicleNotFoundException;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 
 @RestController
@@ -52,7 +53,7 @@ public class ScenarioController {
         var randomScenario = new RandomScenario(randomize, randomCars, randomScooters, randomBoats,
                 randomPorts, randomBusStops);
 
-        log.debug("Called createScenario (force: {} randomScenario: {} and {} scenario",
+        log.info("Called createScenario (force: {} randomScenario: {} and {} scenario",
                 pForce, randomScenario.toString(), (Objects.isNull(scenario) ? "provided" : "no"));
         scenarioService.createScenario(scenario, randomScenario, pForce);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
@@ -76,4 +77,28 @@ public class ScenarioController {
             userService.manageRide(username, usageEnd);
         }
     }
+
+    @PostMapping("single-ride/{username}")
+    public void executeSingleMovementScenario(@PathVariable String username,
+            @RequestBody ScenarioVehicleDTO vehicleMovement) {
+        if (userService.rideStatus(username).isPresent()) {
+            throw new ScenarioException("The user is already on a ride");
+
+        }
+        try {
+            var vehicle = vehicleService.getById(vehicleMovement.vehicleId());
+            var time = LocalDateTime.now();
+            UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE,
+                    LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
+            userService.manageRide(username, usageStart);
+            UseDTO usageEnd = new UseDTO(vehicle, UseStatus.COMPLETED, vehicleMovement.destination(), time);
+            userService.manageRide(username, usageEnd);
+
+        } catch (VehicleNotFoundException e) {
+            throw new ScenarioException("The vehicle does not exist");
+
+        }
+
+    }
+
 }

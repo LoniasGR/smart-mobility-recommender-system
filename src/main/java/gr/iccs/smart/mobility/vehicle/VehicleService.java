@@ -90,7 +90,7 @@ public class VehicleService {
         validateLocation(newLocation, ports, vehicle.getType());
 
         if (vehicle.getType() == VehicleType.SEA_VESSEL) {
-            updateRelatedPorts(newLocation, ports, vehicle);
+            addBoatToPort(newLocation, ports, vehicle);
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
@@ -138,7 +138,7 @@ public class VehicleService {
         }
     }
 
-    private void updateRelatedPorts(Point newLocation, List<Port> ports, Vehicle vehicle) {
+    private void addBoatToPort(Point newLocation, List<Port> ports, Vehicle vehicle) {
         var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
         // If the sea vessel is parked in a boat stop, add it to the list of boats in
@@ -146,12 +146,6 @@ public class VehicleService {
         if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
             pointOfInterestService.update(coastLocation.get());
-        }
-        // Otherwise remove it if it's leaving a boat stop
-        else {
-            pointOfInterestService
-                    .getByExactLocation(vehicle.getLocation())
-                    .ifPresent(port -> pointOfInterestService.removeVehicle(port, vehicle));
         }
     }
 
@@ -181,6 +175,11 @@ public class VehicleService {
     public List<LandVehicle> findLandVehicleWithOneLevelConnectionNearLocation(Point point, Double distance) {
         var range = new Distance(distance, Metrics.KILOMETERS);
         return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationAround(point, range);
+    }
+
+    public List<LandVehicle> findScooterNolConnectionNearLocation(Point point, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return vehicleRepository.findScooterNoConnectionByLocationAround(point, range);
     }
 
     public List<LandVehicle> findLandVehicleNoConnectionByNearLocation(Point point, Double distance) {

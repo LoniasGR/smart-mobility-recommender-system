@@ -28,6 +28,12 @@ public class DatabaseService {
         return info;
     }
 
+    public void addVehicleLocationIndex() {
+        dbClientProvider.getClient()
+                .query("CREATE POINT INDEX vehicle_location_index IF NOT EXISTS FOR (v:LandVehicle) ON (v.location)")
+                .run();
+    }
+
     public Double distance(Point p1, Point p2) {
         return calculateDistance(p1, p2);
     }

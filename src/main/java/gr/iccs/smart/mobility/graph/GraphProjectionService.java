@@ -73,7 +73,7 @@ public class GraphProjectionService {
         for (Map<String, Object> map : res) {
             if (map.get("index") instanceof Long idx) {
                 if (index == idx) {
-                    log.info("Result {} is: {}", index, map);
+                    log.debug("Result {} is: {}", index, map);
                     ret.add(map);
                     index++;
                 }

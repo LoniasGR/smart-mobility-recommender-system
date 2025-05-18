@@ -30,6 +30,14 @@ public interface PointOfInterestRepository extends Neo4jRepository<PointOfIntere
             """)
     List<BusStop> findBusStopsByLocationNear(Point point, Distance max);
 
+    @Query("""
+            MATCH p=(n:PointOfInterest)-[*0..1]->(m)
+                WHERE point.distance(n.location, $point) < $max
+                RETURN n, collect(relationships(p)), collect(m)
+                ORDER BY point.distance(n.location, $point) ASC
+            """)
+    List<PointOfInterest> findPOIByLocationNear(Point point, Distance max);
+
     Optional<Port> findByLocation(Point point);
 
     @Query("MATCH p=(q)-[:PARKED_IN*0..1]->(n:Port)-[*0..1]->(m) RETURN collect(q), n, collect(relationships(p)), collect(m)")
@@ -48,4 +56,12 @@ public interface PointOfInterestRepository extends Neo4jRepository<PointOfIntere
     @Query("MATCH (bs:Port{id: $portID})-[p:PARKED_IN]-(v:Vehicle{id: $vehicleID}) " +
             "DETACH DELETE p")
     public void deleteParkedIn(String portID, String vehicleID);
+
+    @Query("""
+            MATCH (bs:Port)-[p:PARKED_IN]-(v:Vehicle{id: $vehicleID})
+            OPTIONAL MATCH r=(bs)-[:PARKED_IN*0..1]-(m)
+            OPTIONAL MATCH q=(bs)-[:CONNECTS_TO*0..1]->(vv)
+            RETURN bs, collect(relationships(r)), collect(relationships(q)), collect(m), collect(vv)
+            """)
+    public Port getPortOfVehicle(String vehicleID);
 }

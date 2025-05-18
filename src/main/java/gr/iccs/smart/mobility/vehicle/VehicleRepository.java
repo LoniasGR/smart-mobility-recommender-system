@@ -6,7 +6,6 @@ import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
 
@@ -34,6 +33,11 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
                         "WHERE point.distance(v.location, $point) < $range RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC;")
         List<LandVehicle> findLandVehicleNoConnectionByLocationAround(Point point, Distance range);
+
+        @Query("MATCH (v: Scooter) " +
+                        "WHERE point.distance(v.location, $point) < $range RETURN v " +
+                        "ORDER BY point.distance(v.location, $point) ASC;")
+        List<LandVehicle> findScooterNoConnectionByLocationAround(Point point, Distance range);
 
         @Query("MATCH (v: LandVehicle)" +
                         "WHERE point.distance(v.location, $point) < $range RETURN v " +
