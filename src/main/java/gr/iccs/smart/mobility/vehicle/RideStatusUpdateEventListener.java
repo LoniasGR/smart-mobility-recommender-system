@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.graph.GraphService;
+import gr.iccs.smart.mobility.pointsOfInterest.BusStop;
 import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsOfInterest.Port;
 import gr.iccs.smart.mobility.usage.RideStatusUpdateEvent;
 import gr.iccs.smart.mobility.usage.UseStatus;
 
@@ -20,6 +23,9 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
 
     @Autowired
     private GraphService graphService;
+
+    @Autowired
+    private TransportationPropertiesConfig config;
 
     @Override
     public void onApplicationEvent(RideStatusUpdateEvent event) {
@@ -62,6 +68,23 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
             // This needs to include incoming relationships and outgoing ones.
             if (v.isLandVehicle()) {
                 // Incoming relationships
+                // Get all relationships with ports and bus stops in walking distance
+                var poi = pointOfInterestService.getPOIByLocationNear(v.getLocation(),
+                        config.getDistances().getMaxWalkingDistanceKms());
+                for (var p : poi) {
+                    if (p instanceof Port) {
+                        pointOfInterestService.createConnectionFrom((Port) p, (LandVehicle) v,
+                                config.getDistances().getMaxWalkingDistanceKms());
+                    } else if (p instanceof BusStop) {
+                        pointOfInterestService.createConnectionFrom((BusStop) p, (LandVehicle) v,
+                                config.getDistances().getMaxWalkingDistanceKms());
+                    }
+                }
+
+                // TODO: Get all relationships with scooters in scooter distance
+
+                // TODO: Get all relationships with cars in car distance
+
 
                 // Outgoing relationships
                 graphService.createVehicleConnections((LandVehicle) v);
