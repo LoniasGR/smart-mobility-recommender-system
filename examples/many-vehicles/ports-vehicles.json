@@ -1,0 +1,295 @@
+{
+    "ports": [
+        {
+            "port_id": "port_1",
+            "name": "Test1",
+            "location": {
+                "latitude": 41.0163544,
+                "longitude": 28.9766619
+            }
+        },
+        {
+            "port_id": "port_2",
+            "name": "Test2",
+            "location": {
+                "latitude": 41.0219298,
+                "longitude": 28.9767732
+            }
+        },
+        {
+            "port_id": "port_3",
+            "name": "Haliç",
+            "location": {
+                "latitude": 41.0282142,
+                "longitude": 28.9664811
+            }
+        },
+        {
+            "port_id": "port_4",
+            "name": "Fener",
+            "location": {
+                "latitude": 41.0302268,
+                "longitude": 28.9528899
+            }
+        }
+    ],
+    "scooters": [
+        {
+            "scooter_id": "vehicle_1",
+            "location": {
+                "longitude": 28.977005,
+                "latitude": 41.023911
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_15",
+            "location": {
+                "longitude": 28.98209,
+                "latitude": 41.0410
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_16",
+            "location": {
+                "longitude": 28.983,
+                "latitude": 41.041
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_17",
+            "location": {
+                "longitude": 28.98828,
+                "latitude": 41.03
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_18",
+            "location": {
+                "longitude": 28.9525,
+                "latitude": 41.0535
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_19",
+            "location": {
+                "longitude": 28.935,
+                "latitude": 41.0442
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_20",
+            "location": {
+                "longitude": 28.9409,
+                "latitude": 41.034
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_21",
+            "location": {
+                "longitude": 28.9431,
+                "latitude": 41.026
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_22",
+            "location": {
+                "longitude": 28.95175,
+                "latitude": 41.01813
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "scooter_id": "vehicle_23",
+            "location": {
+                "longitude": 28.956,
+                "latitude": 41.0155
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        }
+    ],
+    "passenger_cars": [
+        {
+            "car_id": "vehicle_2",
+            "location": {
+                "longitude": 28.9725,
+                "latitude": 41.022
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_3",
+            "location": {
+                "longitude": 28.9781,
+                "latitude": 41.024893
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_4",
+            "location": {
+                "longitude": 28.9583,
+                "latitude": 41.020
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_5",
+            "location": {
+                "longitude": 28.9544,
+                "latitude": 41.021
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_6",
+            "location": {
+                "longitude": 29.0365,
+                "latitude": 41.010
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_7",
+            "location": {
+                "longitude": 29.038232,
+                "latitude": 41.021
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_8",
+            "location": {
+                "longitude": 29.0313,
+                "latitude": 41.0329
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_9",
+            "location": {
+                "longitude": 29.0284,
+                "latitude": 41.030
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_10",
+            "location": {
+                "longitude": 28.9887,
+                "latitude": 41.0409
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "car_id": "vehicle_14",
+            "location": {
+                "longitude": 28.98058,
+                "latitude": 41.041
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        }
+    ],
+    "sea_vessels": [
+        {
+            "sea_vessel_id": "vehicle_11",
+            "location": {
+                "longitude": 28.9766619,
+                "latitude": 41.0163544
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "sea_vessel_id": "vehicle_12",
+            "location": {
+                "latitude": 41.0282142,
+                "longitude": 28.9664811
+            },
+            "battery": {
+                "level": 70
+            },
+            "is_dummy": true
+        },
+        {
+            "sea_vessel_id": "vehicle_13",
+            "location": {
+                "latitude": 41.0302268,
+                "longitude": 28.9528899
+            },
+            "battery": {
+                "level": 65
+            },
+            "is_dummy": true
+        }
+    ]
+}3
