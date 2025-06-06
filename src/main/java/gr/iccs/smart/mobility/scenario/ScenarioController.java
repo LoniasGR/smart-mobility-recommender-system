@@ -86,7 +86,7 @@ public class ScenarioController {
 
         }
         try {
-            var vehicle = vehicleService.getById(vehicleMovement.vehicleId());
+            var vehicle = vehicleService.getLandVehicleByIdNoConnections(vehicleMovement.vehicleId());
             var time = LocalDateTime.now();
             UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE,
                     LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);

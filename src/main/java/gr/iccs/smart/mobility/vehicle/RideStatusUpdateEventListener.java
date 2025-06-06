@@ -48,13 +48,14 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
 
         var v = vehicleService.getById(event.getVehicleId());
 
+        // If the vehicle is in use, we have to remove it from the graph
         if (useInfo.status().equals(UseStatus.ACTIVE)) {
-            // Since the vehicle is in use, we remove it from the graph
             if (v.isLandVehicle()) {
                 vehicleService.deleteAllConnectionsOfLandVehicle(event.getVehicleId());
             } else {
-                // We have to remove the boat from the port and then check if
-                // there are any boats remaining. If not, we remove all outgoing relations
+                // If it's a boat, we have to remove it from the port and then check if
+                // there are any boats remaining on that port.
+                // If not, we remove all outgoing relations.
                 var port = pointOfInterestService.getPortOfVehicle(event.getVehicleId());
                 port.getParkedVehicles().removeIf(vehicle -> vehicle.getId().equals(v.getId()));
 

@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
@@ -18,7 +19,10 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         List<LandVehicle> findAllLandVehiclesWithOneLevelConnection();
 
         @Query("MATCH p=(n:LandVehicle{id: $vehicleId})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
-        LandVehicle findLandVehicleWithOneLevelConnection(String vehicleId);
+        Optional<LandVehicle> findLandVehicleWithOneLevelConnection(String vehicleId);
+
+        @Query("MATCH p=(n:LandVehicle{id: $vehicleId}) RETURN n")
+        Optional<LandVehicle> findLandVehicleWithNoConnections(String vehicleId);
 
         @Query("MATCH (v:Vehicle) RETURN v")
         List<VehicleDTO> findAllVehiclesNoConnections();

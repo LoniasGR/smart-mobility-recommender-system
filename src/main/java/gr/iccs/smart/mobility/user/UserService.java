@@ -58,7 +58,7 @@ public class UserService {
      * @param useInfo
      */
     public void manageRide(String username, UseDTO useInfo) {
-        Vehicle vehicle = vehicleService.getById(useInfo.vehicle().getId());
+        var vehicle = vehicleService.getLandVehicleByIdNoConnections(useInfo.vehicle().getId());
 
         var person = getById(username);
         var ride = person.getCurrentRide();

@@ -79,6 +79,14 @@ public class VehicleService {
         throw new VehicleNotFoundException();
     }
 
+    public LandVehicle getLandVehicleByIdNoConnections(String id) {
+        var vehicle = vehicleRepository.findLandVehicleWithNoConnections(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+ 
     public Vehicle updateVehicleStatus(String id, VehicleInfoDTO vehicleInfoDTO) {
         var oldVehicle = vehicleRepository.findById(id);
         if (oldVehicle.isEmpty()) {
@@ -111,7 +119,7 @@ public class VehicleService {
 
     public LandVehicle saveAndGet(LandVehicle vehicle) {
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
-        return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
+        return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId()).get();
     }
 
     private void validateLocation(Point newLocation, List<Port> ports, VehicleType vehicleType) {
