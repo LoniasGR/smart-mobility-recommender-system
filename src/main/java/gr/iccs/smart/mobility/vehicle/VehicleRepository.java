@@ -27,6 +27,17 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         @Query("MATCH (v:Vehicle) RETURN v")
         List<VehicleDTO> findAllVehiclesNoConnections();
 
+        @Query("MATCH (v:Vehicle{id: $vehicleId}) RETURN v")
+        Optional<Vehicle> findNoConnectionsById(String vehicleId);
+
+        @Query("""
+                MATCH p=(n:LandVehicle)-[*0..1]->(m)
+                WHERE n.id = $vehicleId
+                RETURN n, collect(relationships(p)), collect(m)
+                """)
+        Optional<Vehicle> findOneLevelConnectionsById(String vehicleId);
+
+
         @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) " +
                         "WHERE point.distance(n.location, $point) < $range " +
                         "RETURN n, collect(relationships(p)), collect(m) " +
@@ -46,12 +57,14 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         @Query("MATCH (v: LandVehicle)" +
                         "WHERE point.distance(v.location, $point) < $range RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
-        List<LandVehicle> findLandVesselsByLocationAround(Point point, Double range, Integer limit);
+        List<LandVehicle> findLandVehiclesByLocationAround(Point point, Double range, Integer limit);
 
-        @Query("MATCH (v: Vehicle{type: $type}) " +
-                        "WHERE point.distance(v.location, $point) < $range RETURN v " +
-                        "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")
-        List<Vehicle> findVehicleByTypeAndLocationAround(String type, Point point, Double range, Integer limit);
+        @Query("""
+                MATCH (v: Vehicle{type: $type})
+                WHERE point.distance(v.location, $point) < $range RETURN v
+                ORDER BY point.distance(v.location, $point);
+                """)
+        List<Vehicle> findVehicleByTypeAndLocationAround(String type, Point point, Double range);
 
         @Query("MATCH (v: Vehicle{type: $type}) RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")

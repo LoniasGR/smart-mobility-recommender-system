@@ -11,7 +11,6 @@ import gr.iccs.smart.mobility.usage.UsageService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
-import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 import net.datafaker.Faker;
 
@@ -37,7 +36,7 @@ public class UserService {
     }
 
     public User getById(String username) {
-        var person = userRepository.findById(username);
+        var person = userRepository.findByUsername(username);
         if (person.isPresent()) {
             return person.get();
         }
@@ -78,7 +77,7 @@ public class UserService {
             usageService.createOrUpdateRide(ride.get(), useInfo, null);
         }
         userRepository.save(person);
-        rideStatusUpdateEventPublisher.publishRideStatusUpdateEvent(useInfo, vehicle.getId());
+            rideStatusUpdateEventPublisher.publishRideStatusUpdateEvent(useInfo, vehicle.getId());
     }
 
     public Optional<Used> rideStatus(String username) {

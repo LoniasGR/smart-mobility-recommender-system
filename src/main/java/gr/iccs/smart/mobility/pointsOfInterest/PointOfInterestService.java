@@ -169,6 +169,14 @@ public class PointOfInterestService {
         return pointOfInterestRepository.getPortOfVehicle(vehicleID);
     }
 
+    public void save(PointOfInterest pointOfInterest) {
+        if (pointOfInterest instanceof Port) {
+            neo4jTemplate.saveAs(pointOfInterest, PortWithOneLevelConnection.class);
+        } else {
+            neo4jTemplate.saveAs(pointOfInterest, BusStopWithOneLevelConnection.class);
+        }
+    }
+
     public Port saveAndGet(Port port) {
         neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
         // We need to update the boat stop to get the new connection info

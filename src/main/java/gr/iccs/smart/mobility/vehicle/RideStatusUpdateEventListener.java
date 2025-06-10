@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
+import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.graph.GraphService;
 import gr.iccs.smart.mobility.pointsOfInterest.BusStop;
 import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
@@ -46,7 +47,7 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
 
         vehicleService.updateVehicleStatus(event.getVehicleId(), vehicleInfo);
 
-        var v = vehicleService.getById(event.getVehicleId());
+        var v = vehicleService.getByIdNoConnections(event.getVehicleId());
 
         // If the vehicle is in use, we have to remove it from the graph
         if (useInfo.status().equals(UseStatus.ACTIVE)) {
@@ -75,17 +76,39 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
                 for (var p : poi) {
                     if (p instanceof Port) {
                         pointOfInterestService.createConnectionFrom((Port) p, (LandVehicle) v,
-                                config.getDistances().getMaxWalkingDistanceKms());
+                                config.getDistances().getMaxWalkingDistanceMeters());
+                        
                     } else if (p instanceof BusStop) {
                         pointOfInterestService.createConnectionFrom((BusStop) p, (LandVehicle) v,
-                                config.getDistances().getMaxWalkingDistanceKms());
+                                config.getDistances().getMaxWalkingDistanceMeters());
                     }
+                    pointOfInterestService.save(p);
                 }
 
-                // TODO: Get all relationships with scooters in scooter distance
+                // Get all relationships with scooters in scooter distance
+                var maxScooterDistance = config.getDistances().getMaxScooterDistanceMeters();
+                var scooters = vehicleService.findVehicleByTypeAndLocationAround(VehicleType.SCOOTER,v.getLocation(),
+                        maxScooterDistance);
+                for (var scooter : scooters) {
+                    if (scooter.getId().equals(v.getId())) {
+                        continue; // Skip the same vehicle
+                    }
+                    LandVehicle s = vehicleService.createConnectionTo((LandVehicle) scooter,(ReachableNode) v, maxScooterDistance);
+                    vehicleService.saveAndGet(s);
+                }
+                
 
-                // TODO: Get all relationships with cars in car distance
-
+                // Get all relationships with cars in car distance
+                var maxCarDistance = config.getDistances().getMaxCarDistanceMeters();
+                var cars = vehicleService.findVehicleByTypeAndLocationAround(VehicleType.CAR, v.getLocation(),
+                        maxCarDistance);
+                for (var car : cars) {
+                    if (car.getId().equals(v.getId())) {
+                        continue; // Skip the same vehicle
+                    }
+                    LandVehicle c = vehicleService.createConnectionTo((LandVehicle) car, (ReachableNode) v, maxCarDistance);
+                    vehicleService.saveAndGet(c);
+                }
 
                 // Outgoing relationships
                 graphService.createVehicleConnections((LandVehicle) v);

@@ -100,7 +100,7 @@ public class RecommendationService {
             b = pointOfInterestService.saveAndGet(b);
         }
 
-        var landVehicles = vehicleService.getAllLandVehiclesWithOneLevelConnection();
+        var landVehicles = vehicleService.findAllLandVehiclesWithOneLevelConnection();
         for (var v : landVehicles) {
             switch (v.getType()) {
                 case VehicleType.CAR:

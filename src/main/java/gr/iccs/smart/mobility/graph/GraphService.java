@@ -250,7 +250,7 @@ public class GraphService {
 
         // First we calculate connections for all the cars
         startTime = Instant.now();
-        var vehicles = vehicleService.getAllLandVehicles(LandVehicle.class);
+        var vehicles = vehicleService.findAllLandVehicles(LandVehicle.class);
         duration = Duration.between(startTime, Instant.now());
         log.debug("Getting all vehicles took: " + duration.toMillis() + " ms");
 
