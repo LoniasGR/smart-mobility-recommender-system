@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
@@ -18,10 +19,24 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         List<LandVehicle> findAllLandVehiclesWithOneLevelConnection();
 
         @Query("MATCH p=(n:LandVehicle{id: $vehicleId})-[*0..1]->(m) RETURN n, collect(relationships(p)), collect(m)")
-        LandVehicle findLandVehicleWithOneLevelConnection(String vehicleId);
+        Optional<LandVehicle> findLandVehicleWithOneLevelConnection(String vehicleId);
+
+        @Query("MATCH p=(n:LandVehicle{id: $vehicleId}) RETURN n")
+        Optional<LandVehicle> findLandVehicleWithNoConnections(String vehicleId);
 
         @Query("MATCH (v:Vehicle) RETURN v")
         List<VehicleDTO> findAllVehiclesNoConnections();
+
+        @Query("MATCH (v:Vehicle{id: $vehicleId}) RETURN v")
+        Optional<Vehicle> findNoConnectionsById(String vehicleId);
+
+        @Query("""
+                MATCH p=(n:LandVehicle)-[*0..1]->(m)
+                WHERE n.id = $vehicleId
+                RETURN n, collect(relationships(p)), collect(m)
+                """)
+        Optional<Vehicle> findOneLevelConnectionsById(String vehicleId);
+
 
         @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) " +
                         "WHERE point.distance(n.location, $point) < $range " +
@@ -34,15 +49,22 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
                         "ORDER BY point.distance(v.location, $point) ASC;")
         List<LandVehicle> findLandVehicleNoConnectionByLocationAround(Point point, Distance range);
 
+        @Query("MATCH (v: Scooter) " +
+                        "WHERE point.distance(v.location, $point) < $range RETURN v " +
+                        "ORDER BY point.distance(v.location, $point) ASC;")
+        List<LandVehicle> findScooterNoConnectionByLocationAround(Point point, Distance range);
+
         @Query("MATCH (v: LandVehicle)" +
                         "WHERE point.distance(v.location, $point) < $range RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit;")
-        List<LandVehicle> findLandVesselsByLocationAround(Point point, Double range, Integer limit);
+        List<LandVehicle> findLandVehiclesByLocationAround(Point point, Double range, Integer limit);
 
-        @Query("MATCH (v: Vehicle{type: $type}) " +
-                        "WHERE point.distance(v.location, $point) < $range RETURN v " +
-                        "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")
-        List<Vehicle> findVehicleByTypeAndLocationAround(String type, Point point, Double range, Integer limit);
+        @Query("""
+                MATCH (v: Vehicle{type: $type})
+                WHERE point.distance(v.location, $point) < $range RETURN v
+                ORDER BY point.distance(v.location, $point);
+                """)
+        List<Vehicle> findVehicleByTypeAndLocationAround(String type, Point point, Double range);
 
         @Query("MATCH (v: Vehicle{type: $type}) RETURN v " +
                         "ORDER BY point.distance(v.location, $point) ASC LIMIT $limit")
@@ -51,4 +73,6 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         @Query("MATCH (v:Vehicle)-[r:PARKED_IN]->(b:Port{id: $portId}) RETURN v")
         List<Vehicle> findSeaVesselsParkedInPort(String portId);
 
+        @Query("MATCH (n:LandVehicle{id: $vehicleId})-[r:CONNECTS_TO]-() DELETE r")
+        void deleteAllConnectionsOfLandVehicle(String vehicleId);
 }

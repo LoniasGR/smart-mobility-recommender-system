@@ -1,0 +1,14 @@
+{
+    "origin": {
+        "latitude": 41.016,
+        "longitude": 28.976
+    },
+    "destination": {
+        "latitude": 41.04,
+        "longitude": 28.983
+    },
+    "options": {
+        "recommendationPaths": 1,
+        "weightType": "time"
+    }
+}

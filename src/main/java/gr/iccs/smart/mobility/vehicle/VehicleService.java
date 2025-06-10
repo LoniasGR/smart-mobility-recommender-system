@@ -79,24 +79,48 @@ public class VehicleService {
         throw new VehicleNotFoundException();
     }
 
+    public Vehicle getByIdNoConnections(String id) {
+        var vehicle = vehicleRepository.findNoConnectionsById(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
+        public Vehicle getByIdOneLevelConnections(String id) {
+        var vehicle = vehicleRepository.findOneLevelConnectionsById(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
+    public LandVehicle getLandVehicleByIdNoConnections(String id) {
+        var vehicle = vehicleRepository.findLandVehicleWithNoConnections(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+ 
     public Vehicle updateVehicleStatus(String id, VehicleInfoDTO vehicleInfoDTO) {
-        var oldVehicle = vehicleRepository.findById(id);
+        var oldVehicle = vehicleRepository.findOneLevelConnectionsById(id);
         if (oldVehicle.isEmpty()) {
             throw new VehicleNotFoundException();
         }
         var vehicle = oldVehicle.get();
         var newLocation = Values.point(4326, vehicleInfoDTO.latitude(), vehicleInfoDTO.longitude()).asPoint();
         var ports = pointOfInterestService.getAllPorts();
-        validateLocation(newLocation, ports, vehicle.getType());
 
         if (vehicle.getType() == VehicleType.SEA_VESSEL) {
-            updateRelatedPorts(newLocation, ports, vehicle);
+            addBoatToPort(newLocation, ports, vehicle);
         }
         vehicle.setLocation(newLocation);
         vehicle.setStatus(vehicleInfoDTO.status());
         if (vehicleInfoDTO.battery() != null) {
             vehicle.setBattery(vehicleInfoDTO.battery().level());
         }
+
         return vehicleRepository.save(vehicle);
     }
 
@@ -111,24 +135,7 @@ public class VehicleService {
 
     public LandVehicle saveAndGet(LandVehicle vehicle) {
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
-        return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId());
-
-    }
-
-    private void validateLocation(Point newLocation, List<Port> ports, VehicleType vehicleType) {
-        var isSeaLocation = LocationDTO
-                .istanbulLocation(newLocation) == IstanbulLocations.IstanbulLocationDescription.SEA;
-        var isCoastLocation = ports.stream().anyMatch(bs -> bs.getLocation().equals(newLocation));
-
-        // Check if the location provided is valid for a sea vessel
-        if (vehicleType == VehicleType.SEA_VESSEL && !(isSeaLocation || isCoastLocation)) {
-            throw new BadVehicleRequest("A sea vessel cannot go in the land");
-        }
-
-        // Check if location provided is valid for other vehicles
-        if (vehicleType != VehicleType.SEA_VESSEL && isSeaLocation) {
-            throw new BadVehicleRequest("A land vehicle cannot go in the sea");
-        }
+        return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId()).get();
     }
 
     private void assignRelatedPort(List<Port> ports, Vehicle vehicle) {
@@ -139,7 +146,7 @@ public class VehicleService {
         }
     }
 
-    private void updateRelatedPorts(Point newLocation, List<Port> ports, Vehicle vehicle) {
+    private void addBoatToPort(Point newLocation, List<Port> ports, Vehicle vehicle) {
         var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
 
         // If the sea vessel is parked in a boat stop, add it to the list of boats in
@@ -147,12 +154,6 @@ public class VehicleService {
         if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
             coastLocation.get().getParkedVehicles().add(vehicle);
             pointOfInterestService.update(coastLocation.get());
-        }
-        // Otherwise remove it if it's leaving a boat stop
-        else {
-            pointOfInterestService
-                    .getByExactLocation(vehicle.getLocation())
-                    .ifPresent(port -> pointOfInterestService.removeVehicle(port, vehicle));
         }
     }
 
@@ -171,11 +172,11 @@ public class VehicleService {
 
     }
 
-    public <T> List<T> getAllLandVehicles(Class<T> type) {
+    public <T> List<T> findAllLandVehicles(Class<T> type) {
         return vehicleRepository.getAllLandVehicles(type);
     }
 
-    public List<LandVehicle> getAllLandVehiclesWithOneLevelConnection() {
+    public List<LandVehicle> findAllLandVehiclesWithOneLevelConnection() {
         return vehicleRepository.findAllLandVehiclesWithOneLevelConnection();
     }
 
@@ -184,18 +185,22 @@ public class VehicleService {
         return vehicleRepository.findLandVechicleWithOneLevelConnectionByLocationAround(point, range);
     }
 
+    public List<LandVehicle> findScooterNolConnectionNearLocation(Point point, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return vehicleRepository.findScooterNoConnectionByLocationAround(point, range);
+    }
+
     public List<LandVehicle> findLandVehicleNoConnectionByNearLocation(Point point, Double distance) {
         var range = new Distance(distance, Metrics.KILOMETERS);
         return vehicleRepository.findLandVehicleNoConnectionByLocationAround(point, range);
     }
 
     public List<LandVehicle> findLandVesselsByLocationAround(Point point, Distance distance, Integer max) {
-        return vehicleRepository.findLandVesselsByLocationAround(point, distance.getValue(), max);
+        return vehicleRepository.findLandVehiclesByLocationAround(point, distance.getValue(), max);
     }
 
-    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Distance distance,
-            Integer max) {
-        return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance.getValue(), max);
+    public List<Vehicle> findVehicleByTypeAndLocationAround(VehicleType type, Point point, Double distance) {
+        return vehicleRepository.findVehicleByTypeAndLocationAround(type.name(), point, distance);
     }
 
     public List<Vehicle> findVehicleByTypeAndLocationNear(VehicleType type, Point point, Integer max) {
@@ -208,6 +213,10 @@ public class VehicleService {
 
     public List<Vehicle> findNearLocation(Point point, Distance maxDistance) {
         return vehicleRepository.findByLocationNear(point, maxDistance);
+    }
+
+    public void deleteAllConnectionsOfLandVehicle(String vehicleId) {
+        vehicleRepository.deleteAllConnectionsOfLandVehicle(vehicleId);
     }
 
     public CarWrapper createCarsFromResourceFile() {

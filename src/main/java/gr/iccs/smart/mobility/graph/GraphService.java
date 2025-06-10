@@ -78,6 +78,7 @@ public class GraphService {
     }
 
     private void createScooterConnections(LandVehicle scooter) {
+        var functionStartTime = Instant.now();
         var startTime = Instant.now();
         var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
                 scooter.getLocation(),
@@ -106,19 +107,53 @@ public class GraphService {
         vehicleService.saveAndGet(scooter);
         duration = Duration.between(startTime, Instant.now());
         log.debug("Saving scooter: " + duration.toMillis() + " ms");
+        duration = Duration.between(functionStartTime, Instant.now());
+        log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
+    }
 
+    public void createIncomingConnections(LandVehicle vehicle) {
+        var startTime = Instant.now();
+        var surroundingScooters = vehicleService.findScooterNolConnectionNearLocation(
+                vehicle.getLocation(),
+                config.getDistances().getMaxScooterDistanceKms());
+        var duration = Duration.between(startTime, Instant.now());
+        log.debug("Finding surrounding vehicles: " + duration.toMillis() + " ms");
+
+        startTime = Instant.now();
+        vehicle = createConnectionWithVehicles(vehicle,
+                surroundingScooters,
+                config.getDistances().getMaxScooterDistanceMeters());
+        duration = Duration.between(startTime, Instant.now());
+        log.debug("Creating connections with surrounding vehicles: " + duration.toMillis() + " ms");
     }
 
     private void createCarConnections(LandVehicle car) {
+        var functionStartTime = Instant.now();
+        var startTime = Instant.now();
+        log.debug("Creating connections for car: " + car.getId());
         if (config.getDistances().getMaxCarDistanceKms() != null) {
-            var otherVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(car.getLocation(),
-                    config.getDistances().getMaxCarDistanceKms());
+            var otherVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
+                    car.getLocation(), config.getDistances().getMaxCarDistanceKms());
+            log.warn("Getting surrounding vehicles took: "
+                    + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+            startTime = Instant.now();
             createConnectionWithVehicles(car, otherVehicles, config.getDistances().getMaxCarDistanceMeters());
         }
+        log.debug("    Creating connections with surrounding vehicles took: "
+                + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        startTime = Instant.now();
         createConnectionWithPorts(car, config.getDistances().getMaxCarDistanceKms());
+        log.debug("    Creating connections with ports took: " +
+                Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        startTime = Instant.now();
         createConnectionWithBusStops(car, config.getDistances().getMaxCarDistanceKms());
+        log.debug("    Creating connections with busStops took: " +
+                Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        startTime = Instant.now();
         vehicleService.saveAndGet(car);
-
+        log.debug("    Saving vehicle: " + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        var duration = Duration.between(functionStartTime, Instant.now());
+        log.debug("    Creating car connection: " + duration.toMillis() + " ms");
     }
 
     private void createPortConnections(Port port, List<Port> ports) {
@@ -143,13 +178,18 @@ public class GraphService {
 
         // Create connections with other ports if there are boats parked
         if (port.getParkedVehicles().size() > 0) {
-            for (var otherPort : ports) {
-                if (!otherPort.getId().equals(port.getId())) {
-                    port = pointOfInterestService.createConnectionFrom(port, otherPort, null);
-                }
-            }
+            port = connectPortWithOtherPorts(port, ports);
         }
         pointOfInterestService.saveAndGet(port);
+    }
+
+    public Port connectPortWithOtherPorts(Port p, List<Port> ports) {
+        for (var otherPort : ports) {
+            if (!otherPort.getId().equals(p.getId())) {
+                p = pointOfInterestService.createConnectionFrom(p, otherPort, null);
+            }
+        }
+        return p;
     }
 
     private void createBusStopConnections(BusStop busStop, List<BusStop> otherStops) {
@@ -183,6 +223,8 @@ public class GraphService {
 
     public void graphPreCalculation() {
         var startTime = Instant.now();
+
+        // Calculate connections for all the ports
         var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
         var duration = Duration.between(startTime, Instant.now());
         log.debug("Getting ports: " + duration.toMillis() + " ms");
@@ -208,23 +250,20 @@ public class GraphService {
 
         // First we calculate connections for all the cars
         startTime = Instant.now();
-        var vehicles = vehicleService.getAllLandVehicles(LandVehicle.class);
+        var vehicles = vehicleService.findAllLandVehicles(LandVehicle.class);
         duration = Duration.between(startTime, Instant.now());
         log.debug("Getting all vehicles took: " + duration.toMillis() + " ms");
 
         for (var startVehicle : vehicles) {
-            if (startVehicle.getType().equals(VehicleType.SCOOTER)) {
-                startTime = Instant.now();
-                createScooterConnections(startVehicle);
-                duration = Duration.between(startTime, Instant.now());
-                log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
+            createVehicleConnections(startVehicle);
+        }
+    }
 
-            } else {
-                startTime = Instant.now();
-                createCarConnections(startVehicle);
-                duration = Duration.between(startTime, Instant.now());
-                log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
-            }
+    public void createVehicleConnections(LandVehicle vehicle) {
+        if (vehicle.getType().equals(VehicleType.SCOOTER)) {
+            createScooterConnections(vehicle);
+        } else {
+            createCarConnections(vehicle);
         }
     }
 

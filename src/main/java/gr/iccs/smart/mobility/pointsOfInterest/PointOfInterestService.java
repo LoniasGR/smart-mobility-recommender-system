@@ -88,6 +88,11 @@ public class PointOfInterestService {
         return pointOfInterestRepository.findBusStopsByLocationNear(location, range);
     }
 
+    public List<PointOfInterest> getPOIByLocationNear(Point location, Double distance) {
+        var range = new Distance(distance, Metrics.KILOMETERS);
+        return pointOfInterestRepository.findPOIByLocationNear(location, range);
+    }
+
     public Optional<Port> getByExactLocation(Point location) {
         return pointOfInterestRepository.findByLocation(location);
     }
@@ -113,6 +118,10 @@ public class PointOfInterestService {
             throw new IllegalArgumentException("There is no boat stop to update");
         }
         return pointOfInterestRepository.save(newPort);
+    }
+
+    public void removeVehicle(String portId, String vehicleId) {
+        pointOfInterestRepository.deleteParkedIn(portId, vehicleId);
     }
 
     public void removeVehicle(Port port, Vehicle v) {
@@ -154,6 +163,18 @@ public class PointOfInterestService {
         }
         busStop.addConnection(connection);
         return busStop;
+    }
+
+    public Port getPortOfVehicle(String vehicleID) {
+        return pointOfInterestRepository.getPortOfVehicle(vehicleID);
+    }
+
+    public void save(PointOfInterest pointOfInterest) {
+        if (pointOfInterest instanceof Port) {
+            neo4jTemplate.saveAs(pointOfInterest, PortWithOneLevelConnection.class);
+        } else {
+            neo4jTemplate.saveAs(pointOfInterest, BusStopWithOneLevelConnection.class);
+        }
     }
 
     public Port saveAndGet(Port port) {
