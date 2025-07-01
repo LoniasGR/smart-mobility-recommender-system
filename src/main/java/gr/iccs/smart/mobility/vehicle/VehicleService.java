@@ -8,7 +8,6 @@ import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
@@ -31,26 +30,30 @@ import gr.iccs.smart.mobility.util.ResourceReader;
 
 @Service
 public class VehicleService {
-    private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
+    private static final Logger log = LoggerFactory.getLogger(VehicleService.class);
     private static final Random RANDOM = new Random();
-
-    @Autowired
+    
     private VehicleRepository vehicleRepository;
-
-    @Autowired
     private PointOfInterestService pointOfInterestService;
-
-    @Autowired
     private ConnectionService connectionService;
-
-    @Autowired
     private Neo4jTemplate neo4jTemplate;
-
-    @Autowired
     private DataFileConfig dataFileConfig;
-
-    @Autowired
     private ResourceReader resourceReader;
+
+    VehicleService(VehicleRepository vehicleRepository,
+                   PointOfInterestService pointOfInterestService,
+                   ConnectionService connectionService,
+                   Neo4jTemplate neo4jTemplate,
+                   DataFileConfig dataFileConfig,
+                   ResourceReader resourceReader) {
+        this.vehicleRepository = vehicleRepository;
+        this.pointOfInterestService = pointOfInterestService;
+        this.connectionService = connectionService;
+        this.neo4jTemplate = neo4jTemplate;
+        this.dataFileConfig = dataFileConfig;
+        this.resourceReader = resourceReader;
+    }
+
 
     public List<VehicleDTO> getAll() {
         return vehicleRepository.findAllVehiclesNoConnections();
@@ -227,7 +230,7 @@ public class VehicleService {
             return mapper.readValue(stream, CarWrapper.class);
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
-                log.warn("File %s not found, terminating...", filePath);
+                log.warn("File {} not found, terminating...", filePath);
             }
             throw new RuntimeException(e);
         }
