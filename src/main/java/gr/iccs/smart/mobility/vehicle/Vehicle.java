@@ -1,5 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import java.io.Serializable;
+
 import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -11,7 +13,9 @@ import jakarta.validation.constraints.NotNull;
  * Vehicle info + current status
  */
 @Node
-public abstract sealed class Vehicle permits Boat, LandVehicle {
+public abstract sealed class Vehicle implements Serializable permits Boat, LandVehicle {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @NotNull(message = "id cannot be empty")
     private final String id;
@@ -42,9 +46,7 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
     }
 
     /*
-     **************************************************************************
-     * GETTERS & SETTERS
-     **************************************************************************
+     ********* GETTERS & SETTERS
      */
     public VehicleType getType() {
         return type;
@@ -87,7 +89,6 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
     }
 
     public VehicleDAO toVehicleDAO() {
-        return new VehicleDAO(this.id, this.type, this.battery, this.dummy,
-                LocationDTO.fromGeographicPoint(location));
+        return new VehicleDAO(this.id, this.type, this.battery, this.dummy, LocationDTO.fromGeographicPoint(location));
     }
 }

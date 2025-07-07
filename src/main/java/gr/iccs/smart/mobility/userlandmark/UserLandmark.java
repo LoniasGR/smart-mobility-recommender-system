@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.userLandmark;
+package gr.iccs.smart.mobility.userlandmark;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;

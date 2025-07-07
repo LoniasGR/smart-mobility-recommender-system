@@ -12,8 +12,7 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
     private final VehicleService vehicleService;
     private final VehicleGraphService vehicleGraphService;
 
-    public RideStatusUpdateEventListener(VehicleService vehicleService,
-            VehicleGraphService vehicleGraphService) {
+    public RideStatusUpdateEventListener(VehicleService vehicleService, VehicleGraphService vehicleGraphService) {
         this.vehicleService = vehicleService;
         this.vehicleGraphService = vehicleGraphService;
     }
@@ -26,18 +25,10 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
         // We first need to do a pass on the vehicle status
         if (useInfo.status().equals(UseStatus.ACTIVE)) {
             vehicleStatus = VehicleStatus.IN_USE;
-        } else {
-            vehicleStatus = VehicleStatus.IDLE;
+            vehicleService.updateVehicleStatus(event.getVehicleId(), vehicleStatus, true);
         }
 
-        var vehicleInfo = new VehicleInfoDTO(null,
-                useInfo.location().latitude(),
-                useInfo.location().longitude(),
-                vehicleStatus);
-
-        vehicleService.updateVehicleStatus(event.getVehicleId(), vehicleInfo);
-
-        var v = vehicleService.getByIdNoConnections(event.getVehicleId());
+        var v = vehicleService.updateVehicleLocation(event.getVehicleId(), useInfo.location(), true);
 
         // If the vehicle is in use, we have to remove it from the graph
         if (useInfo.status().equals(UseStatus.ACTIVE)) {
@@ -45,7 +36,7 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
         } else {
             // Here we should be adding the new relationships to the database
             // This needs to include incoming relationships and outgoing ones.
-            vehicleGraphService.addVehicleToGraph(v);
+            vehicleGraphService.addVehicleToGraphAsync(v);
         }
     }
 }

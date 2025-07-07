@@ -24,10 +24,15 @@ import jakarta.validation.Valid;
 public class VehicleController {
     private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
 
-    private VehicleService vehicleService;
+    private final VehicleService vehicleService;
+    private final VehicleDBService vehicleDBService;
+    private final VehicleUtilitiesService vehicleUtilitiesService;
 
-    VehicleController(VehicleService vehicleService) {
+    VehicleController(VehicleService vehicleService, VehicleDBService vehicleDBService,
+            VehicleUtilitiesService vehicleUtilitiesService) {
         this.vehicleService = vehicleService;
+        this.vehicleDBService = vehicleDBService;
+        this.vehicleUtilitiesService = vehicleUtilitiesService;
     }
 
     /**
@@ -39,11 +44,11 @@ public class VehicleController {
             @RequestParam(required = false, defaultValue = "json") FormatSelection format) {
         log.debug("Vehicle API: Get All, format={}", format);
         if (format == FormatSelection.GEOJSON) {
-            var geoJsonResponse = vehicleService.createGeoJSON();
+            var geoJsonResponse = vehicleUtilitiesService.createGeoJSON();
             return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/geo+json"))
                     .body(new VehicleGeoJsonResponse(geoJsonResponse));
         }
-        var jsonResponse = vehicleService.getAll();
+        var jsonResponse = vehicleDBService.getAll();
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(new VehicleListResponse(jsonResponse));
     }
 
@@ -57,17 +62,17 @@ public class VehicleController {
     @PostMapping("/")
     public void create(@Valid @RequestBody VehicleDAO vehicle) {
         log.info("Vehicle API: Create {}", vehicle);
-        vehicleService.create(vehicle);
+        vehicleService.initialize(vehicle);
     }
 
     @PutMapping(value = "/{id}")
     public VehicleDTO updateStatus(@PathVariable String id, @RequestBody VehicleInfoDTO vehicle) {
         log.info("Vehicle API: updateStatus for {} with data {}", id, vehicle);
-        return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
+        return VehicleDTO.fromVehicle(vehicleService.updateVehicleInfo(id, vehicle));
     }
 
     @GetMapping(value = "/geojson")
     public FeatureCollection generateGeoJSON() {
-        return vehicleService.createGeoJSON();
+        return vehicleUtilitiesService.createGeoJSON();
     }
 }

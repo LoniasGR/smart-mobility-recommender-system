@@ -3,9 +3,10 @@ package gr.iccs.smart.mobility.location;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Point;
 
+import java.io.Serializable;
 import java.util.List;
 
-public record LocationDTO(Double latitude, Double longitude) {
+public record LocationDTO(Double latitude, Double longitude) implements Serializable {
     public static LocationDTO fromGeographicPoint(Point point) {
         if (point == null) {
             return null;
@@ -21,19 +22,21 @@ public record LocationDTO(Double latitude, Double longitude) {
         LocationDTO location = LocationDTO.fromGeographicPoint(point);
         return istanbulLocation(location);
     }
+
     public static IstanbulLocations.IstanbulLocationDescription istanbulLocation(LocationDTO location) {
-        if(pointInPolygon(location, IstanbulLocations.europeanSidePolygon)) {
+        if (pointInPolygon(location, IstanbulLocations.europeanSidePolygon)) {
             return IstanbulLocations.IstanbulLocationDescription.EUROPEAN_SIDE;
         }
 
-        if(pointInPolygon(location, IstanbulLocations.asianSidePolygon)) {
+        if (pointInPolygon(location, IstanbulLocations.asianSidePolygon)) {
             return IstanbulLocations.IstanbulLocationDescription.ASIAN_SIDE;
         }
         return IstanbulLocations.IstanbulLocationDescription.SEA;
     }
 
     /**
-     * <a href="https://observablehq.com/@tmcw/understanding-point-in-polygon">Source</a>
+     * <a href=
+     * "https://observablehq.com/@tmcw/understanding-point-in-polygon">Source</a>
      */
     private static boolean pointInPolygon(LocationDTO point, List<LocationDTO> polygon) {
         Double x = point.latitude(), y = point.longitude();
@@ -48,7 +51,8 @@ public record LocationDTO(Double latitude, Double longitude) {
                     // We are substituting the position of the point in the line
                     && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 
-            if (intersect) inside = !inside;
+            if (intersect)
+                inside = !inside;
         }
         return inside;
     }

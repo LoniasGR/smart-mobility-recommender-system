@@ -11,8 +11,8 @@ import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
 import gr.iccs.smart.mobility.location.InvalidLocationException;
 import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.BusStopDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.PortDTO;
+import gr.iccs.smart.mobility.pointsofinterest.BusStopDTO;
+import gr.iccs.smart.mobility.pointsofinterest.PortDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
@@ -35,30 +35,27 @@ public class RecommendationUtils {
         // There are multiple labels for each node, but only one is relevant
         for (String label : node.labels()) {
             switch (label) {
-                case "UserStartLandmark":
-                    return GeoJSONUtils.createStartingPointFeature(location);
-                case "UserDestinationLandmark":
-                    return GeoJSONUtils.createDestinationPointFeature(location);
-                case "LandVehicle":
-                    var vehicle = new VehicleDTO(
-                            node.get("id").asString(),
-                            Enum.valueOf(VehicleType.class, node.get("type").asString()),
-                            node.get("battery").asLong(),
-                            node.get("dummy").asBoolean(),
-                            location,
-                            Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
-                    return GeoJSONUtils.createVehicleFeature(vehicle);
-                case "Port":
-                    var port = new PortDTO(node.get("id").asString(), node.get("name").asString(),
-                            LocationDTO.fromGeographicPoint(location));
-                    return GeoJSONUtils.createPortFeature(port);
-                case "BusStop":
-                    var busStop = new BusStopDTO(node.get("id").asString(), node.get("name").asString(),
-                            LocationDTO.fromGeographicPoint(location));
-                    return GeoJSONUtils.createBusStopFeature(busStop);
-                case "ReachableNode":
-                case "UserLandmark":
-                    continue;
+            case "UserStartLandmark":
+                return GeoJSONUtils.createStartingPointFeature(location);
+            case "UserDestinationLandmark":
+                return GeoJSONUtils.createDestinationPointFeature(location);
+            case "LandVehicle":
+                var vehicle = new VehicleDTO(node.get("id").asString(),
+                        Enum.valueOf(VehicleType.class, node.get("type").asString()), node.get("battery").asLong(),
+                        node.get("dummy").asBoolean(), location,
+                        Enum.valueOf(VehicleStatus.class, node.get("status").asString()));
+                return GeoJSONUtils.createVehicleFeature(vehicle);
+            case "Port":
+                var port = new PortDTO(node.get("id").asString(), node.get("name").asString(),
+                        LocationDTO.fromGeographicPoint(location));
+                return GeoJSONUtils.createPortFeature(port);
+            case "BusStop":
+                var busStop = new BusStopDTO(node.get("id").asString(), node.get("name").asString(),
+                        LocationDTO.fromGeographicPoint(location));
+                return GeoJSONUtils.createBusStopFeature(busStop);
+            case "ReachableNode":
+            case "UserLandmark":
+                continue;
             }
         }
         throw new IllegalArgumentException("Node with labels: " + node.labels() + " does not have a valid label");
@@ -71,21 +68,21 @@ public class RecommendationUtils {
     private static String extractSegmentMode(InternalNode node) {
         for (String label : node.labels()) {
             switch (label) {
-                case "UserStartLandmark":
-                    return "walk";
-                case "Car":
-                    return "passenger_car";
-                case "Scooter":
-                    return "e_scooter";
-                case "Port":
-                    return "sea_vessel";
-                case "BusStop":
-                    return "public_transport";
-                case "ReachableNode":
-                case "UserLandmark":
-                case "LandVehicle":
-                case "UserDestinationLandmark":
-                    continue;
+            case "UserStartLandmark":
+                return "walk";
+            case "Car":
+                return "passenger_car";
+            case "Scooter":
+                return "e_scooter";
+            case "Port":
+                return "sea_vessel";
+            case "BusStop":
+                return "public_transport";
+            case "ReachableNode":
+            case "UserLandmark":
+            case "LandVehicle":
+            case "UserDestinationLandmark":
+                continue;
             }
         }
         return "";

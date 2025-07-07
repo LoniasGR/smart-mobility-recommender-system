@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.userLandmark;
+package gr.iccs.smart.mobility.userlandmark;
 
 import java.util.ArrayList;
 import java.util.List;

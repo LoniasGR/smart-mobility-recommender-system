@@ -7,24 +7,24 @@ import org.springframework.stereotype.Service;
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ReachableNode;
 import gr.iccs.smart.mobility.graph.GraphService;
-import gr.iccs.smart.mobility.pointsOfInterest.BusStop;
-import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
-import gr.iccs.smart.mobility.pointsOfInterest.Port;
+import gr.iccs.smart.mobility.pointsofinterest.BusStop;
+import gr.iccs.smart.mobility.pointsofinterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsofinterest.Port;
 
 @Service
 public class VehicleGraphService {
-    private final VehicleService vehicleService;
+    private final VehicleDBService vehicleDBService;
+    private final VehicleUtilitiesService vehicleUtilitiesService;
     private final PointOfInterestService pointOfInterestService;
     private final GraphService graphService;
     private final TransportationPropertiesConfig config;
     private final ExecutorService executorService;
 
-    VehicleGraphService(VehicleService vehicleService,
-            PointOfInterestService pointOfInterestService,
-            GraphService graphService,
-            TransportationPropertiesConfig config,
-            ExecutorService executorService) {
-        this.vehicleService = vehicleService;
+    VehicleGraphService(VehicleDBService vehicleDBService, PointOfInterestService pointOfInterestService,
+            VehicleUtilitiesService vehicleUtilitiesService, GraphService graphService,
+            TransportationPropertiesConfig config, ExecutorService executorService) {
+        this.vehicleDBService = vehicleDBService;
+        this.vehicleUtilitiesService = vehicleUtilitiesService;
         this.pointOfInterestService = pointOfInterestService;
         this.graphService = graphService;
         this.config = config;
@@ -32,18 +32,18 @@ public class VehicleGraphService {
     }
 
     public void addVehicleToGraphAsync(Vehicle v) {
-        if (v.getStatus() == VehicleStatus.CREATING) {
+        if (v.getStatus() == VehicleStatus.CREATING || v.getStatus() == VehicleStatus.IN_USE) {
             executorService.submit(() -> {
                 addVehicleToGraph(v);
                 v.setStatus(VehicleStatus.IDLE);
-                vehicleService.saveAndGet(v);
+                vehicleDBService.save(v);
             });
         }
     }
 
     public void removeVehicleFromGraph(Vehicle v) {
         if (v.isLandVehicle()) {
-            vehicleService.deleteAllConnectionsOfLandVehicle(v.getId());
+            vehicleDBService.deleteAllConnectionsOfLandVehicle(v.getId());
         } else {
             // If it's a boat, we have to remove it from the port and then check if
             // there are any boats remaining on that port.
@@ -77,28 +77,28 @@ public class VehicleGraphService {
 
         // Get all relationships with scooters in scooter distance
         var maxScooterDistance = config.getDistances().getMaxScooterDistanceMeters();
-        var scooters = vehicleService.findVehicleByTypeAndLocationAround(VehicleType.SCOOTER, v.getLocation(),
+        var scooters = vehicleDBService.findVehicleByTypeAndLocationAround(VehicleType.SCOOTER, v.getLocation(),
                 maxScooterDistance);
         for (var scooter : scooters) {
             if (scooter.getId().equals(v.getId())) {
                 continue; // Skip the same vehicle
             }
-            LandVehicle s = vehicleService.createConnectionTo((LandVehicle) scooter, (ReachableNode) v,
+            LandVehicle s = vehicleUtilitiesService.createConnectionTo((LandVehicle) scooter, (ReachableNode) v,
                     maxScooterDistance);
-            vehicleService.saveAndGet(s);
+            vehicleDBService.saveAndGet(s);
         }
 
         // Get all relationships with cars in car distance
         var maxCarDistance = config.getDistances().getMaxCarDistanceMeters();
-        var cars = vehicleService.findVehicleByTypeAndLocationAround(VehicleType.CAR, v.getLocation(),
+        var cars = vehicleDBService.findVehicleByTypeAndLocationAround(VehicleType.CAR, v.getLocation(),
                 maxCarDistance);
         for (var car : cars) {
             if (car.getId().equals(v.getId())) {
                 continue; // Skip the same vehicle
             }
-            LandVehicle c = vehicleService.createConnectionTo((LandVehicle) car, (ReachableNode) v,
+            LandVehicle c = vehicleUtilitiesService.createConnectionTo((LandVehicle) car, (ReachableNode) v,
                     maxCarDistance);
-            vehicleService.saveAndGet(c);
+            vehicleDBService.saveAndGet(c);
         }
 
         // Outgoing relationships
@@ -119,8 +119,7 @@ public class VehicleGraphService {
                 graphService.connectPortWithOtherPorts(port, ports);
             }
             port.getParkedVehicles().add(v);
-            pointOfInterestService.saveAndGet(port);
+            pointOfInterestService.save(port);
         }
     }
-
 }

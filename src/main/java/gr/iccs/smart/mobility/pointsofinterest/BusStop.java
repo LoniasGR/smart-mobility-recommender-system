@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.pointsOfInterest;
+package gr.iccs.smart.mobility.pointsofinterest;
 
 import java.util.List;
 

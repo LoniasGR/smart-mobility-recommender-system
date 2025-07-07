@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,42 +17,44 @@ import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.graph.GraphProjectionService;
 import gr.iccs.smart.mobility.graph.WeightType;
-import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsofinterest.PointOfInterestService;
 import gr.iccs.smart.mobility.user.User;
-import gr.iccs.smart.mobility.userLandmark.UserDestinationLandmark;
-import gr.iccs.smart.mobility.userLandmark.UserLandmarkService;
-import gr.iccs.smart.mobility.userLandmark.UserStartLandmark;
-import gr.iccs.smart.mobility.userLandmark.UserStartLandmarkDTO;
-import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.userlandmark.UserDestinationLandmark;
+import gr.iccs.smart.mobility.userlandmark.UserLandmarkService;
+import gr.iccs.smart.mobility.userlandmark.UserStartLandmark;
+import gr.iccs.smart.mobility.userlandmark.UserStartLandmarkDTO;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
+import gr.iccs.smart.mobility.vehicle.VehicleUtilitiesService;
 
 @Service
 public class RecommendationService {
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
-    @Autowired
-    private PointOfInterestService pointOfInterestService;
+    private final PointOfInterestService pointOfInterestService;
+    private final VehicleDBService vehicleDBService;
+    private final VehicleUtilitiesService vehicleUtilitiesService;
+    private final UserLandmarkService userLandmarkService;
+    private final ConnectionService connectionService;
+    private final TransportationPropertiesConfig config;
+    private final Neo4jTemplate neo4jTemplate;
+    private final DatabaseService databaseService;
+    private final GraphProjectionService graphProjectionService;
 
-    @Autowired
-    private VehicleService vehicleService;
-
-    @Autowired
-    private UserLandmarkService userLandmarkService;
-
-    @Autowired
-    private ConnectionService connectionService;
-
-    @Autowired
-    private TransportationPropertiesConfig config;
-
-    @Autowired
-    private Neo4jTemplate neo4jTemplate;
-
-    @Autowired
-    private DatabaseService databaseService;
-
-    @Autowired
-    private GraphProjectionService graphProjectionService;
+    RecommendationService(PointOfInterestService pointOfInterestService, VehicleDBService vehicleDBService,
+            VehicleUtilitiesService vehicleUtilitiesService, UserLandmarkService userLandmarkService,
+            ConnectionService connectionService, TransportationPropertiesConfig config, Neo4jTemplate neo4jTemplate,
+            DatabaseService databaseService, GraphProjectionService graphProjectionService) {
+        this.pointOfInterestService = pointOfInterestService;
+        this.vehicleDBService = vehicleDBService;
+        this.vehicleUtilitiesService = vehicleUtilitiesService;
+        this.userLandmarkService = userLandmarkService;
+        this.connectionService = connectionService;
+        this.config = config;
+        this.neo4jTemplate = neo4jTemplate;
+        this.databaseService = databaseService;
+        this.graphProjectionService = graphProjectionService;
+    }
 
     private void createStartLandmarkConnections(UserStartLandmark startLandmark, UserDestinationLandmark destLandmark) {
         log.info("Creating start landmark connections");
@@ -64,7 +65,7 @@ public class RecommendationService {
             startLandmark.getConnections().add(connection);
         }
 
-        var nearbyVehicles = vehicleService.findLandVehicleNoConnectionByNearLocation(startLandmark.getLocation(),
+        var nearbyVehicles = vehicleDBService.findLandVehicleNoConnectionByNearLocation(startLandmark.getLocation(),
                 config.getDistances().getMaxWalkingDistanceKms());
 
         for (var v : nearbyVehicles) {
@@ -97,22 +98,23 @@ public class RecommendationService {
         var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
         for (var b : ports) {
             pointOfInterestService.createConnectionFrom(b, destLandmark, maxWalkingDistanceMeters);
-            b = pointOfInterestService.saveAndGet(b);
+            pointOfInterestService.saveAndGet(b);
         }
 
-        var landVehicles = vehicleService.findAllLandVehiclesWithOneLevelConnection();
+        var landVehicles = vehicleDBService.findAllLandVehiclesWithOneLevelConnection();
         for (var v : landVehicles) {
             switch (v.getType()) {
-                case VehicleType.CAR:
-                    vehicleService.saveAndGet(vehicleService.createConnectionTo(v, destLandmark, maxCarDistanceMeters));
-                    break;
-                case VehicleType.SCOOTER:
-                    vehicleService.saveAndGet(
-                            vehicleService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
+            case VehicleType.CAR:
+                vehicleDBService
+                        .saveAndGet(vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxCarDistanceMeters));
+                break;
+            case VehicleType.SCOOTER:
+                vehicleDBService.saveAndGet(
+                        vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
 
-                    break;
-                default:
-                    continue;
+                break;
+            default:
+                continue;
             }
         }
     }
@@ -155,10 +157,7 @@ public class RecommendationService {
             }
 
             graphProjectionService.generateGraph(projection, nodes);
-            data = graphProjectionService.shortestPaths(
-                    projection,
-                    user.getUsername(),
-                    weightType,
+            data = graphProjectionService.shortestPaths(projection, user.getUsername(), weightType,
                     recommendationPaths);
         } finally {
             graphProjectionService.destroyGraph(projection);
@@ -174,8 +173,8 @@ public class RecommendationService {
         for (var d : data) {
             if (d.get("path") instanceof List<?> list) {
                 var fc = RecommendationUtils.createPathFeatureCollection(list);
-                if (options.wholeMap()) {
-                    vehicleService.addVehiclesToGeoJSON(fc);
+                if (options.wholeMap().booleanValue()) {
+                    vehicleUtilitiesService.addVehiclesToGeoJSON(fc);
                 }
                 collections.add(fc);
             }

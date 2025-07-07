@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.userLandmark;
+package gr.iccs.smart.mobility.userlandmark;
 
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 

@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.pointsOfInterest;
+package gr.iccs.smart.mobility.pointsofinterest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,7 @@ public abstract class PointOfInterest implements ReachableNode, StartingNode {
     private final List<Connection> connections;
 
     /*
-     **************************************************************************
      * GETTERS & SETTERS
-     **************************************************************************
      */
 
     public String getId() {

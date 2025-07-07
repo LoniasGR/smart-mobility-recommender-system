@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.pointsOfInterest;
+package gr.iccs.smart.mobility.pointsofinterest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,7 @@ public final class Port extends PointOfInterest {
     private final List<Vehicle> parkedVehicles;
 
     /*
-     **************************************************************************
      * GETTERS & SETTERS
-     **************************************************************************
      */
 
     public List<Vehicle> getParkedVehicles() {

@@ -1,4 +1,4 @@
-package gr.iccs.smart.mobility.pointsOfInterest;
+package gr.iccs.smart.mobility.pointsofinterest;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
@@ -31,26 +30,26 @@ import gr.iccs.smart.mobility.vehicle.Vehicle;
 @Service
 public class PointOfInterestService {
 
-    @Autowired
     private DataFileConfig dataFileConfig;
-
-    @Autowired
     private ResourceReader resourceReader;
-
-    @Autowired
     private PointOfInterestRepository pointOfInterestRepository;
-
-    @Autowired
     private ConnectionService connectionService;
-
-    @Autowired
     private DatabaseService databaseService;
-
-    @Autowired
     private TransportationPropertiesConfig transportPropertiesConfig;
-
-    @Autowired
     private Neo4jTemplate neo4jTemplate;
+
+    PointOfInterestService(DataFileConfig dataFileConfig, ResourceReader resourceReader,
+            PointOfInterestRepository pointOfInterestRepository, ConnectionService connectionService,
+            DatabaseService databaseService, TransportationPropertiesConfig transportPropertiesConfig,
+            Neo4jTemplate neo4jTemplate) {
+        this.dataFileConfig = dataFileConfig;
+        this.resourceReader = resourceReader;
+        this.pointOfInterestRepository = pointOfInterestRepository;
+        this.connectionService = connectionService;
+        this.databaseService = databaseService;
+        this.transportPropertiesConfig = transportPropertiesConfig;
+        this.neo4jTemplate = neo4jTemplate;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(PointOfInterestService.class);
 
