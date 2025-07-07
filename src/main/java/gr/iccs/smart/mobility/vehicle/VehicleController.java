@@ -55,14 +55,14 @@ public class VehicleController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/")
-    public void create(@Valid @RequestBody Vehicle vehicle) {
-        log.debug("Vehicle API: Create {}", vehicle);
+    public void create(@Valid @RequestBody VehicleDAO vehicle) {
+        log.info("Vehicle API: Create {}", vehicle);
         vehicleService.create(vehicle);
     }
 
     @PutMapping(value = "/{id}")
     public VehicleDTO updateStatus(@PathVariable String id, @RequestBody VehicleInfoDTO vehicle) {
-        log.debug("Vehicle API: updateStatus for {} with data {}", id, vehicle);
+        log.info("Vehicle API: updateStatus for {} with data {}", id, vehicle);
         return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
     }
 

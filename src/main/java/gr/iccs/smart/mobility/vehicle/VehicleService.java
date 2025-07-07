@@ -32,7 +32,7 @@ import gr.iccs.smart.mobility.util.ResourceReader;
 public class VehicleService {
     private static final Logger log = LoggerFactory.getLogger(VehicleService.class);
     private static final Random RANDOM = new Random();
-    
+
     private VehicleRepository vehicleRepository;
     private PointOfInterestService pointOfInterestService;
     private ConnectionService connectionService;
@@ -41,11 +41,11 @@ public class VehicleService {
     private ResourceReader resourceReader;
 
     VehicleService(VehicleRepository vehicleRepository,
-                   PointOfInterestService pointOfInterestService,
-                   ConnectionService connectionService,
-                   Neo4jTemplate neo4jTemplate,
-                   DataFileConfig dataFileConfig,
-                   ResourceReader resourceReader) {
+            PointOfInterestService pointOfInterestService,
+            ConnectionService connectionService,
+            Neo4jTemplate neo4jTemplate,
+            DataFileConfig dataFileConfig,
+            ResourceReader resourceReader) {
         this.vehicleRepository = vehicleRepository;
         this.pointOfInterestService = pointOfInterestService;
         this.connectionService = connectionService;
@@ -54,24 +54,31 @@ public class VehicleService {
         this.resourceReader = resourceReader;
     }
 
-
     public List<VehicleDTO> getAll() {
         return vehicleRepository.findAllVehiclesNoConnections();
     }
 
-    public Vehicle create(Vehicle vehicle) {
-        if (vehicle.getType() == null) {
+    private void validateVehicle(VehicleType type, String vehicleId) {
+        if (type == null) {
             throw new BadVehicleRequest("vehicle type is missing");
         }
 
-        if (vehicle.getId() == null) {
+        if (vehicleId == null) {
             throw new BadVehicleRequest("Vehicle id is missing");
         }
 
-        if (vehicleRepository.existsById(vehicle.getId())) {
+        if (vehicleRepository.existsById(vehicleId)) {
             throw new BadVehicleRequest("Vehicle already exists");
         }
-        return vehicleRepository.save(vehicle);
+    }
+
+    public Vehicle create(VehicleDAO vehicle) {
+        return createVehicle(vehicle.toVehicle());
+    }
+
+    public Vehicle createVehicle(Vehicle v) {
+        validateVehicle(v.getType(), v.getId());
+        return vehicleRepository.save(v);
     }
 
     public Vehicle getById(String id) {
@@ -90,7 +97,7 @@ public class VehicleService {
         throw new VehicleNotFoundException();
     }
 
-        public Vehicle getByIdOneLevelConnections(String id) {
+    public Vehicle getByIdOneLevelConnections(String id) {
         var vehicle = vehicleRepository.findOneLevelConnectionsById(id);
         if (vehicle.isPresent()) {
             return vehicle.get();
@@ -105,7 +112,7 @@ public class VehicleService {
         }
         throw new VehicleNotFoundException();
     }
- 
+
     public Vehicle updateVehicleStatus(String id, VehicleInfoDTO vehicleInfoDTO) {
         var oldVehicle = vehicleRepository.findOneLevelConnectionsById(id);
         if (oldVehicle.isEmpty()) {
@@ -228,18 +235,19 @@ public class VehicleService {
             ObjectMapper mapper = new ObjectMapper();
             var stream = resourceReader.readResource(filePath);
             return mapper.readValue(stream, CarWrapper.class);
+        } catch (FileNotFoundException e) {
+            log.warn("File {} not found, terminating...", filePath);
         } catch (Exception e) {
-            if (e instanceof FileNotFoundException) {
-                log.warn("File {} not found, terminating...", filePath);
-            }
             throw new RuntimeException(e);
         }
+    }
+
     }
 
     private void createRandomCars(Integer n) {
         for (int i = 0; i < n; i++) {
             var vehicle = new Car("car_" + i, VehicleType.CAR, true, null);
-            var car = create(vehicle);
+            var car = create(vehicle.toVehicleDAO());
             createRandomVehicleInfo(car);
         }
     }
@@ -264,14 +272,14 @@ public class VehicleService {
         for (var p : cars) {
             var car = p.toCar();
             car.setStatus(VehicleStatus.IDLE);
-            create(car);
+            createVehicle(car);
         }
     }
 
     public void createRandomScooters(Integer n) {
         for (int i = 0; i < n; i++) {
             var vehicle = new Scooter("scooter_" + i, VehicleType.SCOOTER, true, null);
-            var scooter = create(vehicle);
+            var scooter = createVehicle(vehicle));
             createRandomVehicleInfo(scooter);
         }
     }
@@ -289,7 +297,7 @@ public class VehicleService {
         for (var p : scooters) {
             var scooter = p.toScooter();
             scooter.setStatus(VehicleStatus.IDLE);
-            create(scooter);
+            createVehicle(scooter);
         }
     }
 
@@ -297,7 +305,7 @@ public class VehicleService {
         var ports = pointOfInterestService.getAllPorts();
         for (int i = 0; i < n; i++) {
             var vehicle = new Boat("boat_" + i, VehicleType.SEA_VESSEL, true, 10);
-            var boat = (Boat) create(vehicle);
+            var boat = (Boat) createVehicle(vehicle);
             createRandomBoatInfo(boat, ports);
         }
     }
@@ -316,7 +324,7 @@ public class VehicleService {
             var boat = p.toBoat();
             boat.setStatus(VehicleStatus.IDLE);
             // Return type of create is Vehicle, so we need to cast it to Boat
-            boat = (Boat) create(boat);
+            boat = (Boat) createVehicle(boat);
             assignRelatedPort(pointOfInterestService.getAllPorts(), boat);
         }
     }
@@ -339,5 +347,4 @@ public class VehicleService {
                 newLocation.longitude(),
                 VehicleStatus.IDLE);
     }
-
 }

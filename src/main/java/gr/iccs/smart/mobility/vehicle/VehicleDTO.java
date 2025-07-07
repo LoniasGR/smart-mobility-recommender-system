@@ -14,4 +14,14 @@ public record VehicleDTO(@Id String id, VehicleType type, Long battery, Boolean 
                 vehicle.getLocation(),
                 vehicle.getStatus());
     }
+
+    public static Vehicle toVehicle(VehicleDTO vehicleDTO) {
+        if (vehicleDTO.type() == VehicleType.SEA_VESSEL) {
+            return new Boat(vehicleDTO.id(), vehicleDTO.type(), vehicleDTO.dummy(), vehicleDTO.battery(),
+                    vehicleDTO.location(), null);
+        } else {
+            return new LandVehicle(vehicleDTO.id(), vehicleDTO.type(), vehicleDTO.dummy(), vehicleDTO.battery(),
+                    vehicleDTO.location(), null);
+        }
+    }
 }
