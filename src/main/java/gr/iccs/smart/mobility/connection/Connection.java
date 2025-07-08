@@ -1,11 +1,13 @@
 package gr.iccs.smart.mobility.connection;
 
+import java.io.Serializable;
+
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
 @RelationshipProperties
-public class Connection {
+public class Connection implements Serializable {
     @RelationshipId
     private String id;
 
