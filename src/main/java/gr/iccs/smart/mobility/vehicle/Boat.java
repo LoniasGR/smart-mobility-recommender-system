@@ -1,12 +1,14 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import org.neo4j.driver.types.Point;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.Node;
 
 @Node(primaryLabel = "Sea Vessel")
 public final class Boat extends Vehicle {
     private Integer capacity;
 
+    @PersistenceCreator
     public Boat(String id, VehicleType type, Boolean dummy, Integer capacity) {
         super(id, type, dummy);
         this.capacity = capacity;

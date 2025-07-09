@@ -1,10 +1,13 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import java.io.Serializable;
+
 import org.springframework.data.annotation.Id;
 
 import gr.iccs.smart.mobility.location.LocationDTO;
 
-public record VehicleDAO(@Id String id, VehicleType type, Long battery, Boolean dummy, LocationDTO location) {
+public record VehicleDAO(@Id String id, VehicleType type, Long battery, Boolean dummy, LocationDTO location)
+        implements Serializable {
 
     public Vehicle toVehicle() {
         if (this.type() == VehicleType.SEA_VESSEL) {

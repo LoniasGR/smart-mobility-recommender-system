@@ -174,7 +174,7 @@ public class GraphService {
         }
 
         // Create connections with other ports if there are boats parked
-        if (port.getParkedVehicles().isEmpty()) {
+        if (!port.getParkedVehicles().isEmpty()) {
             port = connectPortWithOtherPorts(port, ports);
         }
         pointOfInterestService.saveAndGet(port);

@@ -36,7 +36,7 @@ public class RideStatusUpdateEventListener implements ApplicationListener<RideSt
         } else {
             // Here we should be adding the new relationships to the database
             // This needs to include incoming relationships and outgoing ones.
-            vehicleGraphService.addVehicleToGraphAsync(v);
+            vehicleGraphService.addVehicleToGraph(v);
         }
     }
 }

@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.graph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class GraphProjectionService {
         var res = client.query(query).fetch().all();
 
         if (res.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
 
         // For some reason we are getting a lot more results than we
