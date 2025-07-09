@@ -4,23 +4,27 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import gr.iccs.smart.mobility.location.LocationDTO;
 
 @RestController
-@RequestMapping("api/boat-stop")
+@RequestMapping("api/ports")
 public class PortController {
     private static final Logger log = LoggerFactory.getLogger(PortController.class);
 
-    @Autowired
-    private PointOfInterestService portService;
+    private final PointOfInterestService portService;
+
+    PortController(PointOfInterestService pointOfInterestService) {
+        this.portService = pointOfInterestService;
+    }
 
     @GetMapping
     public List<Port> getAll() {
@@ -55,9 +59,10 @@ public class PortController {
     }
 
     @PostMapping
-    public Port create(@RequestBody Port port) {
-        log.debug("Port API: create");
-        return (Port) portService.create(port);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Port create(@RequestBody PortDTO port) {
+        log.info("Creating port {}", port);
+        return (Port) portService.create(port.toPort());
     }
 
 }

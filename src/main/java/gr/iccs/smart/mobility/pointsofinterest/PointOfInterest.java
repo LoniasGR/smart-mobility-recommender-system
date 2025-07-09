@@ -18,7 +18,7 @@ public abstract class PointOfInterest implements ReachableNode, StartingNode {
     private final String name;
     private Point location;
 
-    public PointOfInterest(String id, String name, Point location, List<Connection> connections) {
+    protected PointOfInterest(String id, String name, Point location, List<Connection> connections) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -55,6 +55,4 @@ public abstract class PointOfInterest implements ReachableNode, StartingNode {
     public String getName() {
         return this.name;
     }
-
-    public abstract String getOrsProfile();
 }

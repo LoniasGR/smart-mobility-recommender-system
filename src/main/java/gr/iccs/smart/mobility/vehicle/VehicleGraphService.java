@@ -2,6 +2,8 @@ package gr.iccs.smart.mobility.vehicle;
 
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
@@ -13,6 +15,8 @@ import gr.iccs.smart.mobility.pointsofinterest.Port;
 
 @Service
 public class VehicleGraphService {
+    private static final Logger log = LoggerFactory.getLogger(VehicleGraphService.class);
+
     private final VehicleDBService vehicleDBService;
     private final VehicleUtilitiesService vehicleUtilitiesService;
     private final PointOfInterestService pointOfInterestService;
@@ -34,9 +38,15 @@ public class VehicleGraphService {
     public void addVehicleToGraphAsync(Vehicle v) {
         if (v.getStatus() == VehicleStatus.CREATING || v.getStatus() == VehicleStatus.IN_USE) {
             executorService.submit(() -> {
-                addVehicleToGraph(v);
-                v.setStatus(VehicleStatus.IDLE);
-                vehicleDBService.save(v);
+                try {
+                    log.info("Processing vehicle {}", v.getId());
+                    addVehicleToGraph(v);
+                    v.setStatus(VehicleStatus.IDLE);
+                    vehicleDBService.save(v);
+                } catch (Exception e) {
+                    log.error("Exception while processing vehicle {}", v.getId(), e);
+                    throw new RuntimeException(e);
+                }
             });
         }
     }

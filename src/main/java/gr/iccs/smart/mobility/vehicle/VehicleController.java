@@ -58,8 +58,8 @@ public class VehicleController {
         return VehicleDTO.fromVehicle(vehicleService.getById(id));
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
     public void create(@Valid @RequestBody VehicleDAO vehicle) {
         log.info("Vehicle API: Create {}", vehicle);
         vehicleService.initialize(vehicle);

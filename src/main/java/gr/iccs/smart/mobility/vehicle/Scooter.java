@@ -11,10 +11,6 @@ import gr.iccs.smart.mobility.connection.Connection;
 @Node
 public final class Scooter extends LandVehicle {
 
-    private Scooter() {
-        super(null, null, null, null);
-    }
-
     @PersistenceCreator
     public Scooter(String id, VehicleType type, Boolean dummy, List<Connection> connections) {
         super(id, type, dummy, connections);

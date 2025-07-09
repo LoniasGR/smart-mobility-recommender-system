@@ -24,8 +24,9 @@ import gr.iccs.smart.mobility.geojson.FeatureCollection;
 
 @Component
 public class Directions extends Base {
-    private static final List<String> validProfiles = List.of("driving-car", "driving-hvg", "cycling-regular",
-            "cycling-road", "cycling-mountain", "cycling-electric", "foot-walking", "foot-hiking", "wheelchair");
+    private static final List<String> validProfiles = List.of("driving-car",
+            "driving-hvg", "cycling-regular", "cycling-road", "cycling-mountain",
+            "cycling-electric", "foot-walking", "foot-hiking", "wheelchair");
 
     private static final List<LocalDateTime> rate = new LinkedList<>();
 
@@ -92,8 +93,9 @@ public class Directions extends Base {
 
     private Class<?> extrapolateType(String returnType) {
         // TODO: Add the rest of mappings
-        final Map<String, Class<?>> returnTypeMapping = Map.of("geojson", FeatureCollection.class, "",
-                FeatureCollection.class);
+        final Map<String, Class<?>> returnTypeMapping = Map.of(
+                "geojson", FeatureCollection.class,
+                "", FeatureCollection.class);
 
         if (returnType == null) {
             return FeatureCollection.class;
@@ -127,6 +129,8 @@ public class Directions extends Base {
             log.error("Too many requests reached... Waiting for 30s");
             waitToRuntimeException(30000L);
             ret = executeWithRateLimiting(callback);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         updateRateLimit();
         return ret;
@@ -136,12 +140,17 @@ public class Directions extends Base {
         verifyProfile(profile);
 
         return executeWithRateLimiting(() -> {
-            URI uri = UriComponentsBuilder.fromUriString(baseURL + "/" + profile)
-                    .queryParam("start", start.y() + "," + start.x()).queryParam("end", end.y() + "," + end.x())
-                    .encode().build().toUri();
+            URI uri = UriComponentsBuilder
+                    .fromUriString(baseURL + "/" + profile)
+                    .queryParam("start", start.y() + "," + start.x())
+                    .queryParam("end", end.y() + "," + end.x())
+                    .encode()
+                    .build()
+                    .toUri();
 
             log.debug("Calling URL: {}", uri);
-            ResponseEntity<FeatureCollection> entity = client.get().uri(uri).retrieve()
+            ResponseEntity<FeatureCollection> entity = client.get().uri(uri)
+                    .retrieve()
                     .toEntity(FeatureCollection.class);
 
             return entity.getBody();
@@ -154,12 +163,20 @@ public class Directions extends Base {
         Class<T> clazz = (Class<T>) extrapolateType(returnType);
 
         return executeWithRateLimiting(() -> {
-            URI uri = UriComponentsBuilder.fromUriString(baseURL + "/" + profile + format).encode().build().toUri();
+            URI uri = UriComponentsBuilder
+                    .fromUriString(baseURL + "/" + profile + format)
+                    .encode()
+                    .build()
+                    .toUri();
             log.debug("Calling URL: {}", uri);
 
-            ResponseEntity<T> entity = client.post().uri(uri).contentType(MediaType.APPLICATION_JSON).body(options)
-                    .retrieve().toEntity(clazz);
-            return entity.getBody();
+            var resp = client.post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(options)
+                    .retrieve();
+
+            return resp.toEntity(clazz).getBody();
         });
     }
 
