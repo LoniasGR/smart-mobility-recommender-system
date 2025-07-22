@@ -1,0 +1,79 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    29.00278,
+                    41.051008
+                ]
+            },
+            "properties": {
+                "scooter_count": 10,
+                "car_count": 5,
+                "boat_count": 2,
+                "ports": [
+                    {
+                        "name": "Be\u015fikta\u015f Ferry Terminal",
+                        "latitude": 41.04083,
+                        "longitude": 29.00722
+                    }
+                ],
+                "name": "Besiktas"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    29.027,
+                    40.992
+                ]
+            },
+            "properties": {
+                "scooter_count": 30,
+                "car_count": 2,
+                "boat_count": 3,
+                "ports": [
+                    {
+                        "name": "Kad\u0131k\u00f6y Ferry Terminal",
+                        "latitude": 40.9909,
+                        "longitude": 29.0187
+                    }
+                ],
+                "name": "Kadikoy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    28.974084,
+                    41.0257724
+                ]
+            },
+            "properties": {
+                "scooter_count": 10,
+                "car_count": 7,
+                "boat_count": 10,
+                "ports": [
+                    {
+                        "name": "Emin\u00f6n\u00fc \u015eehir Hatlar\u0131 Ferry Pier",
+                        "latitude": 41.016487,
+                        "longitude": 28.970381
+                    },
+                    {
+                        "name": "Karak\u00f6y \u015eehir Hatlar\u0131 Ferry Pier",
+                        "latitude": 41.016667,
+                        "longitude": 28.966667
+                    }
+                ],
+                "name": "Karak\u00f6y"
+            }
+        }
+    ]
+}
