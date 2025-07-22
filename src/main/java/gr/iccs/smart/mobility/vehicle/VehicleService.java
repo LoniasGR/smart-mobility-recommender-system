@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.neo4j.driver.Values;
-import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -93,7 +92,7 @@ public class VehicleService {
             var vehicle = new Boat("boat_" + i, VehicleType.SEA_VESSEL, true, 10);
             var boat = (Boat) vehicleDBService.createVehicle(vehicle);
             createRandomBoatInfo(boat, ports);
-            addBoatToPort(vehicle.getLocation(), ports, vehicle);
+            vehicleGraphService.assignRelatedPort(vehicle, ports);
         }
     }
 
@@ -112,26 +111,7 @@ public class VehicleService {
             boat.setStatus(VehicleStatus.IDLE);
             // Return type of create is Vehicle, so we need to cast it to Boat
             boat = (Boat) vehicleDBService.createVehicle(boat);
-            assignRelatedPort(pointOfInterestService.getAllPorts(), boat);
-        }
-    }
-
-    private void assignRelatedPort(List<Port> ports, Vehicle vehicle) {
-        var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
-        if (coastLocation.isPresent()) {
-            coastLocation.get().getParkedVehicles().add(vehicle);
-            pointOfInterestService.update(coastLocation.get());
-        }
-    }
-
-    private void addBoatToPort(Point newLocation, List<Port> ports, Vehicle vehicle) {
-        var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(newLocation)).findFirst();
-
-        // If the sea vessel is parked in a boat stop, add it to the list of boats in
-        // the stop
-        if (coastLocation.isPresent() && !newLocation.equals(vehicle.getLocation())) {
-            coastLocation.get().getParkedVehicles().add(vehicle);
-            pointOfInterestService.update(coastLocation.get());
+            vehicleGraphService.addBoatToPort(boat);
         }
     }
 

@@ -1,5 +1,6 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
@@ -35,11 +36,28 @@ public class VehicleGraphService {
         this.executorService = executorService;
     }
 
+    protected void assignRelatedPort(Vehicle vehicle, List<Port> ports) {
+        var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
+        if (coastLocation.isPresent()) {
+            log.info("Adding vehicle {} to port {}", vehicle.getId(), coastLocation.get().getId());
+            coastLocation.get().getParkedVehicles().add(vehicle);
+            pointOfInterestService.update(coastLocation.get());
+        }
+    }
+
+    protected void addBoatToPort(Vehicle boat) {
+        var ports = pointOfInterestService.getAllPorts();
+        assignRelatedPort(boat, ports);
+    }
+
     public void addVehicleToGraphAsync(Vehicle v) {
         if (v.getStatus() == VehicleStatus.CREATING || v.getStatus() == VehicleStatus.IN_USE) {
             executorService.submit(() -> {
                 try {
                     log.info("Processing vehicle {}", v.getId());
+                    if (!v.isLandVehicle()) {
+                        addBoatToPort(v);
+                    }
                     var newV = addVehicleToGraph(v);
                     newV.setStatus(VehicleStatus.IDLE);
                     vehicleDBService.save(newV);
