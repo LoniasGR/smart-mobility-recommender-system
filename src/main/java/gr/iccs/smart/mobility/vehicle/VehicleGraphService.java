@@ -40,9 +40,9 @@ public class VehicleGraphService {
             executorService.submit(() -> {
                 try {
                     log.info("Processing vehicle {}", v.getId());
-                    addVehicleToGraph(v);
-                    v.setStatus(VehicleStatus.IDLE);
-                    vehicleDBService.save(v);
+                    var newV = addVehicleToGraph(v);
+                    newV.setStatus(VehicleStatus.IDLE);
+                    vehicleDBService.save(newV);
                 } catch (Exception e) {
                     log.error("Exception while processing vehicle {}", v.getId(), e);
                     throw new RuntimeException(e);
@@ -68,7 +68,7 @@ public class VehicleGraphService {
         }
     }
 
-    private void addLandVehicleToGraph(LandVehicle v) {
+    private Vehicle addLandVehicleToGraph(LandVehicle v) {
         // Incoming relationships
         // Get all relationships with ports and bus stops in walking distance
         var poi = pointOfInterestService.getPOIByLocationNear(v.getLocation(),
@@ -112,13 +112,13 @@ public class VehicleGraphService {
         }
 
         // Outgoing relationships
-        graphService.createVehicleConnections(v);
+        return graphService.createVehicleConnections(v);
 
     }
 
-    public void addVehicleToGraph(Vehicle v) {
+    public Vehicle addVehicleToGraph(Vehicle v) {
         if (v.isLandVehicle()) {
-            addLandVehicleToGraph((LandVehicle) v);
+            return addLandVehicleToGraph((LandVehicle) v);
         } else {
             // We have to add the boat to the port. If the port already has
             // boats, there is nothing else to do. Otherwise, we need to connect
@@ -130,6 +130,7 @@ public class VehicleGraphService {
             }
             port.getParkedVehicles().add(v);
             pointOfInterestService.save(port);
+            return v;
         }
     }
 }

@@ -40,6 +40,38 @@ public class VehicleDBService {
         return vehicleRepository.findAllVehiclesNoConnections();
     }
 
+    public Vehicle getById(String id) {
+        var vehicle = vehicleRepository.findById(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
+    public Vehicle getByIdNoConnections(String id) {
+        var vehicle = vehicleRepository.findNoConnectionsById(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
+    public Vehicle getByIdOneLevelConnections(String id) {
+        var vehicle = vehicleRepository.findOneLevelConnectionsById(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
+    public LandVehicle getLandVehicleByIdNoConnections(String id) {
+        var vehicle = vehicleRepository.findLandVehicleWithNoConnections(id);
+        if (vehicle.isPresent()) {
+            return vehicle.get();
+        }
+        throw new VehicleNotFoundException();
+    }
+
     public Vehicle createVehicle(Vehicle v) {
         validateVehicle(v.getType(), v.getId());
         return vehicleRepository.save(v);

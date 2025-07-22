@@ -10,21 +10,21 @@ import gr.iccs.smart.mobility.usage.UsageService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
-import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import net.datafaker.Faker;
 
 @Service
 public class UserService {
 
     private UserRepository userRepository;
-    private VehicleService vehicleService;
+    private VehicleDBService vehicleDBService;
     private UsageService usageService;
     private RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher;
 
-    UserService(UserRepository userRepository, VehicleService vehicleService, UsageService usageService,
+    UserService(UserRepository userRepository, VehicleDBService vehicleDBService, UsageService usageService,
             RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher) {
         this.userRepository = userRepository;
-        this.vehicleService = vehicleService;
+        this.vehicleDBService = vehicleDBService;
         this.usageService = usageService;
         this.rideStatusUpdateEventPublisher = rideStatusUpdateEventPublisher;
     }
@@ -57,7 +57,7 @@ public class UserService {
      * @param useInfo
      */
     public void manageRide(String username, UseDTO useInfo) {
-        var vehicle = vehicleService.getLandVehicleByIdNoConnections(useInfo.vehicle().getId());
+        var vehicle = vehicleDBService.getLandVehicleByIdNoConnections(useInfo.vehicle().getId());
 
         var person = getById(username);
         var ride = person.getCurrentRide();

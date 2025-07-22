@@ -171,7 +171,7 @@ public class VehicleService {
     }
 
     public Vehicle updateVehicleLocation(String id, LocationDTO location, boolean shouldSave) {
-        var vehicle = getByIdOneLevelConnections(id);
+        var vehicle = vehicleDBService.getByIdOneLevelConnections(id);
         return updateVehicleLocation(vehicle, location, shouldSave);
     }
 
@@ -184,12 +184,12 @@ public class VehicleService {
     }
 
     public Vehicle updateVehicleStatus(String id, VehicleStatus status, boolean shouldSave) {
-        var vehicle = getByIdOneLevelConnections(id);
+        var vehicle = vehicleDBService.getByIdOneLevelConnections(id);
         return updateVehicleStatus(vehicle, status, shouldSave);
     }
 
     public Vehicle updateVehicleInfo(String id, VehicleInfoDTO vehicleInfoDTO) {
-        var vehicle = getByIdOneLevelConnections(id);
+        var vehicle = vehicleDBService.getByIdOneLevelConnections(id);
         vehicle = updateVehicleLocation(vehicle, vehicleInfoDTO.location(), false);
         vehicle = updateVehicleStatus(vehicle, vehicleInfoDTO.status(), false);
         if (vehicleInfoDTO.battery() != null) {
@@ -205,37 +205,5 @@ public class VehicleService {
         v = vehicleDBService.createVehicle(v);
         vehicleGraphService.addVehicleToGraphAsync(v);
         return v;
-    }
-
-    public Vehicle getById(String id) {
-        var vehicle = vehicleRepository.findById(id);
-        if (vehicle.isPresent()) {
-            return vehicle.get();
-        }
-        throw new VehicleNotFoundException();
-    }
-
-    public Vehicle getByIdNoConnections(String id) {
-        var vehicle = vehicleRepository.findNoConnectionsById(id);
-        if (vehicle.isPresent()) {
-            return vehicle.get();
-        }
-        throw new VehicleNotFoundException();
-    }
-
-    public Vehicle getByIdOneLevelConnections(String id) {
-        var vehicle = vehicleRepository.findOneLevelConnectionsById(id);
-        if (vehicle.isPresent()) {
-            return vehicle.get();
-        }
-        throw new VehicleNotFoundException();
-    }
-
-    public LandVehicle getLandVehicleByIdNoConnections(String id) {
-        var vehicle = vehicleRepository.findLandVehicleWithNoConnections(id);
-        if (vehicle.isPresent()) {
-            return vehicle.get();
-        }
-        throw new VehicleNotFoundException();
     }
 }

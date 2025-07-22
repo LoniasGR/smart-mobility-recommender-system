@@ -24,6 +24,8 @@ import gr.iccs.smart.mobility.userlandmark.UserLandmarkService;
 import gr.iccs.smart.mobility.userlandmark.UserStartLandmark;
 import gr.iccs.smart.mobility.userlandmark.UserStartLandmarkDTO;
 import gr.iccs.smart.mobility.vehicle.VehicleDBService;
+import gr.iccs.smart.mobility.vehicle.VehicleDTO;
+import gr.iccs.smart.mobility.vehicle.VehicleNotFoundException;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
 import gr.iccs.smart.mobility.vehicle.VehicleUtilitiesService;
 
@@ -104,22 +106,23 @@ public class RecommendationService {
         var landVehicles = vehicleDBService.findAllLandVehiclesWithOneLevelConnection();
         for (var v : landVehicles) {
             switch (v.getType()) {
-            case VehicleType.CAR:
-                vehicleDBService
-                        .saveAndGet(vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxCarDistanceMeters));
-                break;
-            case VehicleType.SCOOTER:
-                vehicleDBService.saveAndGet(
-                        vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
+                case VehicleType.CAR:
+                    vehicleDBService
+                            .saveAndGet(
+                                    vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxCarDistanceMeters));
+                    break;
+                case VehicleType.SCOOTER:
+                    vehicleDBService.saveAndGet(
+                            vehicleUtilitiesService.createConnectionTo(v, destLandmark, maxScooterDistanceMeters));
 
-                break;
-            default:
-                continue;
+                    break;
+                default:
+                    continue;
             }
         }
     }
 
-    public List<FeatureCollection> recommendationV2(Point start, Point finish, User user,
+    private List<Map<String, Object>> generateRecommendation(Point start, Point finish, User user,
             RecommendationOptions options) {
         var startLandmark = new UserStartLandmark(start, null, user);
         var destLandmark = new UserDestinationLandmark(finish, user);
@@ -168,6 +171,13 @@ public class RecommendationService {
         if (Objects.isNull(data) || data.isEmpty()) {
             throw new NoRouteFoundException("No viable route between origin and destination");
         }
+        return data;
+    }
+
+    public List<FeatureCollection> geojsonRecommendation(Point start, Point finish, User user,
+            RecommendationOptions options) {
+
+        var data = generateRecommendation(start, finish, user, options);
 
         List<FeatureCollection> collections = new ArrayList<>();
         for (var d : data) {
@@ -180,5 +190,37 @@ public class RecommendationService {
             }
         }
         return collections;
+    }
+
+    private List<VehicleDTO> createVehicleList(List<?> list) {
+        List<VehicleDTO> vehicles = new ArrayList<>();
+        for (var i : list) {
+            if (i != null) {
+                // TODO: There are more things than vehicles in here, but we are not
+                // bothering ourselves with them for now
+                try {
+                    var v = vehicleDBService.getByIdNoConnections(i.toString());
+                    vehicles.add(VehicleDTO.fromVehicle(v));
+                } catch (VehicleNotFoundException e) {
+                    // do nothing
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return vehicles;
+    }
+
+    public List<List<VehicleDTO>> jsonRecommendation(Point start, Point finish, User user,
+            RecommendationOptions options) {
+        var data = generateRecommendation(start, finish, user, options);
+        List<List<VehicleDTO>> recommendations = new ArrayList<>();
+        for (var d : data) {
+            if (d.get("nodePath") instanceof List<?> list) {
+                var vehicles = createVehicleList(list);
+                recommendations.add(vehicles);
+            }
+        }
+        return recommendations;
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.util.FormatSelection;
 import jakarta.validation.Valid;
 
@@ -40,22 +39,22 @@ public class VehicleController {
      *         format.
      */
     @GetMapping(value = { "", "/" })
-    public ResponseEntity<VehicleResponse> getAll(
+    public ResponseEntity<?> getAll(
             @RequestParam(required = false, defaultValue = "json") FormatSelection format) {
         log.debug("Vehicle API: Get All, format={}", format);
         if (format == FormatSelection.GEOJSON) {
             var geoJsonResponse = vehicleUtilitiesService.createGeoJSON();
             return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/geo+json"))
-                    .body(new VehicleGeoJsonResponse(geoJsonResponse));
+                    .body(geoJsonResponse);
         }
         var jsonResponse = vehicleDBService.getAll();
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(new VehicleListResponse(jsonResponse));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jsonResponse);
     }
 
     @GetMapping(value = "/{id}")
     public VehicleDTO getById(@PathVariable String id) {
         log.debug("Vehicle API: Get By ID {}", id);
-        return VehicleDTO.fromVehicle(vehicleService.getById(id));
+        return VehicleDTO.fromVehicle(vehicleDBService.getById(id));
     }
 
     @PostMapping("/")
@@ -69,10 +68,5 @@ public class VehicleController {
     public VehicleDTO updateStatus(@PathVariable String id, @RequestBody VehicleInfoDTO vehicle) {
         log.info("Vehicle API: updateStatus for {} with data {}", id, vehicle);
         return VehicleDTO.fromVehicle(vehicleService.updateVehicleInfo(id, vehicle));
-    }
-
-    @GetMapping(value = "/geojson")
-    public FeatureCollection generateGeoJSON() {
-        return vehicleUtilitiesService.createGeoJSON();
     }
 }

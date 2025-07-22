@@ -31,17 +31,19 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         Optional<Vehicle> findNoConnectionsById(String vehicleId);
 
         @Query("""
-                MATCH p=(n:LandVehicle)-[*0..1]->(m)
-                WHERE n.id = $vehicleId
-                RETURN n, collect(relationships(p)), collect(m)
-                """)
+                        MATCH p=(n:LandVehicle)-[*0..1]->(m)
+                        WHERE n.id = $vehicleId
+                        RETURN n, collect(relationships(p)), collect(m)
+                        """)
         Optional<Vehicle> findOneLevelConnectionsById(String vehicleId);
 
-
-        @Query("MATCH p=(n:LandVehicle)-[*0..1]->(m) " +
-                        "WHERE point.distance(n.location, $point) < $range " +
-                        "RETURN n, collect(relationships(p)), collect(m) " +
-                        "ORDER BY point.distance(n.location, $point) ASC;")
+        @Query("""
+                        MATCH p=(n:LandVehicle)-[*0..1]->(m)
+                        WHERE point.distance(n.location, $point) < $range
+                        AND NOT n.status IN ["CREATING", "IN_USE"]
+                        RETURN n, collect(relationships(p)), collect(m)
+                        ORDER BY point.distance(n.location, $point) ASC;
+                        """)
         List<LandVehicle> findLandVechicleWithOneLevelConnectionByLocationAround(Point point, Distance range);
 
         @Query("MATCH (v: LandVehicle) " +
@@ -60,10 +62,13 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
         List<LandVehicle> findLandVehiclesByLocationAround(Point point, Double range, Integer limit);
 
         @Query("""
-                MATCH (v: Vehicle{type: $type})
-                WHERE point.distance(v.location, $point) < $range RETURN v
-                ORDER BY point.distance(v.location, $point);
-                """)
+                        MATCH (v: Vehicle{type: $type})
+                        WHERE point.distance(v.location, $point) < $range
+                        AND NOT v.status IN ["CREATING", "IN_USE"]
+                        RETURN v
+                        ORDER BY point.distance(v.location, $point);
+                        """)
+
         List<Vehicle> findVehicleByTypeAndLocationAround(String type, Point point, Double range);
 
         @Query("MATCH (v: Vehicle{type: $type}) RETURN v " +

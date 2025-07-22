@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,22 +20,24 @@ import gr.iccs.smart.mobility.recommendation.RecommendationDTO;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.user.UserService;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import gr.iccs.smart.mobility.vehicle.VehicleNotFoundException;
-import gr.iccs.smart.mobility.vehicle.VehicleService;
 
 @RestController
 @RequestMapping("/api/scenario")
 public class ScenarioController {
     private static final Logger log = LoggerFactory.getLogger(ScenarioController.class);
 
-    @Autowired
-    private VehicleService vehicleService;
+    private final VehicleDBService vehicleDBService;
+    private final ScenarioService scenarioService;
+    private final UserService userService;
 
-    @Autowired
-    private ScenarioService scenarioService;
-
-    @Autowired
-    private UserService userService;
+    ScenarioController(VehicleDBService vehicleDBService,
+            ScenarioService scenarioService, UserService userService) {
+        this.vehicleDBService = vehicleDBService;
+        this.scenarioService = scenarioService;
+        this.userService = userService;
+    }
 
     @PostMapping
     public ResponseEntity<String> createScenario(
@@ -54,7 +55,7 @@ public class ScenarioController {
                 randomPorts, randomBusStops);
 
         log.info("Called createScenario (force: {} randomScenario: {} and {} scenario",
-                forceBoolean, randomScenario.toString(), (Objects.isNull(scenario) ? "provided" : "no"));
+                forceBoolean, randomScenario, (Objects.isNull(scenario) ? "provided" : "no"));
         scenarioService.createScenario(scenario, randomScenario, forceBoolean);
         return new ResponseEntity<>("Created scenario", HttpStatus.OK);
     }
@@ -68,7 +69,7 @@ public class ScenarioController {
         var time = LocalDateTime.now();
         for (RecommendationDTO s : vehicleScenarios) {
             time = time.plusMinutes(3);
-            var vehicle = vehicleService.getById(s.vehicle().id());
+            var vehicle = vehicleDBService.getById(s.vehicle().id());
             UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE,
                     LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
             userService.manageRide(username, usageStart);
@@ -86,7 +87,7 @@ public class ScenarioController {
 
         }
         try {
-            var vehicle = vehicleService.getLandVehicleByIdNoConnections(vehicleMovement.vehicleId());
+            var vehicle = vehicleDBService.getLandVehicleByIdNoConnections(vehicleMovement.vehicleId());
             var time = LocalDateTime.now();
             UseDTO usageStart = new UseDTO(vehicle, UseStatus.ACTIVE,
                     LocationDTO.fromGeographicPoint(vehicle.getLocation()), time);
@@ -98,7 +99,5 @@ public class ScenarioController {
             throw new ScenarioException("The vehicle does not exist");
 
         }
-
     }
-
 }

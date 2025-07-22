@@ -81,7 +81,7 @@ public class GraphService {
         return vehicle;
     }
 
-    private void createScooterConnections(LandVehicle scooter) {
+    private LandVehicle createScooterConnections(LandVehicle scooter) {
         var functionStartTime = Instant.now();
         var startTime = Instant.now();
         var surroundingVehicles = vehicleDBService.findLandVehicleWithOneLevelConnectionNearLocation(
@@ -106,11 +106,12 @@ public class GraphService {
         log.debug("Creating connections with bus stops: {} ms", duration.toMillis());
 
         startTime = Instant.now();
-        vehicleDBService.saveAndGet(scooter);
+        var s = vehicleDBService.saveAndGet(scooter);
         duration = Duration.between(startTime, Instant.now());
         log.debug("Saving scooter: {} ms", duration.toMillis());
         duration = Duration.between(functionStartTime, Instant.now());
         log.debug("Creating scooter connection: {} ms", duration.toMillis());
+        return s;
     }
 
     public void createIncomingConnections(LandVehicle vehicle) {
@@ -126,7 +127,7 @@ public class GraphService {
         log.debug("Creating connections with surrounding vehicles: {} ms", duration.toMillis());
     }
 
-    private void createCarConnections(LandVehicle car) {
+    private LandVehicle createCarConnections(LandVehicle car) {
         var functionStartTime = Instant.now();
         var startTime = Instant.now();
         log.debug("Creating connections for car: {}", car.getId());
@@ -148,10 +149,11 @@ public class GraphService {
         log.debug("    Creating connections with busStops took: {} ms",
                 Duration.between(startTime, Instant.now()).toMillis());
         startTime = Instant.now();
-        vehicleDBService.saveAndGet(car);
+        var c = vehicleDBService.saveAndGet(car);
         log.debug("    Saving vehicle: {} ms", Duration.between(startTime, Instant.now()).toMillis());
         var duration = Duration.between(functionStartTime, Instant.now());
         log.debug("    Creating car connection: {} ms", duration.toMillis());
+        return c;
     }
 
     private void createPortConnections(Port port, List<Port> ports) {
@@ -255,11 +257,11 @@ public class GraphService {
         }
     }
 
-    public void createVehicleConnections(LandVehicle vehicle) {
+    public LandVehicle createVehicleConnections(LandVehicle vehicle) {
         if (vehicle.getType().equals(VehicleType.SCOOTER)) {
-            createScooterConnections(vehicle);
+            return createScooterConnections(vehicle);
         } else {
-            createCarConnections(vehicle);
+            return createCarConnections(vehicle);
         }
     }
 
