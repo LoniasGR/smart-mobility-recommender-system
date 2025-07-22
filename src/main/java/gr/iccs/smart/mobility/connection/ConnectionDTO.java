@@ -1,6 +1,6 @@
 package gr.iccs.smart.mobility.connection;
 
-public record ConnectionDTO(String id, Double distance, Double time, ReachableNode target) {
+public record ConnectionDTO(Long id, Double distance, Double time, ReachableNode target) {
     public static ConnectionDTO fromConnection(Connection connection) {
         return new ConnectionDTO(
                 connection.getId(),
