@@ -1,0 +1,28 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    28.9575,
+                    41.03361
+                ]
+            },
+            "properties": {
+                "car_count": 1,
+                "scooter_count": 1,
+                "boat_count": 5,
+                "ports": [
+                    {
+                        "name": "Halic Shipyard",
+                        "latitude": 41.04,
+                        "longitude": 29.00745
+                    }
+                ],
+                "name": "Halic Shipyard"
+            }
+        }
+    ]
+}

@@ -22,7 +22,7 @@ AREAS = {
         "Tubitak Campus": {
             "latitude": 40.785556,
             "longitude": 29.449167,
-            "car_count": 2,
+            "car_count": 5,
             "scooter_count": 10,
             "boat_count": 0,
             "ports": [],
@@ -32,15 +32,20 @@ AREAS = {
         "Halic Shipyard": {
             "latitude": 41.03361,
             "longitude": 28.95750,
-            "car_count": 1,
-            "scooter_count": 1,
+            "car_count": 10,
+            "scooter_count": 10,
             "boat_count": 5,
             "ports": [
                 {
                     "name": "Halic Shipyard",
                     "latitude": 41.0400,
                     "longitude": 29.00745,
-                }
+                },
+                {
+                    "name": "Fener",
+                    "latitude": 41.0312,
+                    "longitude": 28.952,
+                },
             ],
         },
     },

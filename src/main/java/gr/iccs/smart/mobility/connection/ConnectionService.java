@@ -20,8 +20,7 @@ public class ConnectionService {
 
     public Connection createConnection(ReachableNode destinationNode,
             Double distance, Double time) {
-        var connection = new Connection(destinationNode, distance, time, null);
-        return connection;
+        return new Connection(destinationNode, distance, time, null);
     }
 
     public Connection generateConnection(StartingNode startingNode, ReachableNode destinationNode) {
