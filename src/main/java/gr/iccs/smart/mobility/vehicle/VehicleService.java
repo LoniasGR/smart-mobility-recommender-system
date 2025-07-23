@@ -92,7 +92,7 @@ public class VehicleService {
             var vehicle = new Boat("boat_" + i, VehicleType.SEA_VESSEL, true, 10);
             var boat = (Boat) vehicleDBService.createVehicle(vehicle);
             createRandomBoatInfo(boat, ports);
-            vehicleGraphService.assignRelatedPort(vehicle, ports);
+            vehicleGraphService.assignRelatedPort(vehicle, ports, false);
         }
     }
 
@@ -111,7 +111,7 @@ public class VehicleService {
             boat.setStatus(VehicleStatus.IDLE);
             // Return type of create is Vehicle, so we need to cast it to Boat
             boat = (Boat) vehicleDBService.createVehicle(boat);
-            vehicleGraphService.addBoatToPort(boat);
+            vehicleGraphService.addBoatToPort(boat, false);
         }
     }
 

@@ -36,18 +36,26 @@ public class VehicleGraphService {
         this.executorService = executorService;
     }
 
-    protected void assignRelatedPort(Vehicle vehicle, List<Port> ports) {
+    protected void addBoatToGraph(Vehicle vehicle) {
+        addBoatToPort(vehicle, true);
+    }
+
+    protected void assignRelatedPort(Vehicle vehicle, List<Port> ports, boolean shouldUpdateGraph) {
         var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
         if (coastLocation.isPresent()) {
-            log.info("Adding vehicle {} to port {}", vehicle.getId(), coastLocation.get().getId());
-            coastLocation.get().getParkedVehicles().add(vehicle);
-            pointOfInterestService.update(coastLocation.get());
+            var port = coastLocation.get();
+            log.info("Adding vehicle {} to port {}", vehicle.getId(), port.getId());
+            if (port.getParkedVehicles().isEmpty() && shouldUpdateGraph) {
+                port = graphService.connectPortWithOtherPorts(port, ports);
+            }
+            port.getParkedVehicles().add(vehicle);
+            pointOfInterestService.save(port);
         }
     }
 
-    protected void addBoatToPort(Vehicle boat) {
-        var ports = pointOfInterestService.getAllPorts();
-        assignRelatedPort(boat, ports);
+    protected void addBoatToPort(Vehicle boat, boolean shouldUpdateGraph) {
+        var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
+        assignRelatedPort(boat, ports, shouldUpdateGraph);
     }
 
     public void addVehicleToGraphAsync(Vehicle v) {
@@ -55,9 +63,6 @@ public class VehicleGraphService {
             executorService.submit(() -> {
                 try {
                     log.info("Processing vehicle {}", v.getId());
-                    if (!v.isLandVehicle()) {
-                        addBoatToPort(v);
-                    }
                     var newV = addVehicleToGraph(v);
                     newV.setStatus(VehicleStatus.IDLE);
                     vehicleDBService.save(newV);
@@ -141,13 +146,7 @@ public class VehicleGraphService {
             // We have to add the boat to the port. If the port already has
             // boats, there is nothing else to do. Otherwise, we need to connect
             // the port with the other ports.
-            var port = pointOfInterestService.getPortOfVehicle(v.getId());
-            if (port.getParkedVehicles().isEmpty()) {
-                var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
-                graphService.connectPortWithOtherPorts(port, ports);
-            }
-            port.getParkedVehicles().add(v);
-            pointOfInterestService.save(port);
+            addBoatToGraph(v);
             return v;
         }
     }
