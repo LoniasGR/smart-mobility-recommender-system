@@ -1,0 +1,72 @@
+[
+    {
+        "id": "scooter-1",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0367757361429,
+            "longitude": 28.959825199385385
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-2",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.03846015094896,
+            "longitude": 28.959008984544433
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-3",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04,
+            "longitude": 29.00745
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-4",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04,
+            "longitude": 29.00745
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-5",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04,
+            "longitude": 29.00745
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-6",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04,
+            "longitude": 29.00745
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-7",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04,
+            "longitude": 29.00745
+        },
+        "battery": 100
+    }
+]

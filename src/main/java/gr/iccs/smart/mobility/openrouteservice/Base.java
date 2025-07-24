@@ -9,19 +9,19 @@ import gr.iccs.smart.mobility.config.OrsPropertiesConfig;
 public class Base {
     protected static RestClient client;
     protected static Integer rateLimit;
-    protected static String APIKey;
+    protected static String apiKey;
     protected String baseURL;
 
     private RestClient.Builder addApiKey(RestClient.Builder client) {
-        if (!APIKey.isEmpty()) {
-            return client.defaultHeader("Authorization", APIKey);
+        if (!apiKey.isEmpty()) {
+            return client.defaultHeader("Authorization", apiKey);
 
         }
         return client;
     }
 
     public Base(OrsPropertiesConfig config) {
-        APIKey = config.getAPIKey();
+        apiKey = config.getAPIKey();
         baseURL = config.getHost() + "/" + config.getAPIVersion();
         rateLimit = config.getRateLimit();
 

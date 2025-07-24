@@ -1,0 +1,22 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    29.00278,
+                    40.78556
+                ]
+            },
+            "properties": {
+                "car_count": 2,
+                "scooter_count": 10,
+                "boat_count": 0,
+                "ports": [],
+                "name": "Tubitak Campus"
+            }
+        }
+    ]
+}

@@ -3,8 +3,8 @@ package gr.iccs.smart.mobility.geojson;
 import org.neo4j.driver.types.Point;
 import org.springframework.stereotype.Service;
 
-import gr.iccs.smart.mobility.pointsOfInterest.BusStopDTO;
-import gr.iccs.smart.mobility.pointsOfInterest.PortDTO;
+import gr.iccs.smart.mobility.pointsofinterest.BusStopDTO;
+import gr.iccs.smart.mobility.pointsofinterest.PortDTO;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleDTO;
 
@@ -13,9 +13,7 @@ public class GeoJSONUtils {
 
     /**
      * Same as {@link #createVehicleFeature(VehicleDTO v)
-     * createVehicleFeature(VehicleDTO v)},
-     * but takes
-     * a vehicle as arguement.
+     * createVehicleFeature(VehicleDTO v)}, but takes a vehicle as arguement.
      * 
      * @param v Vehicle
      * @return geoJSON feature for a vehicle
@@ -40,18 +38,18 @@ public class GeoJSONUtils {
         f.getProperties().put("is_dummy", v.dummy().toString());
 
         switch (v.type()) {
-            case SEA_VESSEL:
-                f.getProperties().put("marker-symbol", "ferry");
-                f.getProperties().put("marker-color", "#5fd60f");
-                break;
-            case CAR:
-                f.getProperties().put("marker-symbol", "car");
-                f.getProperties().put("marker-color", "#b11313");
-                break;
-            case SCOOTER:
-                f.getProperties().put("marker-symbol", "scooter");
-                f.getProperties().put("marker-color", "#3309ce");
-                break;
+        case SEA_VESSEL:
+            f.getProperties().put("marker-symbol", "ferry");
+            f.getProperties().put("marker-color", "#5fd60f");
+            break;
+        case CAR:
+            f.getProperties().put("marker-symbol", "car");
+            f.getProperties().put("marker-color", "#b11313");
+            break;
+        case SCOOTER:
+            f.getProperties().put("marker-symbol", "scooter");
+            f.getProperties().put("marker-color", "#3309ce");
+            break;
         }
         return f;
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -17,6 +18,12 @@ public sealed class LandVehicle extends Vehicle implements ReachableNode, Starti
 
     public LandVehicle(String id, VehicleType type, Boolean dummy, List<Connection> connections) {
         super(id, type, dummy);
+        this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
+    }
+
+    public LandVehicle(String id, VehicleType type, Boolean dummy, Long battery, Point location,
+            List<Connection> connections) {
+        super(id, type, dummy, battery, location);
         this.connections = Objects.requireNonNullElseGet(connections, ArrayList::new);
     }
 

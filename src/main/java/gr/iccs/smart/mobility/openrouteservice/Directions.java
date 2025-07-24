@@ -32,8 +32,7 @@ public class Directions extends Base {
 
     private static final Logger log = LoggerFactory.getLogger(Directions.class);
 
-    public Directions(
-            OrsPropertiesConfig config) {
+    public Directions(OrsPropertiesConfig config) {
         super(config);
         baseURL += "/directions";
     }
@@ -130,6 +129,8 @@ public class Directions extends Base {
             log.error("Too many requests reached... Waiting for 30s");
             waitToRuntimeException(30000L);
             ret = executeWithRateLimiting(callback);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         updateRateLimit();
         return ret;
@@ -169,13 +170,13 @@ public class Directions extends Base {
                     .toUri();
             log.debug("Calling URL: {}", uri);
 
-            ResponseEntity<T> entity = client.post()
+            var resp = client.post()
                     .uri(uri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(options)
-                    .retrieve()
-                    .toEntity(clazz);
-            return entity.getBody();
+                    .retrieve();
+
+            return resp.toEntity(clazz).getBody();
         });
     }
 

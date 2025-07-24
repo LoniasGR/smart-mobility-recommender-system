@@ -1,13 +1,19 @@
 package gr.iccs.smart.mobility.connection;
 
+import java.io.Serializable;
+
+import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
 @RelationshipProperties
-public class Connection {
+public class Connection implements Serializable {
     @RelationshipId
-    private String id;
+    private Long id;
+
+    @Version
+    private Long version;
 
     private final Double distance;
     private final Double time;
@@ -45,11 +51,11 @@ public class Connection {
         return distance;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

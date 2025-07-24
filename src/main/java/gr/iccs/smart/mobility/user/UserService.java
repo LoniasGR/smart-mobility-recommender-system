@@ -3,7 +3,6 @@ package gr.iccs.smart.mobility.user;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gr.iccs.smart.mobility.usage.RideStatusUpdateEventPublisher;
@@ -11,23 +10,24 @@ import gr.iccs.smart.mobility.usage.UsageService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
-import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import net.datafaker.Faker;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private VehicleService vehicleService;
-
-    @Autowired
+    private VehicleDBService vehicleDBService;
     private UsageService usageService;
-
-    @Autowired
     private RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher;
+
+    UserService(UserRepository userRepository, VehicleDBService vehicleDBService, UsageService usageService,
+            RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher) {
+        this.userRepository = userRepository;
+        this.vehicleDBService = vehicleDBService;
+        this.usageService = usageService;
+        this.rideStatusUpdateEventPublisher = rideStatusUpdateEventPublisher;
+    }
 
     private final Faker faker = new Faker();
 
@@ -57,7 +57,7 @@ public class UserService {
      * @param useInfo
      */
     public void manageRide(String username, UseDTO useInfo) {
-        var vehicle = vehicleService.getLandVehicleByIdNoConnections(useInfo.vehicle().getId());
+        var vehicle = vehicleDBService.getLandVehicleByIdNoConnections(useInfo.vehicle().getId());
 
         var person = getById(username);
         var ride = person.getCurrentRide();
@@ -77,7 +77,7 @@ public class UserService {
             usageService.createOrUpdateRide(ride.get(), useInfo, null);
         }
         userRepository.save(person);
-            rideStatusUpdateEventPublisher.publishRideStatusUpdateEvent(useInfo, vehicle.getId());
+        rideStatusUpdateEventPublisher.publishRideStatusUpdateEvent(useInfo, vehicle.getId());
     }
 
     public Optional<Used> rideStatus(String username) {
@@ -86,8 +86,8 @@ public class UserService {
     }
 
     public void createScenarioUsers() {
-        var custom_user = new User("test.user", null);
-        create(custom_user);
+        var customUser = new User("test.user", null);
+        create(customUser);
         for (int i = 0; i < 10; i++) {
             var user = new User(faker.internet().username(), null);
             create(user);

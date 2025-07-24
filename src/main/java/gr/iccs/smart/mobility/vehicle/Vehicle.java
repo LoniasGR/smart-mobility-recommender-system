@@ -1,48 +1,52 @@
 package gr.iccs.smart.mobility.vehicle;
 
+import java.io.Serializable;
+
 import org.neo4j.driver.types.Point;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
+import gr.iccs.smart.mobility.location.LocationDTO;
 import jakarta.validation.constraints.NotNull;
 
 /**
  * Vehicle info + current status
  */
 @Node
-public abstract sealed class Vehicle permits Boat, LandVehicle {
+public abstract sealed class Vehicle implements Serializable permits Boat, LandVehicle {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @NotNull(message = "id cannot be empty")
     private final String id;
     private final VehicleType type;
     private final Boolean dummy;
 
-    /*
-     * TODO:
-     * We can measure distance with spatial functions of neo4j
-     * https://neo4j.com/docs/cypher-manual/current/functions/spatial/
-     */
     private Point location;
 
     private Long battery;
 
     private VehicleStatus status;
 
-    public Vehicle(String id, VehicleType type, Boolean dummy) {
+    protected Vehicle(String id, VehicleType type, Boolean dummy) {
         this.id = id;
         this.type = type;
         this.dummy = dummy;
     }
 
-    public Vehicle(String id, VehicleType type, Boolean dummy, Long battery) {
+    protected Vehicle(String id, VehicleType type, Boolean dummy, Long battery) {
         this(id, type, dummy);
         this.battery = battery;
     }
 
+    protected Vehicle(String id, VehicleType type, Boolean dummy, Long battery, Point location) {
+        this(id, type, dummy);
+        this.battery = battery;
+        this.location = location;
+    }
+
     /*
-     **************************************************************************
-     * GETTERS & SETTERS
-     **************************************************************************
+     ********* GETTERS & SETTERS
      */
     public VehicleType getType() {
         return type;
@@ -81,9 +85,10 @@ public abstract sealed class Vehicle permits Boat, LandVehicle {
     }
 
     public boolean isLandVehicle() {
-        if (this.type.equals(VehicleType.SEA_VESSEL)) {
-            return false;
-        }
-        return true;
+        return !this.type.equals(VehicleType.SEA_VESSEL);
+    }
+
+    public VehicleDAO toVehicleDAO() {
+        return new VehicleDAO(this.id, this.type, this.battery, this.dummy, LocationDTO.fromGeographicPoint(location));
     }
 }

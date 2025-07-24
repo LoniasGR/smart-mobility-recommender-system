@@ -1,0 +1,792 @@
+[
+    {
+        "id": "scooter-1",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.055702812563396,
+            "longitude": 29.004002424950908
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-2",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05344901887854,
+            "longitude": 29.003746240203064
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-3",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05419168479201,
+            "longitude": 29.004302960379622
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-4",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.048377932143794,
+            "longitude": 29.00748225447594
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-5",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05405726954986,
+            "longitude": 29.00410010053359
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-6",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05518040803233,
+            "longitude": 29.003747485150377
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-7",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04872033998612,
+            "longitude": 29.001756101078463
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-8",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05512052102575,
+            "longitude": 29.00743514833287
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-9",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04917827732395,
+            "longitude": 28.998116753587727
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-10",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05208747705384,
+            "longitude": 29.000737127138283
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-11",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04737807565865,
+            "longitude": 29.00223551158073
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-12",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0557053747983,
+            "longitude": 29.004075321020068
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-13",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.047403597766916,
+            "longitude": 28.998615591315342
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-14",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.05430576550065,
+            "longitude": 29.002336973973687
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-15",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0547466839496,
+            "longitude": 29.000206952063852
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-16",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04083,
+            "longitude": 29.00722
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-17",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.04083,
+            "longitude": 29.00722
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-18",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99476533177803,
+            "longitude": 29.025373977511514
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-19",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99322073830177,
+            "longitude": 29.031752516273215
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-20",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.996455469223406,
+            "longitude": 29.026510182206092
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-21",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99275946403661,
+            "longitude": 29.031913130699344
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-22",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99614696151915,
+            "longitude": 29.0297049969707
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-23",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99208927112367,
+            "longitude": 29.02535528823433
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-24",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.994489189179085,
+            "longitude": 29.02444381875037
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-25",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99213427148478,
+            "longitude": 29.030767548562586
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-26",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.987731170552664,
+            "longitude": 29.026545131175215
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-27",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.991007626583276,
+            "longitude": 29.022933842668444
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-28",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.992864262416404,
+            "longitude": 29.02229569941618
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-29",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.989911438861554,
+            "longitude": 29.02694521658353
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-30",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.991996272491214,
+            "longitude": 29.026667119268176
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-31",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.98933004738997,
+            "longitude": 29.026599121001478
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-32",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99399898351935,
+            "longitude": 29.02943371838957
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-33",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.995262375848,
+            "longitude": 29.022230483476328
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-34",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.991686151226794,
+            "longitude": 29.02756058273037
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-35",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99239583854289,
+            "longitude": 29.022668604759414
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-36",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.98929470944088,
+            "longitude": 29.0222873984299
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-37",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99049606331663,
+            "longitude": 29.022920934269663
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-38",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.98944760972527,
+            "longitude": 29.026563792680747
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-39",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99618279181321,
+            "longitude": 29.03113751160871
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-40",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.98914137747572,
+            "longitude": 29.02364140333208
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-41",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99333088864359,
+            "longitude": 29.023290337114968
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-42",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99386106206126,
+            "longitude": 29.031815623040615
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-43",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99252680756367,
+            "longitude": 29.02484661382876
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-44",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99162438238597,
+            "longitude": 29.029519463423167
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-45",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.996962429342545,
+            "longitude": 29.027617003692352
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-46",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99655554646929,
+            "longitude": 29.02767220214198
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-47",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 40.98855608683583,
+            "longitude": 29.022465341493724
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-48",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 40.99164010710148,
+            "longitude": 29.030507797050245
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-49",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 40.993682216443716,
+            "longitude": 29.026623693054024
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-50",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 40.9909,
+            "longitude": 29.0187
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-51",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 40.9909,
+            "longitude": 29.0187
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-52",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 40.9909,
+            "longitude": 29.0187
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-53",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0243686992557,
+            "longitude": 28.97361435319614
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-54",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.03069088358266,
+            "longitude": 28.977480792679035
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-55",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0208320200214,
+            "longitude": 28.97653490465299
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-56",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02617685218008,
+            "longitude": 28.970388811901568
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-57",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02745811543835,
+            "longitude": 28.97744196043024
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-58",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02727983239887,
+            "longitude": 28.973072250498138
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-59",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02667342199655,
+            "longitude": 28.973474965697612
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-60",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.024479273062546,
+            "longitude": 28.978576165524988
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-61",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02366848562792,
+            "longitude": 28.969425033240146
+        },
+        "battery": 100
+    },
+    {
+        "id": "scooter-62",
+        "type": "SCOOTER",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0281174494021,
+            "longitude": 28.973294348189704
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-63",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.025921628017784,
+            "longitude": 28.97398484088797
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-64",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.02519559067333,
+            "longitude": 28.976366158900042
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-65",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.029223280103004,
+            "longitude": 28.971415186959796
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-66",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.026916634727776,
+            "longitude": 28.97421979301197
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-67",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.023246489709535,
+            "longitude": 28.97751072791561
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-68",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.027006022114975,
+            "longitude": 28.969211086904124
+        },
+        "battery": 100
+    },
+    {
+        "id": "car-69",
+        "type": "CAR",
+        "dummy": false,
+        "location": {
+            "latitude": 41.0256273189263,
+            "longitude": 28.977021621847257
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-70",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-71",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-72",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-73",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-74",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-75",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-76",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016667,
+            "longitude": 28.966667
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-77",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-78",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016667,
+            "longitude": 28.966667
+        },
+        "battery": 100
+    },
+    {
+        "id": "sea_vessel-79",
+        "type": "SEA_VESSEL",
+        "dummy": false,
+        "location": {
+            "latitude": 41.016487,
+            "longitude": 28.970381
+        },
+        "battery": 100
+    }
+]

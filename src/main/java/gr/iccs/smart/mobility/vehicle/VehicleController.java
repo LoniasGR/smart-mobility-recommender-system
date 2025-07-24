@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.util.FormatSelection;
 import jakarta.validation.Valid;
 
@@ -24,10 +23,15 @@ import jakarta.validation.Valid;
 public class VehicleController {
     private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
 
-    private VehicleService vehicleService;
+    private final VehicleService vehicleService;
+    private final VehicleDBService vehicleDBService;
+    private final VehicleUtilitiesService vehicleUtilitiesService;
 
-    VehicleController(VehicleService vehicleService) {
+    VehicleController(VehicleService vehicleService, VehicleDBService vehicleDBService,
+            VehicleUtilitiesService vehicleUtilitiesService) {
         this.vehicleService = vehicleService;
+        this.vehicleDBService = vehicleDBService;
+        this.vehicleUtilitiesService = vehicleUtilitiesService;
     }
 
     /**
@@ -35,39 +39,34 @@ public class VehicleController {
      *         format.
      */
     @GetMapping(value = { "", "/" })
-    public ResponseEntity<VehicleResponse> getAll(
+    public ResponseEntity<?> getAll(
             @RequestParam(required = false, defaultValue = "json") FormatSelection format) {
         log.debug("Vehicle API: Get All, format={}", format);
         if (format == FormatSelection.GEOJSON) {
-            var geoJsonResponse = vehicleService.createGeoJSON();
+            var geoJsonResponse = vehicleUtilitiesService.createGeoJSON();
             return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/geo+json"))
-                    .body(new VehicleGeoJsonResponse(geoJsonResponse));
+                    .body(geoJsonResponse);
         }
-        var jsonResponse = vehicleService.getAll();
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(new VehicleListResponse(jsonResponse));
+        var jsonResponse = vehicleDBService.getAll();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jsonResponse);
     }
 
     @GetMapping(value = "/{id}")
     public VehicleDTO getById(@PathVariable String id) {
         log.debug("Vehicle API: Get By ID {}", id);
-        return VehicleDTO.fromVehicle(vehicleService.getById(id));
+        return VehicleDTO.fromVehicle(vehicleDBService.getById(id));
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/")
-    public void create(@Valid @RequestBody Vehicle vehicle) {
-        log.debug("Vehicle API: Create {}", vehicle);
-        vehicleService.create(vehicle);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@Valid @RequestBody VehicleDAO vehicle) {
+        log.info("Vehicle API: Create {}", vehicle);
+        vehicleService.initialize(vehicle);
     }
 
     @PutMapping(value = "/{id}")
     public VehicleDTO updateStatus(@PathVariable String id, @RequestBody VehicleInfoDTO vehicle) {
-        log.debug("Vehicle API: updateStatus for {} with data {}", id, vehicle);
-        return VehicleDTO.fromVehicle(vehicleService.updateVehicleStatus(id, vehicle));
-    }
-
-    @GetMapping(value = "/geojson")
-    public FeatureCollection generateGeoJSON() {
-        return vehicleService.createGeoJSON();
+        log.info("Vehicle API: updateStatus for {} with data {}", id, vehicle);
+        return VehicleDTO.fromVehicle(vehicleService.updateVehicleInfo(id, vehicle));
     }
 }

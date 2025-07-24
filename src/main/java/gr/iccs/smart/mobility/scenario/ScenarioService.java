@@ -2,37 +2,41 @@ package gr.iccs.smart.mobility.scenario;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gr.iccs.smart.mobility.database.DatabaseService;
 import gr.iccs.smart.mobility.graph.GraphService;
-import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsofinterest.PointOfInterestService;
 import gr.iccs.smart.mobility.user.UserService;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import gr.iccs.smart.mobility.vehicle.VehicleService;
 
 @Service
 public class ScenarioService {
-    @Autowired
-    private VehicleService vehicleService;
 
-    @Autowired
-    private PointOfInterestService pointOfInterestService;
+    private final VehicleService vehicleService;
+    private final VehicleDBService vehicleDBService;
+    private final PointOfInterestService pointOfInterestService;
+    private final UserService userService;
+    private final GraphService graphService;
+    private final DatabaseService databaseService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private GraphService graphService;
-
-    @Autowired
-    private DatabaseService databaseService;
+    ScenarioService(VehicleService vehicleService, VehicleDBService vehicleDBService,
+            PointOfInterestService pointOfInterestService, UserService userService, GraphService graphService,
+            DatabaseService databaseService) {
+        this.vehicleService = vehicleService;
+        this.vehicleDBService = vehicleDBService;
+        this.pointOfInterestService = pointOfInterestService;
+        this.userService = userService;
+        this.graphService = graphService;
+        this.databaseService = databaseService;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(ScenarioService.class);
 
     public void createScenario(ScenarioDTO scenario, RandomScenario randomScenario, boolean force) {
         databaseService.addVehicleLocationIndex();
-        if (!vehicleService.getAll().isEmpty() || !pointOfInterestService.getAll().isEmpty()) {
+        if (!vehicleDBService.getAll().isEmpty() || !pointOfInterestService.getAll().isEmpty()) {
             if (!force) {
                 throw new ScenarioException("The database is not empty, cannot create scenario.");
             }

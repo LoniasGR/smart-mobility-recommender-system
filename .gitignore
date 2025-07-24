@@ -21,3 +21,6 @@ ors-docker/
 
 ## Env files ##
 .env
+
+## Python Files ##
+*.pyc

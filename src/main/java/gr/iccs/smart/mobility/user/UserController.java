@@ -1,11 +1,9 @@
 package gr.iccs.smart.mobility.user;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,19 +19,22 @@ import gr.iccs.smart.mobility.util.EmptyJsonResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/people")
+@RequestMapping("/api/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public List<UserDTO> getAll() {
         log.debug("User API: Get All");
         return userService.getAll()
                 .stream().map(UserDTO::fromUser)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GetMapping(value = "/{username}")
@@ -42,11 +43,11 @@ public class UserController {
         return UserDTO.fromUser(userService.getById(username));
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        log.debug("User API: Create {}", user);
-        return userService.create(user);
+    @ResponseStatus(HttpStatus.CREATED)
+    public User create(@Valid @RequestBody UserDAO user) {
+        log.info("Creating user {}", user);
+        return userService.create(user.toUser());
     }
 
     @PostMapping("{username}/ride")

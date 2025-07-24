@@ -1,4 +1,9 @@
 package gr.iccs.smart.mobility.vehicle;
 
-public record VehicleInfoDTO(Battery battery, Double latitude, Double longitude, VehicleStatus status) {
+import java.io.Serializable;
+
+import gr.iccs.smart.mobility.location.LocationDTO;
+
+public record VehicleInfoDTO(Battery battery, LocationDTO location, VehicleStatus status) implements Serializable {
+
 }

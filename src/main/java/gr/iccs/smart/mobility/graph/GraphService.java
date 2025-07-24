@@ -6,41 +6,45 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
-import gr.iccs.smart.mobility.pointsOfInterest.Port;
-import gr.iccs.smart.mobility.pointsOfInterest.BusStop;
-import gr.iccs.smart.mobility.pointsOfInterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsofinterest.BusStop;
+import gr.iccs.smart.mobility.pointsofinterest.PointOfInterestService;
+import gr.iccs.smart.mobility.pointsofinterest.Port;
 import gr.iccs.smart.mobility.vehicle.LandVehicle;
-import gr.iccs.smart.mobility.vehicle.VehicleService;
+import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
+import gr.iccs.smart.mobility.vehicle.VehicleUtilitiesService;
 
 @Service
 public class GraphService {
     private static final Logger log = LoggerFactory.getLogger(GraphService.class);
 
-    @Autowired
-    private VehicleService vehicleService;
+    private final VehicleUtilitiesService vehicleUtilitiesService;
+    private final VehicleDBService vehicleDBService;
+    private final TransportationPropertiesConfig config;
+    private final ConnectionService connectionService;
+    private final PointOfInterestService pointOfInterestService;
 
-    @Autowired
-    private TransportationPropertiesConfig config;
+    GraphService(VehicleUtilitiesService vehicleUtilitiesService, VehicleDBService vehicleDBService,
+            TransportationPropertiesConfig config, ConnectionService connectionService,
+            PointOfInterestService pointOfInterestService) {
+        this.vehicleUtilitiesService = vehicleUtilitiesService;
+        this.vehicleDBService = vehicleDBService;
+        this.config = config;
+        this.connectionService = connectionService;
+        this.pointOfInterestService = pointOfInterestService;
+    }
 
-    @Autowired
-    private ConnectionService connectionService;
-
-    @Autowired
-    private PointOfInterestService pointOfInterestService;
-
-    private LandVehicle createConnectionWithVehicles(LandVehicle startVehicle,
-            List<LandVehicle> otherVehicles, Double maxDistance) {
+    private LandVehicle createConnectionWithVehicles(LandVehicle startVehicle, List<LandVehicle> otherVehicles,
+            Double maxDistance) {
         for (LandVehicle v : otherVehicles) {
             if (v.getId().equals(startVehicle.getId())) {
                 continue;
             }
-            startVehicle = vehicleService.createConnectionTo(startVehicle, v, maxDistance);
+            startVehicle = vehicleUtilitiesService.createConnectionTo(startVehicle, v, maxDistance);
         }
         return startVehicle;
     }
@@ -56,7 +60,7 @@ public class GraphService {
             rangeInMeters = range * 1000;
         }
         for (var b : ports) {
-            vehicle = vehicleService.createConnectionTo(vehicle, b, rangeInMeters);
+            vehicle = vehicleUtilitiesService.createConnectionTo(vehicle, b, rangeInMeters);
         }
         return vehicle;
     }
@@ -72,94 +76,89 @@ public class GraphService {
             rangeInMeters = range * 1000;
         }
         for (var b : busStops) {
-            vehicle = vehicleService.createConnectionTo(vehicle, b, rangeInMeters);
+            vehicle = vehicleUtilitiesService.createConnectionTo(vehicle, b, rangeInMeters);
         }
         return vehicle;
     }
 
-    private void createScooterConnections(LandVehicle scooter) {
+    private LandVehicle createScooterConnections(LandVehicle scooter) {
         var functionStartTime = Instant.now();
         var startTime = Instant.now();
-        var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
-                scooter.getLocation(),
-                config.getDistances().getMaxScooterDistanceKms());
+        var surroundingVehicles = vehicleDBService.findLandVehicleWithOneLevelConnectionNearLocation(
+                scooter.getLocation(), config.getDistances().getMaxScooterDistanceKms());
         var duration = Duration.between(startTime, Instant.now());
-        log.debug("Finding surrounding vehicles: " + duration.toMillis() + " ms");
+        log.debug("Finding surrounding vehicles: {} ms", duration.toMillis());
 
         startTime = Instant.now();
-        scooter = createConnectionWithVehicles(scooter,
-                surroundingVehicles,
+        scooter = createConnectionWithVehicles(scooter, surroundingVehicles,
                 config.getDistances().getMaxScooterDistanceMeters());
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating connections with surrounding vehicles: " + duration.toMillis() + " ms");
+        log.debug("Creating connections with surrounding vehicles: {} ms", duration.toMillis());
 
         startTime = Instant.now();
         scooter = createConnectionWithPorts(scooter, config.getDistances().getMaxScooterDistanceKms());
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating connections with ports: " + duration.toMillis() + " ms");
+        log.debug("Creating connections with ports: {} ms", duration.toMillis());
 
         startTime = Instant.now();
         scooter = createConnectionWithBusStops(scooter, config.getDistances().getMaxScooterDistanceKms());
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating connections with bus stops: " + duration.toMillis() + " ms");
+        log.debug("Creating connections with bus stops: {} ms", duration.toMillis());
 
         startTime = Instant.now();
-        vehicleService.saveAndGet(scooter);
+        var s = vehicleDBService.saveAndGet(scooter);
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Saving scooter: " + duration.toMillis() + " ms");
+        log.debug("Saving scooter: {} ms", duration.toMillis());
         duration = Duration.between(functionStartTime, Instant.now());
-        log.debug("Creating scooter connection: " + duration.toMillis() + " ms");
+        log.debug("Creating scooter connection: {} ms", duration.toMillis());
+        return s;
     }
 
     public void createIncomingConnections(LandVehicle vehicle) {
         var startTime = Instant.now();
-        var surroundingScooters = vehicleService.findScooterNolConnectionNearLocation(
-                vehicle.getLocation(),
+        var surroundingScooters = vehicleDBService.findScooterNolConnectionNearLocation(vehicle.getLocation(),
                 config.getDistances().getMaxScooterDistanceKms());
         var duration = Duration.between(startTime, Instant.now());
-        log.debug("Finding surrounding vehicles: " + duration.toMillis() + " ms");
+        log.debug("Finding surrounding vehicles: {} ms", duration.toMillis());
 
         startTime = Instant.now();
-        vehicle = createConnectionWithVehicles(vehicle,
-                surroundingScooters,
-                config.getDistances().getMaxScooterDistanceMeters());
+        createConnectionWithVehicles(vehicle, surroundingScooters, config.getDistances().getMaxScooterDistanceMeters());
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating connections with surrounding vehicles: " + duration.toMillis() + " ms");
+        log.debug("Creating connections with surrounding vehicles: {} ms", duration.toMillis());
     }
 
-    private void createCarConnections(LandVehicle car) {
+    private LandVehicle createCarConnections(LandVehicle car) {
         var functionStartTime = Instant.now();
         var startTime = Instant.now();
-        log.debug("Creating connections for car: " + car.getId());
+        log.debug("Creating connections for car: {}", car.getId());
         if (config.getDistances().getMaxCarDistanceKms() != null) {
-            var otherVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
-                    car.getLocation(), config.getDistances().getMaxCarDistanceKms());
-            log.warn("Getting surrounding vehicles took: "
-                    + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+            var otherVehicles = vehicleDBService.findLandVehicleWithOneLevelConnectionNearLocation(car.getLocation(),
+                    config.getDistances().getMaxCarDistanceKms());
+            log.info("Getting surrounding vehicles took: {} ms", Duration.between(startTime, Instant.now()).toMillis());
             startTime = Instant.now();
             createConnectionWithVehicles(car, otherVehicles, config.getDistances().getMaxCarDistanceMeters());
         }
-        log.debug("    Creating connections with surrounding vehicles took: "
-                + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        log.debug("    Creating connections with surrounding vehicles took: {} ms",
+                Duration.between(startTime, Instant.now()).toMillis());
         startTime = Instant.now();
         createConnectionWithPorts(car, config.getDistances().getMaxCarDistanceKms());
-        log.debug("    Creating connections with ports took: " +
-                Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        log.debug("    Creating connections with ports took: {} ms",
+                Duration.between(startTime, Instant.now()).toMillis());
         startTime = Instant.now();
         createConnectionWithBusStops(car, config.getDistances().getMaxCarDistanceKms());
-        log.debug("    Creating connections with busStops took: " +
-                Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        log.debug("    Creating connections with busStops took: {} ms",
+                Duration.between(startTime, Instant.now()).toMillis());
         startTime = Instant.now();
-        vehicleService.saveAndGet(car);
-        log.debug("    Saving vehicle: " + Duration.between(startTime, Instant.now()).toMillis() + " ms");
+        var c = vehicleDBService.saveAndGet(car);
+        log.debug("    Saving vehicle: {} ms", Duration.between(startTime, Instant.now()).toMillis());
         var duration = Duration.between(functionStartTime, Instant.now());
-        log.debug("    Creating car connection: " + duration.toMillis() + " ms");
+        log.debug("    Creating car connection: {} ms", duration.toMillis());
+        return c;
     }
 
     private void createPortConnections(Port port, List<Port> ports) {
         // Find all land vehicles around the port
-        var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
-                port.getLocation(),
+        var surroundingVehicles = vehicleDBService.findLandVehicleWithOneLevelConnectionNearLocation(port.getLocation(),
                 config.getDistances().getMaxWalkingDistanceKms());
 
         // Connect the port with all the vehicles around it (if close enough)
@@ -177,7 +176,7 @@ public class GraphService {
         }
 
         // Create connections with other ports if there are boats parked
-        if (port.getParkedVehicles().size() > 0) {
+        if (!port.getParkedVehicles().isEmpty()) {
             port = connectPortWithOtherPorts(port, ports);
         }
         pointOfInterestService.saveAndGet(port);
@@ -194,9 +193,8 @@ public class GraphService {
 
     private void createBusStopConnections(BusStop busStop, List<BusStop> otherStops) {
         // Find all land vehicles around the bus stop
-        var surroundingVehicles = vehicleService.findLandVehicleWithOneLevelConnectionNearLocation(
-                busStop.getLocation(),
-                config.getDistances().getMaxWalkingDistanceKms());
+        var surroundingVehicles = vehicleDBService.findLandVehicleWithOneLevelConnectionNearLocation(
+                busStop.getLocation(), config.getDistances().getMaxWalkingDistanceKms());
 
         // Connect the port with all the vehicles around it (if close enough)
         for (var v : surroundingVehicles) {
@@ -227,43 +225,43 @@ public class GraphService {
         // Calculate connections for all the ports
         var ports = pointOfInterestService.getAllPortsWithOneLevelConnection();
         var duration = Duration.between(startTime, Instant.now());
-        log.debug("Getting ports: " + duration.toMillis() + " ms");
+        log.debug("Getting ports: {} ms", duration.toMillis());
 
         startTime = Instant.now();
         for (var b : ports) {
             createPortConnections(b, ports);
         }
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating ports connections took: " + duration.toMillis() + " ms");
+        log.debug("Creating ports connections took: {} ms", duration.toMillis());
 
         startTime = Instant.now();
         var busStops = pointOfInterestService.getAllBusStopsWithOneLevelConnection();
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Getting bus stops: " + duration.toMillis() + " ms");
+        log.debug("Getting bus stops: {} ms", duration.toMillis());
 
         startTime = Instant.now();
         for (var b : busStops) {
             createBusStopConnections(b, busStops);
         }
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Creating bus stop connections took: " + duration.toMillis() + " ms");
+        log.debug("Creating bus stop connections took: {} ms", duration.toMillis());
 
         // First we calculate connections for all the cars
         startTime = Instant.now();
-        var vehicles = vehicleService.findAllLandVehicles(LandVehicle.class);
+        var vehicles = vehicleDBService.findAllLandVehicles(LandVehicle.class);
         duration = Duration.between(startTime, Instant.now());
-        log.debug("Getting all vehicles took: " + duration.toMillis() + " ms");
+        log.debug("Getting all vehicles took: {} ms", duration.toMillis());
 
         for (var startVehicle : vehicles) {
             createVehicleConnections(startVehicle);
         }
     }
 
-    public void createVehicleConnections(LandVehicle vehicle) {
+    public LandVehicle createVehicleConnections(LandVehicle vehicle) {
         if (vehicle.getType().equals(VehicleType.SCOOTER)) {
-            createScooterConnections(vehicle);
+            return createScooterConnections(vehicle);
         } else {
-            createCarConnections(vehicle);
+            return createCarConnections(vehicle);
         }
     }
 
