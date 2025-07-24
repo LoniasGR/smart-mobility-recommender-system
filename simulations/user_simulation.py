@@ -78,11 +78,15 @@ def create_user(user_data):
 def get_recommendation(username: str, origin, destination):
     body = {"origin": origin, "destination": destination, "options": {}}
     try:
+        start = time.perf_counter()
         response = requests.post(
             f"{RECOMMENDATION_API_URL}/{username}?format=json",
             data=json.dumps(body),
             headers=JSON_HEADER,
-        )  # Replace with your actual API endpoint
+        )
+        print(
+            "Request completed in {0:.0f} seconds".format(time.perf_counter() - start)
+        )
         response.raise_for_status()
         return response.json()  # Assuming the API returns a JSON list of vehicles
     except requests.exceptions.RequestException as e:

@@ -43,7 +43,9 @@ public class VehicleGraphService {
     protected void assignRelatedPort(Vehicle vehicle, List<Port> ports, boolean shouldUpdateGraph) {
         var coastLocation = ports.stream().filter(bs -> bs.getLocation().equals(vehicle.getLocation())).findFirst();
         if (coastLocation.isPresent()) {
-            var port = coastLocation.get();
+            // We needed to refetch the port as the list did not contain the proper
+            // information, this might be a bug in neo4j spring data.
+            var port = pointOfInterestService.getPortByOneLevelConnection(coastLocation.get().getId());
             log.info("Adding vehicle {} to port {}", vehicle.getId(), port.getId());
             if (port.getParkedVehicles().isEmpty() && shouldUpdateGraph) {
                 port = graphService.connectPortWithOtherPorts(port, ports);
