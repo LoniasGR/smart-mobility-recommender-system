@@ -3,18 +3,10 @@ import json
 import random
 import argparse
 
+from snapping_service import snap_to_position
 from json_to_geojson import extract_feature, create_geojson_collection
+from constants import LOG, VEHICLE_API_ENDPOINT, PORT_API_ENDPOINT
 
-# API Endpoint
-LOG = True
-ROOT_URL = "http://localhost:8080"
-VEHICLE_API_ENDPOINT = (
-    f"{ROOT_URL}/api/vehicles/"  # Replace with your actual API endpoint
-)
-PORT_API_ENDPOINT = f"{ROOT_URL}/api/ports"
-
-# Vehicle Types
-VEHICLE_TYPES = ["SCOOTER", "CAR", "SEA_VESSEL"]
 
 # Areas and Vehicle Counts (Based on initial estimates)
 AREAS = {
@@ -38,13 +30,13 @@ AREAS = {
             "ports": [
                 {
                     "name": "Halic Shipyard",
-                    "latitude": 41.0400,
-                    "longitude": 29.00745,
+                    "latitude": 41.03450523769473,
+                    "longitude": 28.954849075497684,
                 },
                 {
                     "name": "Fener",
-                    "latitude": 41.0312,
-                    "longitude": 28.952,
+                    "latitude": 41.03099889721486,
+                    "longitude": 28.952663584981906,
                 },
             ],
         },
@@ -59,8 +51,8 @@ AREAS = {
             "ports": [
                 {
                     "name": "Beşiktaş Ferry Terminal",
-                    "latitude": 41.04083,
-                    "longitude": 29.00722,
+                    "latitude": 41.04017,
+                    "longitude": 29.00560,
                 }
             ],
         },
@@ -68,13 +60,13 @@ AREAS = {
             "latitude": 40.9920,
             "longitude": 29.0270,
             "scooter_count": 30,
-            "car_count": 2,
+            "car_count": 3,
             "boat_count": 3,
             "ports": [
                 {
                     "name": "Kadıköy Ferry Terminal",
-                    "latitude": 40.9909,
-                    "longitude": 29.0187,
+                    "latitude": 40.99397119397936,
+                    "longitude": 29.02445217952253,
                 }
             ],
         },
@@ -87,19 +79,21 @@ AREAS = {
             "ports": [
                 {
                     "name": "Eminönü Şehir Hatları Ferry Pier",
-                    "latitude": 41.016487,
-                    "longitude": 28.970381,
+                    "latitude": 41.01763,
+                    "longitude": 28.97471,
                 },
                 {
                     "name": "Karaköy Şehir Hatları Ferry Pier",
-                    "latitude": 41.016667,
-                    "longitude": 28.966667,
+                    "latitude": 41.02157,
+                    "longitude": 28.97671,
                 },
             ],
         },
     },
 }
 
+# Vehicle Types
+VEHICLE_TYPES = ["SCOOTER", "CAR", "SEA_VESSEL"]
 
 v_id = 1
 p_id = 1
@@ -145,6 +139,13 @@ def create_vehicle(vehicle_type, latitude, longitude):
     global v_id
     vehicle_id = f"{vehicle_type.lower()}-{v_id}"
     v_id = v_id + 1
+
+    if vehicle_type != "SEA_VESSEL":
+        if vehicle_type == "SCOOTER":
+            profile = "cycling-electric"
+        if vehicle_type == "CAR":
+            profile = "driving-car"
+        [longitude, latitude] = snap_to_position(latitude, longitude, profile)
     payload = {
         "id": vehicle_id,
         "type": vehicle_type,

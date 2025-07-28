@@ -4,20 +4,8 @@ import time
 import requests
 import argparse
 
-# API Endpoints
-ROOT_URL = "http://localhost:8080"
-RECOMMENDATION_API_URL = f"{ROOT_URL}/api/recommend"
-USER_API_URL = f"{ROOT_URL}/api/users"
-RIDE_API_URL = f"{ROOT_URL}/single-ride/"
-
-# Predefined List of Users
-USERS = [
-    {"username": "ayse123", "dateOfBirth": "1990-05-15", "gender": "FEMALE"},
-    {"username": "mehmet456", "dateOfBirth": "1985-12-20", "gender": "MALE"},
-    {"username": "fatma789", "dateOfBirth": "1995-08-01", "gender": "FEMALE"},
-    {"username": "ali012", "dateOfBirth": "1980-03-10", "gender": "MALE"},
-    {"username": "zeynep345", "dateOfBirth": "2000-11-25", "gender": "FEMALE"},
-]
+from constants import LOG, JSON_HEADER, RECOMMENDATION_API_URL
+from user_creation import create_users
 
 # Areas and Coordinates (Approximate - adjust based on your map data)
 AREAS = {
@@ -51,28 +39,12 @@ SIMULATION_DURATION = 60  # Seconds
 USAGE_PROBABILITY = 0.2  # Probability of a vehicle being used in each iteration
 MAX_TRIP_DISTANCE = 5  # Maximum trip distance in kilometers
 
-
-JSON_HEADER = {"Content-type": "application/json"}
-
 FILE = "users.json"
-LOG = True
 
 
 def log(payload):
     with open(FILE, "a") as f:
         f.write(f"{json.dumps(payload)},")
-
-
-def create_user(user_data):
-    """Creates a user using the API."""
-    try:
-        response = requests.post(
-            USER_API_URL, data=json.dumps(user_data), headers=JSON_HEADER
-        )
-        response.raise_for_status()
-        print(f"User {user_data['username']} created successfully.")
-    except requests.exceptions.RequestException as e:
-        print(f"Error creating user {user_data['username']}: {e}")
 
 
 def get_recommendation(username: str, origin, destination):
@@ -155,15 +127,14 @@ def run_simulation(scenario="full"):
     """Runs the vehicle usage simulation."""
 
     # 1. Create Users
-    for user_data in USERS:
-        create_user(user_data)
+    users = create_users()
 
     # 3. Run the simulation loop
     start_time = time.time()
     while time.time() - start_time < SIMULATION_DURATION:
-        for user in USERS:
+        for user in users:
             if random.random() < USAGE_PROBABILITY:
-                user = random.choice(USERS)
+                user = random.choice(users)
                 simulate_ride(user, time.time(), scenario)
         time.sleep(1)  # Simulate time passing
 
