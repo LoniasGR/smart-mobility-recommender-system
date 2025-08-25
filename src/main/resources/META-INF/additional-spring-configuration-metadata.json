@@ -49,6 +49,31 @@
       "name": "transportation.distances.maxcardistance",
       "type": "java.lang.Double",
       "description": "The max distance a car could travel on full battery (in km)"
+    },
+    {
+      "name": "mqtt.url",
+      "type": "java.lang.String",
+      "description": "The url of an MQTT broker to connect to, e.g. `tcp://localhost:1883`"
+    },
+    {
+      "name": "mqtt.username",
+      "type": "java.lang.String",
+      "description": "The username used to connect to the MQTT broker, if required"
+    },
+    {
+      "name": "mqtt.password",
+      "type": "java.lang.String",
+      "description": "The password used to connect to the MQTT broker, if required"
+    },
+    {
+      "name": "mqtt.topics",
+      "type": "java.lang.String[]",
+      "description": "List of topics to subscribe to in the MQTT broker, e.g. `['test']`"
+    },
+    {
+      "name": "mqtt.clientId",
+      "type": "java.lang.String",
+      "description": "A client id to use when connecting to the MQTT broker. Helps with identifying the client in the broker."
     }
   ]
 }

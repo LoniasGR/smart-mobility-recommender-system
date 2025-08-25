@@ -11,6 +11,11 @@ spring:
     neo4j:
       database: neo4j
 
+mqtt:
+  url: tcp://localhost:1883
+  username: mqttuser
+  password: mqttpassword
+  
 logging:
   level:
     "[org.springframework.data.neo4j.cypher]": trace
