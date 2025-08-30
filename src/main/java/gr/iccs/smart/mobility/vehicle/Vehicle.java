@@ -19,6 +19,7 @@ public abstract sealed class Vehicle implements Serializable permits Boat, LandV
     @Id
     @NotNull(message = "id cannot be empty")
     private final String id;
+
     private final VehicleType type;
     private final Boolean dummy;
 

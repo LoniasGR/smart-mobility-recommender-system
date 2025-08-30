@@ -61,7 +61,8 @@ public class VehicleGraphService {
     }
 
     public void addVehicleToGraphAsync(Vehicle v) {
-        if (v.getStatus() == VehicleStatus.CREATING || v.getStatus() == VehicleStatus.IN_USE) {
+        if (v.getStatus() == VehicleStatus.CREATING || v.getStatus() == VehicleStatus.IN_USE
+                || v.getStatus() == VehicleStatus.RESERVED) {
             executorService.submit(() -> {
                 try {
                     log.info("Processing vehicle {}", v.getId());

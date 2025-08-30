@@ -1,6 +1,8 @@
 package gr.iccs.smart.mobility.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import gr.iccs.smart.mobility.reservation.Reservation;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
 import jakarta.validation.constraints.NotNull;
@@ -28,9 +30,13 @@ public class User {
     @Relationship(type = "USED", direction = Relationship.Direction.OUTGOING)
     private final List<Used> vehiclesUsed;
 
-    public User(@JsonProperty("username") String username, List<Used> vehiclesUsed) {
+    @Relationship(type = "RESERVATION", direction = Relationship.Direction.OUTGOING)
+    private final List<Reservation> reservations;
+
+    public User(@JsonProperty("username") String username, List<Used> vehiclesUsed, List<Reservation> reservations) {
         this.username = username;
         this.vehiclesUsed = Objects.requireNonNullElseGet(vehiclesUsed, ArrayList::new);
+        this.reservations = Objects.requireNonNullElseGet(reservations, ArrayList::new);
     }
 
     public Optional<Used> getCurrentRide() {
@@ -67,5 +73,13 @@ public class User {
 
     public List<Used> getVehiclesUsed() {
         return vehiclesUsed;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void addReservation(Reservation r) {
+        this.reservations.add(r);
     }
 }

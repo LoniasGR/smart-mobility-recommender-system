@@ -137,14 +137,14 @@ public class RecommendationService {
 
         // Generate the nodes we need to add to the graph projection
         // TODO: Make the 'BusStop' optional
-        String nodes = "['UserLandmark', 'Port', 'BusStop'";
+        var nodes = new StringBuilder("['UserLandmark', 'Port', 'BusStop'");
         for (var vt : VehicleType.values()) {
             if (Objects.isNull(options.requestOptions().ignoreTypes())
                     || !options.requestOptions().ignoreTypes().contains(vt)) {
-                nodes += ",'" + VehicleType.nodeOf(vt) + "'";
+                nodes.append(",'").append(VehicleType.nodeOf(vt)).append("'");
             }
         }
-        nodes += "]";
+        nodes.append("]");
 
         try {
             // Ensure recommendation paths exists
@@ -159,7 +159,7 @@ public class RecommendationService {
                 weightType = WeightType.distance;
             }
 
-            graphProjectionService.generateGraph(projection, nodes);
+            graphProjectionService.generateGraph(projection, nodes.toString());
             data = graphProjectionService.shortestPaths(projection, user.getUsername(), weightType,
                     recommendationPaths);
         } finally {

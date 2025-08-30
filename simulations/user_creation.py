@@ -1,7 +1,7 @@
 import requests
 import json
 
-from constants import USER_API_URL, JSON_HEADER
+from constants import USER_API_URL
 
 # Predefined List of Users
 USERS = [
@@ -18,7 +18,9 @@ def create_user(user_data):
     """Creates a user using the API."""
     try:
         response = requests.post(
-            USER_API_URL, data=json.dumps(user_data), headers=JSON_HEADER
+            USER_API_URL,
+            data=json.dumps(user_data),
+            headers={"Content-type": "application/json"},
         )
         response.raise_for_status()
         print(f"User {user_data['username']} created successfully.")

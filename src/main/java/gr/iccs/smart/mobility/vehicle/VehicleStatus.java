@@ -6,6 +6,7 @@ import java.util.Random;
 public enum VehicleStatus {
     CREATING,
     IN_USE,
+    RESERVED,
     IDLE,
     CHARGING;
 

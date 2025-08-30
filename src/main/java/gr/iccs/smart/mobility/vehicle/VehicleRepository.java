@@ -8,6 +8,8 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
+import gr.iccs.smart.mobility.reservation.Reservation;
+
 public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
 
         List<Vehicle> findByLocationNear(Point point, Distance max);
@@ -80,4 +82,11 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
 
         @Query("MATCH (n:LandVehicle{id: $vehicleId})-[r:CONNECTS_TO]-() DELETE r")
         void deleteAllConnectionsOfLandVehicle(String vehicleId);
+
+        @Query("""
+                        MATCH (v:Vehicle)<-[r:RESERVATION]-(u:User)
+                        WHERE v.id = $vehicleId
+                        RETURN r, v, u
+                        """)
+        public Optional<Vehicle> findVehicleReservation(String vehicleId);
 }

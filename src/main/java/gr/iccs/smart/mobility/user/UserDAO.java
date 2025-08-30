@@ -10,7 +10,7 @@ public record UserDAO(
     public User toUser() {
         var user = new User(
                 this.username(),
-                null);
+                null, null);
 
         user.setGender(this.gender());
         user.setDateOfBirth(this.dateOfBirth());

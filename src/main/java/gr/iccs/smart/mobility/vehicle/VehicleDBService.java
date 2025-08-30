@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.vehicle;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.neo4j.driver.types.Point;
 import org.springframework.data.geo.Distance;
@@ -45,7 +46,7 @@ public class VehicleDBService {
         if (vehicle.isPresent()) {
             return vehicle.get();
         }
-        throw new VehicleNotFoundException();
+        throw new VehicleNotFoundException(id);
     }
 
     public Vehicle getByIdNoConnections(String id) {
@@ -53,7 +54,7 @@ public class VehicleDBService {
         if (vehicle.isPresent()) {
             return vehicle.get();
         }
-        throw new VehicleNotFoundException();
+        throw new VehicleNotFoundException(id);
     }
 
     public Vehicle getByIdOneLevelConnections(String id) {
@@ -61,7 +62,7 @@ public class VehicleDBService {
         if (vehicle.isPresent()) {
             return vehicle.get();
         }
-        throw new VehicleNotFoundException();
+        throw new VehicleNotFoundException(id);
     }
 
     public LandVehicle getLandVehicleByIdNoConnections(String id) {
@@ -69,7 +70,7 @@ public class VehicleDBService {
         if (vehicle.isPresent()) {
             return vehicle.get();
         }
-        throw new VehicleNotFoundException();
+        throw new VehicleNotFoundException(id);
     }
 
     public Vehicle createVehicle(Vehicle v) {
@@ -127,5 +128,9 @@ public class VehicleDBService {
     public LandVehicle saveAndGet(LandVehicle vehicle) {
         neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId()).get();
+    }
+
+    public Optional<Vehicle> findVehicleReservation(String vehicleId) {
+        return vehicleRepository.findVehicleReservation(vehicleId);
     }
 }

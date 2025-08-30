@@ -10,7 +10,7 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @RelationshipProperties
 public class Connection implements Serializable {
     @RelationshipId
-    private Long id;
+    private String id;
 
     @Version
     private Long version;
@@ -51,11 +51,11 @@ public class Connection implements Serializable {
         return distance;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

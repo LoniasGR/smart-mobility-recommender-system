@@ -72,15 +72,14 @@ public class GraphProjectionService {
         Long index = 0L;
         List<Map<String, Object>> ret = new ArrayList<>();
         for (Map<String, Object> map : res) {
-            if (map.get("index") instanceof Long idx) {
-                if (index == idx) {
-                    log.debug("Result {} is: {}", index, map);
-                    ret.add(map);
-                    index++;
-                }
+            if (map.get("index") instanceof Long idx && index.equals(idx)) {
+                log.debug("Result {} is: {}", index, map);
+                ret.add(map);
+                index++;
             }
         }
         return ret;
+
     }
 
     public void destroyGraph(String projName) {

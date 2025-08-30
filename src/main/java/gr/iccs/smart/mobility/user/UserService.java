@@ -10,6 +10,7 @@ import gr.iccs.smart.mobility.usage.UsageService;
 import gr.iccs.smart.mobility.usage.UseDTO;
 import gr.iccs.smart.mobility.usage.UseStatus;
 import gr.iccs.smart.mobility.usage.Used;
+import gr.iccs.smart.mobility.vehicle.Vehicle;
 import gr.iccs.smart.mobility.vehicle.VehicleDBService;
 import net.datafaker.Faker;
 
@@ -41,6 +42,18 @@ public class UserService {
             return person.get();
         }
         throw new PersonNotFoundException();
+    }
+
+    public User update(User user) {
+        if (!userRepository.existsById(user.getUsername())) {
+            throw new PersonNotFoundException();
+        }
+
+        return userRepository.save(user);
+    }
+
+    public void deleteReservation(User user, Vehicle vehicle) {
+        userRepository.deleteReservation(user.getUsername(), vehicle.getId());
     }
 
     public User create(User user) {
@@ -86,10 +99,10 @@ public class UserService {
     }
 
     public void createScenarioUsers() {
-        var customUser = new User("test.user", null);
+        var customUser = new User("test.user", null, null);
         create(customUser);
         for (int i = 0; i < 10; i++) {
-            var user = new User(faker.internet().username(), null);
+            var user = new User(faker.internet().username(), null, null);
             create(user);
         }
     }
