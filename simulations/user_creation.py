@@ -28,6 +28,22 @@ def create_user(user_data):
     except requests.exceptions.RequestException as e:
         print(f"Error creating user {user_data['username']}: {e}")
 
+def create_or_get_users():
+    try:
+        response = requests.get(
+            USER_API_URL,
+            headers={"Content-type": "application/json"},
+        )
+        response.raise_for_status()
+        users = response.json()
+        if users:
+            print("Users already exist. Skipping creation.")
+            return users
+        else:
+            return create_users()
+    except requests.exceptions.RequestException as e:
+        print(f"Error retrieving users: {e}")
+        return []
 
 def create_users():
     users = []

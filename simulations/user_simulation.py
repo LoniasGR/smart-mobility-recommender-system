@@ -4,8 +4,8 @@ import time
 import requests
 import argparse
 
-from constants import LOG, JSON_HEADER, RECOMMENDATION_API_URL
-from user_creation import create_users
+from constants import LOG, RECOMMENDATION_API_URL
+from user_creation import create_or_get_users
 
 # Areas and Coordinates (Approximate - adjust based on your map data)
 AREAS = {
@@ -41,18 +41,18 @@ MAX_TRIP_DISTANCE = 5  # Maximum trip distance in kilometers
 
 FILE = "users.json"
 
+JSON_HEADER = {"Content-Type": "application/json"}
 
 def log(payload):
     with open(FILE, "a") as f:
         f.write(f"{json.dumps(payload)},")
 
-
 def get_recommendation(username: str, origin, destination):
-    body = {"origin": origin, "destination": destination, "options": {}}
+    body = {"username": username, "origin": origin, "destination": destination, "options": {}}
     try:
         start = time.perf_counter()
         response = requests.post(
-            f"{RECOMMENDATION_API_URL}/{username}?format=json",
+            f"{RECOMMENDATION_API_URL}?format=json",
             data=json.dumps(body),
             headers=JSON_HEADER,
         )
@@ -60,10 +60,24 @@ def get_recommendation(username: str, origin, destination):
             "Request completed in {0:.0f} seconds".format(time.perf_counter() - start)
         )
         response.raise_for_status()
-        return response.json()  # Assuming the API returns a JSON list of vehicles
+        return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error retrieving vehicles: {e}")
         return []
+
+def reserve_vehicles(username: str, vehicle_ids: list[str]):
+    body = {"username": username, "vehicleIds": vehicle_ids}
+    try:
+        response = requests.post(
+            f"{RECOMMENDATION_API_URL}/reserve?format=json",
+            data=json.dumps(body),
+            headers=JSON_HEADER,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error reserving vehicles: {e}")
+        return None
 
 
 def simulate_ride(user, when, scenario="full"):
@@ -98,7 +112,13 @@ def simulate_ride(user, when, scenario="full"):
     if LOG:
         log(data)
     paths = get_recommendation(user["username"], origin, destination)
-    print(paths)
+    if not paths or paths == []:
+        print(f"No vehicles available for user {user['username']} from {origin} to {destination}")
+        return
+    print(paths['paths'][0])
+    vehicles = [path['id'] for path in paths['paths'][0]]
+    print(vehicles)
+    reserve_vehicles(user["username"], vehicles)
 
     # payload = {
     #     "vehicleId": paths[0][0]["id"],
@@ -127,7 +147,7 @@ def run_simulation(scenario="full"):
     """Runs the vehicle usage simulation."""
 
     # 1. Create Users
-    users = create_users()
+    users = create_or_get_users()
 
     # 3. Run the simulation loop
     start_time = time.time()
