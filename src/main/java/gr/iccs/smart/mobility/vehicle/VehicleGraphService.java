@@ -66,9 +66,7 @@ public class VehicleGraphService {
             executorService.submit(() -> {
                 try {
                     log.info("Processing vehicle {}", v.getId());
-                    var newV = addVehicleToGraph(v);
-                    newV.setStatus(VehicleStatus.IDLE);
-                    vehicleDBService.save(newV);
+                    addVehicleToGraph(v);
                 } catch (Exception e) {
                     log.error("Exception while processing vehicle {}", v.getId(), e);
                     throw new RuntimeException(e);
@@ -144,13 +142,15 @@ public class VehicleGraphService {
 
     public Vehicle addVehicleToGraph(Vehicle v) {
         if (v.isLandVehicle()) {
-            return addLandVehicleToGraph((LandVehicle) v);
+            v = addLandVehicleToGraph((LandVehicle) v);
         } else {
             // We have to add the boat to the port. If the port already has
             // boats, there is nothing else to do. Otherwise, we need to connect
             // the port with the other ports.
             addBoatToGraph(v);
-            return v;
         }
+        v.setStatus(VehicleStatus.IDLE);
+        vehicleDBService.save(v);
+        return v;
     }
 }

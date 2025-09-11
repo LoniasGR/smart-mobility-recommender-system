@@ -1,6 +1,7 @@
 package gr.iccs.smart.mobility.reservation;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -49,9 +50,13 @@ public class ReservationService {
         }
     }
 
+    public Optional<Vehicle> getVehicleReservation(String vehicleId) {
+        return vehicleDbService.findVehicleReservation(vehicleId);
+    }
+
     private Reservation createReservation(Vehicle vehicle) {
-        if (vehicleDbService.findVehicleReservation(vehicle.getId()).isPresent()) {
-            throw new ReservationException("Vehicle " + vehicle.getId() + " is already reserved", HttpStatus.CONFLICT);
+        if (!vehicle.isAvailable()) {
+            throw new ReservationException("Vehicle " + vehicle.getId() + " is not available", HttpStatus.CONFLICT);
         }
         vehicleService.updateVehicleStatus(vehicle, VehicleStatus.RESERVED, true);
         vehicleGraphService.removeVehicleFromGraph(vehicle);
@@ -59,6 +64,14 @@ public class ReservationService {
     }
 
     public void cancelReservation(String username, String vehicleId) {
+        var v = deleteReservation(username, vehicleId);
+        // We need to refetch the vehicle, so that Neo4J data recognizes it
+        v = vehicleDbService.getByIdNoConnections(v.getId());
+        vehicleGraphService.addVehicleToGraph(v);
+
+    }
+
+    public Vehicle deleteReservation(String username, String vehicleId) {
         var u = userService.getById(username);
         var reservation = u.getReservations().stream()
                 .filter(r -> r.getVehicle().getId().equals(vehicleId))
@@ -68,10 +81,6 @@ public class ReservationService {
                         HttpStatus.NOT_FOUND));
         var v = reservation.getVehicle();
         userService.deleteReservation(u, v);
-
-        // We need to refetch the vehicle, so that Neo4J data recognizes it
-        v = vehicleDbService.getByIdNoConnections(v.getId());
-        vehicleGraphService.addVehicleToGraph(v);
-
+        return v;
     }
 }

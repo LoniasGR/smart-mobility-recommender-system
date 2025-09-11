@@ -23,4 +23,11 @@ public interface UserRepository extends Neo4jRepository<User, String> {
             """)
     public void deleteReservation(String username, String vehicleId);
 
+    @Query("""
+            MATCH (u:User)-[r:RESERVATION]->(v:Vehicle)
+            WHERE v.id = $vehicleId
+            RETURN u
+                """)
+    public User findReserverOfVehicle(String vehicleId);
+
 }

@@ -45,7 +45,7 @@ public interface VehicleRepository extends Neo4jRepository<Vehicle, String> {
                         AND NOT n.status IN ["CREATING", "IN_USE"]
                         RETURN n, collect(relationships(p)), collect(m)
                         ORDER BY point.distance(n.location, $point) ASC;
-                        """)
+                                """)
         List<LandVehicle> findLandVechicleWithOneLevelConnectionByLocationAround(Point point, Distance range);
 
         @Query("MATCH (v: LandVehicle) " +

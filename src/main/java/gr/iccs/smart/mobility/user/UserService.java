@@ -63,6 +63,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User findReserverOfVehicle(String vehicleId) {
+        return userRepository.findReserverOfVehicle(vehicleId);
+    }
+
     /***
      * Handles the creation and update of the ride state.
      * 

@@ -92,4 +92,21 @@ public abstract sealed class Vehicle implements Serializable permits Boat, LandV
     public VehicleDAO toVehicleDAO() {
         return new VehicleDAO(this.id, this.type, this.battery, this.dummy, LocationDTO.fromGeographicPoint(location));
     }
+
+    public boolean isReserved() {
+        return this.getStatus().equals(VehicleStatus.RESERVED);
+    }
+
+    public boolean isInUse() {
+        return this.getStatus().equals(VehicleStatus.IN_USE);
+    }
+
+    public boolean isAvailable() {
+        return this.getStatus().equals(VehicleStatus.IDLE);
+    }
+
+    public boolean isOutOfService() {
+        return this.getStatus().equals(VehicleStatus.CHARGING) ||
+                this.getStatus().equals(VehicleStatus.CREATING);
+    }
 }
