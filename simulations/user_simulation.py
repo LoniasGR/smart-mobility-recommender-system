@@ -1,13 +1,15 @@
 import json
 import random
+from re import L
 import time
+from tkinter import W
 import requests
 import argparse
 
 from constants import LOG, RECOMMENDATION_API_URL
 from user_creation import create_or_get_users
 
-# Areas and Coordinates (Approximate - adjust based on your map data)
+# Areas and Coordinates (Approximate)
 AREAS = {
     "tubitak": {
         "Tubitak": {
@@ -43,12 +45,19 @@ FILE = "users.json"
 
 JSON_HEADER = {"Content-Type": "application/json"}
 
+
 def log(payload):
     with open(FILE, "a") as f:
         f.write(f"{json.dumps(payload)},")
 
+
 def get_recommendation(username: str, origin, destination):
-    body = {"username": username, "origin": origin, "destination": destination, "options": {}}
+    body = {
+        "username": username,
+        "origin": origin,
+        "destination": destination,
+        "options": {},
+    }
     try:
         start = time.perf_counter()
         response = requests.post(
@@ -65,6 +74,7 @@ def get_recommendation(username: str, origin, destination):
         print(f"Error retrieving vehicles: {e}")
         return []
 
+
 def reserve_vehicles(username: str, vehicle_ids: list[str]):
     body = {"username": username, "vehicleIds": vehicle_ids}
     try:
@@ -80,8 +90,64 @@ def reserve_vehicles(username: str, vehicle_ids: list[str]):
         return None
 
 
+def exit_ride(username: str, vehicle_id: str, location: dict):
+    body = {
+        "username": username,
+        "vehicleId": vehicle_id,
+        "location": location,
+    }
+    try:
+        response = requests.post(
+            f"{RECOMMENDATION_API_URL}/end",
+            data=json.dumps(body),
+            headers=JSON_HEADER,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error exiting ride: {e}")
+        return None
+
+
+def start_ride(username: str, vehicle_id: str, location: dict):
+    body = {
+        "username": username,
+        "vehicleId": vehicle_id,
+        "location": location,
+    }
+    try:
+        response = requests.post(
+            f"{RECOMMENDATION_API_URL}/start",
+            data=json.dumps(body),
+            headers=JSON_HEADER,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error exiting ride: {e}")
+        return None
+
+
 def simulate_ride(user, when, scenario="full"):
     """Simulates a user taking a ride on a vehicle."""
+    if user in WORLD_STATE and when >= WORLD_STATE[user]["ride_stop_time"]:
+        exit_ride(
+            user["username"],
+            WORLD_STATE[user]["vehicle_id"],
+            WORLD_STATE[user]["current_destination"],
+        )
+        print(
+            f"User {user['username']} exited vehicle {WORLD_STATE[user]['vehicle_id']} at {WORLD_STATE[user]['current_destination']}"
+        )
+        if WORLD_STATE[user]["next_ride"] is None:
+            del WORLD_STATE[user]
+            return
+        else:
+            start_ride(
+                user["username"],
+                WORLD_STATE[user]["vehicle_id"],
+                WORLD_STATE[user]["current_destination"],
+            )
     origin_area_name = random.choice(list(AREAS[scenario].keys()))
     origin_area = AREAS[scenario][origin_area_name]
     origin_latitude = random.uniform(
@@ -113,10 +179,12 @@ def simulate_ride(user, when, scenario="full"):
         log(data)
     paths = get_recommendation(user["username"], origin, destination)
     if not paths or paths == []:
-        print(f"No vehicles available for user {user['username']} from {origin} to {destination}")
+        print(
+            f"No vehicles available for user {user['username']} from {origin} to {destination}"
+        )
         return
-    print(paths['paths'][0])
-    vehicles = [path['id'] for path in paths['paths'][0]]
+    print(paths["paths"][0])
+    vehicles = [path["id"] for path in paths["paths"][0]]
     print(vehicles)
     reserve_vehicles(user["username"], vehicles)
 
@@ -141,6 +209,9 @@ def simulate_ride(user, when, scenario="full"):
     #     print(
     #         f"Error simulating ride for user {user['username']} and vehicle {vehicle['id']}: {e}"
     #     )
+
+
+WORLD_STATE = {}
 
 
 def run_simulation(scenario="full"):
