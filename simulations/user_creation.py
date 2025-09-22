@@ -11,6 +11,11 @@ USERS = [
     {"username": "fatma789", "dateOfBirth": "1995-08-01", "gender": "FEMALE"},
     {"username": "ali012", "dateOfBirth": "1980-03-10", "gender": "MALE"},
     {"username": "zeynep345", "dateOfBirth": "2000-11-25", "gender": "FEMALE"},
+    {"username": "sau123", "dateOfBirth": "1990-05-15", "gender": "FEMALE"},
+    {"username": "leo456", "dateOfBirth": "1985-12-20", "gender": "MALE"},
+    {"username": "eft789", "dateOfBirth": "1995-08-01", "gender": "FEMALE"},
+    {"username": "asd012", "dateOfBirth": "1980-03-10", "gender": "MALE"},
+    {"username": "paris345", "dateOfBirth": "2000-11-25", "gender": "FEMALE"},
 ]
 
 
@@ -28,6 +33,7 @@ def create_user(user_data):
     except requests.exceptions.RequestException as e:
         print(f"Error creating user {user_data['username']}: {e}")
 
+
 def create_or_get_users():
     try:
         response = requests.get(
@@ -44,6 +50,7 @@ def create_or_get_users():
     except requests.exceptions.RequestException as e:
         print(f"Error retrieving users: {e}")
         return []
+
 
 def create_users():
     users = []

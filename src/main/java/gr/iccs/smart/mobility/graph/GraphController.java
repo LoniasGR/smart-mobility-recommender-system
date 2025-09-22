@@ -1,6 +1,5 @@
 package gr.iccs.smart.mobility.graph;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,8 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/graph")
 public class GraphController {
 
-    @Autowired
-    private GraphService graphService;
+    private final GraphService graphService;
+
+    public GraphController(GraphService graphService) {
+        this.graphService = graphService;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")

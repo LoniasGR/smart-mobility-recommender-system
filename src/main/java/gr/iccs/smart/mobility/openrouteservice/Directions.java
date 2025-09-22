@@ -129,8 +129,6 @@ public class Directions extends Base {
             log.error("Too many requests reached... Waiting for 30s");
             waitToRuntimeException(30000L);
             ret = executeWithRateLimiting(callback);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
         updateRateLimit();
         return ret;

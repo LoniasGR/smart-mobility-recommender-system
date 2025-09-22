@@ -8,4 +8,8 @@ public class NoRouteFoundException extends RuntimeException {
     public NoRouteFoundException(String message) {
         super(message);
     }
+
+    public NoRouteFoundException(Throwable cause) {
+        super(cause);
+    }
 }

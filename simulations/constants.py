@@ -6,6 +6,7 @@ VEHICLE_API_ENDPOINT = (
 )
 PORT_API_ENDPOINT = f"{ROOT_URL}/api/ports"
 RECOMMENDATION_API_URL = f"{ROOT_URL}/api/recommend"
+RESERVATION_API_URL = f"{ROOT_URL}/api/reserve"
 USER_API_URL = f"{ROOT_URL}/api/users"
 RIDE_API_URL = f"{ROOT_URL}/single-ride/"
 

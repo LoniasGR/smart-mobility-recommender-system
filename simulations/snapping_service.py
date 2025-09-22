@@ -4,7 +4,7 @@ import requests
 from constants import OPENROUTESERVCE_API_URL
 
 
-def snap_to_position(lat, lon, profile, radius=50):
+def snap_to_position(lat, lon, profile, radius=50, silent=True):
     try:
         headers = {"Content-type": "application/json"}
         body = {
@@ -15,7 +15,11 @@ def snap_to_position(lat, lon, profile, radius=50):
             f"{OPENROUTESERVCE_API_URL}/{profile}", json=body, headers=headers
         )
         resp.raise_for_status()
-        print(f"Snapping response: {resp.status_code} {resp.text}")
+        if not silent:
+            print(f"Snapping response: {resp.status_code} {resp.text}")
+        if radius > 500:
+            print(f"Failed to snap point ({lat}, {lon}) within 500m radius.")
+            raise Exception("Snapping failed")
         if resp.json()["locations"][0] is None:
             return snap_to_position(lat, lon, profile, radius + 50)
 

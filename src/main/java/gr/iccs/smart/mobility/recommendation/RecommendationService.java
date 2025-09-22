@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
 import gr.iccs.smart.mobility.connection.ConnectionService;
@@ -124,29 +126,30 @@ public class RecommendationService {
 
     private List<Map<String, Object>> generateRecommendation(Point start, Point finish, User user,
             RecommendationOptions options) {
+
         var startLandmark = new UserStartLandmark(start, null, user);
         var destLandmark = new UserDestinationLandmark(finish, user);
         userLandmarkService.save(destLandmark);
         userLandmarkService.save(startLandmark);
-
-        createStartLandmarkConnections(startLandmark, destLandmark);
-        createEndLandmarkConnections(destLandmark);
-
         final String projection = "sm_" + user.getUsername();
-        List<Map<String, Object>> data = null;
-
-        // Generate the nodes we need to add to the graph projection
-        // TODO: Make the 'BusStop' optional
-        var nodes = new StringBuilder("['UserLandmark', 'Port', 'BusStop'");
-        for (var vt : VehicleType.values()) {
-            if (Objects.isNull(options.requestOptions().ignoreTypes())
-                    || !options.requestOptions().ignoreTypes().contains(vt)) {
-                nodes.append(",'").append(VehicleType.nodeOf(vt)).append("'");
-            }
-        }
-        nodes.append("]");
 
         try {
+            createStartLandmarkConnections(startLandmark, destLandmark);
+            createEndLandmarkConnections(destLandmark);
+
+            List<Map<String, Object>> data = null;
+
+            // Generate the nodes we need to add to the graph projection
+            // TODO: Make the 'BusStop' optional
+            var nodes = new StringBuilder("['UserLandmark', 'Port'");
+            for (var vt : VehicleType.values()) {
+                if (Objects.isNull(options.requestOptions().ignoreTypes())
+                        || !options.requestOptions().ignoreTypes().contains(vt)) {
+                    nodes.append(",'").append(VehicleType.nodeOf(vt)).append("'");
+                }
+            }
+            nodes.append("]");
+
             // Ensure recommendation paths exists
             var recommendationPaths = options.requestOptions().recommendationPaths();
             if (Objects.isNull(recommendationPaths)) {
@@ -162,16 +165,19 @@ public class RecommendationService {
             graphProjectionService.generateGraph(projection, nodes.toString());
             data = graphProjectionService.shortestPaths(projection, user.getUsername(), weightType,
                     recommendationPaths);
+
+            if (Objects.isNull(data) || data.isEmpty()) {
+                throw new NoRouteFoundException("No viable route between origin and destination");
+            }
+            return data;
+        } catch (NotFound e) {
+            log.error("One of the landmarks were not found");
+            throw new NoRouteFoundException(e);
         } finally {
             graphProjectionService.destroyGraph(projection);
             userLandmarkService.delete(destLandmark);
             userLandmarkService.delete(startLandmark);
         }
-
-        if (Objects.isNull(data) || data.isEmpty()) {
-            throw new NoRouteFoundException("No viable route between origin and destination");
-        }
-        return data;
     }
 
     public List<FeatureCollection> geojsonRecommendation(Point start, Point finish, User user,

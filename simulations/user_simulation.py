@@ -1,12 +1,12 @@
 import json
 import random
-from re import L
 import time
-from tkinter import W
 import requests
 import argparse
+import threading
 
-from constants import LOG, RECOMMENDATION_API_URL
+from constants import LOG, RECOMMENDATION_API_URL, RESERVATION_API_URL
+from snapping_service import snap_to_position
 from user_creation import create_or_get_users
 
 # Areas and Coordinates (Approximate)
@@ -51,6 +51,10 @@ def log(payload):
         f.write(f"{json.dumps(payload)},")
 
 
+def uprint(msg, username):
+    print(f"[{username}] {msg}")
+
+
 def get_recommendation(username: str, origin, destination):
     body = {
         "username": username,
@@ -79,14 +83,26 @@ def reserve_vehicles(username: str, vehicle_ids: list[str]):
     body = {"username": username, "vehicleIds": vehicle_ids}
     try:
         response = requests.post(
-            f"{RECOMMENDATION_API_URL}/reserve?format=json",
+            f"{RESERVATION_API_URL}?format=json",
             data=json.dumps(body),
             headers=JSON_HEADER,
         )
         response.raise_for_status()
-        return response.json()
+        return response.status_code == 200
     except requests.exceptions.RequestException as e:
         print(f"Error reserving vehicles: {e}")
+        return None
+
+
+def cancel_reservation(username: str, vehicle: str):
+    try:
+        response = requests.post(
+            f"{RESERVATION_API_URL}/{username}/cancel/{vehicle}",
+        )
+        response.raise_for_status()
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        print(f"Error canceling reservation vehicles: {e}")
         return None
 
 
@@ -130,24 +146,6 @@ def start_ride(username: str, vehicle_id: str, location: dict):
 
 def simulate_ride(user, when, scenario="full"):
     """Simulates a user taking a ride on a vehicle."""
-    if user in WORLD_STATE and when >= WORLD_STATE[user]["ride_stop_time"]:
-        exit_ride(
-            user["username"],
-            WORLD_STATE[user]["vehicle_id"],
-            WORLD_STATE[user]["current_destination"],
-        )
-        print(
-            f"User {user['username']} exited vehicle {WORLD_STATE[user]['vehicle_id']} at {WORLD_STATE[user]['current_destination']}"
-        )
-        if WORLD_STATE[user]["next_ride"] is None:
-            del WORLD_STATE[user]
-            return
-        else:
-            start_ride(
-                user["username"],
-                WORLD_STATE[user]["vehicle_id"],
-                WORLD_STATE[user]["current_destination"],
-            )
     origin_area_name = random.choice(list(AREAS[scenario].keys()))
     origin_area = AREAS[scenario][origin_area_name]
     origin_latitude = random.uniform(
@@ -158,7 +156,7 @@ def simulate_ride(user, when, scenario="full"):
     )
 
     destination_area_name = random.choice(list(AREAS[scenario].keys()))
-    destination_area = AREAS[scenario][destination_area_name]
+    destination_area = AREAS[scenario][origin_area_name]
     destination_latitude = random.uniform(
         destination_area["latitude_range"][0], destination_area["latitude_range"][1]
     )
@@ -166,8 +164,13 @@ def simulate_ride(user, when, scenario="full"):
         destination_area["longitude_range"][0], destination_area["longitude_range"][1]
     )
 
-    origin = {"latitude": origin_latitude, "longitude": origin_longitude}
-    destination = {"latitude": destination_latitude, "longitude": destination_longitude}
+    origin = snap_to_position(origin_latitude, origin_longitude, "foot-walking")
+    destination = snap_to_position(
+        destination_latitude, destination_longitude, "foot-walking"
+    )
+
+    origin = {"latitude": origin[1], "longitude": origin[0]}
+    destination = {"latitude": destination[1], "longitude": destination[0]}
 
     data = {
         "time": when,
@@ -177,57 +180,55 @@ def simulate_ride(user, when, scenario="full"):
     }
     if LOG:
         log(data)
+    uprint(f"Requesting ride from {origin} to {destination}", user["username"])
     paths = get_recommendation(user["username"], origin, destination)
     if not paths or paths == []:
-        print(
-            f"No vehicles available for user {user['username']} from {origin} to {destination}"
+        uprint(
+            f"No vehicles available from {origin} to {destination}",
+            user["username"],
         )
         return
-    print(paths["paths"][0])
+    uprint(f"Found paths: {paths['paths'][0]}", user["username"])
     vehicles = [path["id"] for path in paths["paths"][0]]
-    print(vehicles)
+    if vehicles == []:
+        uprint("No route available", user["username"])
+        return
+    uprint(f"Reserving vehicles: {vehicles}", user["username"])
     reserve_vehicles(user["username"], vehicles)
-
-    # payload = {
-    #     "vehicleId": paths[0][0]["id"],
-    #     "destination": {
-    #         "latitude": destination_latitude,
-    #         "longitude": destination_longitude,
-    #     },
-    # }
-    # ride_url = RIDE_API_URL.format(username=user["username"])
-
-    # try:
-    #     response = requests.post(
-    #         ride_url, data=json.dumps(payload), headers=JSON_HEADER
-    #     )
-    #     response.raise_for_status()
-    #     print(
-    #         f"User {user['username']} took vehicle {vehicle['id']} to ({destination_latitude:.4f}, {destination_longitude:.4f})"
-    #     )
-    # except requests.exceptions.RequestException as e:
-    #     print(
-    #         f"Error simulating ride for user {user['username']} and vehicle {vehicle['id']}: {e}"
-    #     )
-
-
-WORLD_STATE = {}
+    time.sleep(5)
+    for vehicle in vehicles:
+        uprint(f"Canceling reservation of {vehicle}", user["username"])
+        cancel_reservation(user["username"], vehicle)
 
 
 def run_simulation(scenario="full"):
     """Runs the vehicle usage simulation."""
 
-    # 1. Create Users
-    users = create_or_get_users()
+    # 1. Create or Get Users
+    available_users = create_or_get_users()
+    threads = []
 
     # 3. Run the simulation loop
     start_time = time.time()
     while time.time() - start_time < SIMULATION_DURATION:
-        for user in users:
-            if random.random() < USAGE_PROBABILITY:
-                user = random.choice(users)
-                simulate_ride(user, time.time(), scenario)
+        if random.random() < USAGE_PROBABILITY:
+            if len(available_users) == 0:
+                print("----------------------")
+                print("No more available users to simulate.")
+                print("----------------------")
+                break
+            user = random.choice(available_users)
+            thread = threading.Thread(
+                target=simulate_ride, args=(user, time.time(), scenario)
+            )
+            available_users.remove(user)
+            thread.start()
+            threads.append(thread)
         time.sleep(1)  # Simulate time passing
+
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
 
 
 def parse_args():
