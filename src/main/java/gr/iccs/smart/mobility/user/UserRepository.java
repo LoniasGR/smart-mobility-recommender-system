@@ -1,5 +1,6 @@
 package gr.iccs.smart.mobility.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -29,5 +30,11 @@ public interface UserRepository extends Neo4jRepository<User, String> {
             RETURN u
                 """)
     public User findReserverOfVehicle(String vehicleId);
+
+    @Query("""
+            MATCH (u:User)
+            RETURN u;
+            """)
+    public List<User> getAll();
 
 }

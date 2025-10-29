@@ -3,10 +3,12 @@ package gr.iccs.smart.mobility.pointsofinterest;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.random.RandomGenerator;
 
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
@@ -25,6 +27,7 @@ import gr.iccs.smart.mobility.scenario.RandomScenario;
 import gr.iccs.smart.mobility.scenario.ScenarioDTO;
 import gr.iccs.smart.mobility.scenario.ScenarioException;
 import gr.iccs.smart.mobility.util.ResourceReader;
+import gr.iccs.smart.mobility.util.RetryWithBackoff;
 import gr.iccs.smart.mobility.vehicle.Vehicle;
 
 @Service
@@ -177,9 +180,11 @@ public class PointOfInterestService {
     }
 
     public Port saveAndGet(Port port) {
-        neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
-        // We need to update the boat stop to get the new connection info
-        return pointOfInterestRepository.getOnePortByOneLevelConnection(port.getId());
+        return RetryWithBackoff.retryWithBackoff(() -> {
+            neo4jTemplate.saveAs(port, PortWithOneLevelConnection.class);
+            // We need to update the boat stop to get the new connection info
+            return pointOfInterestRepository.getOnePortByOneLevelConnection(port.getId());
+        }, 5, 1000, 2.0);
     }
 
     public Port getPortByOneLevelConnection(String portID) {
@@ -212,14 +217,14 @@ public class PointOfInterestService {
             return mapper.readValue(stream, PortWrapper.class);
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
-                log.warn("File %s not found, stopping...", filePath);
+                log.warn("File {} not found, stopping...", filePath);
             }
             throw new RuntimeException(e);
         }
     }
 
     public void createPortScenario(RandomScenario randomScenario, ScenarioDTO scenario) {
-        if (randomScenario.randomize()) {
+        if (randomScenario.randomize().booleanValue()) {
             createRandomPorts(randomScenario.ports());
             return;
         }

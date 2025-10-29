@@ -21,16 +21,14 @@ public class VehicleService {
 
     private static final Random RANDOM = new Random();
 
-    private final VehicleRepository vehicleRepository;
     private final VehicleUtilitiesService vehicleUtilitiesService;
     private final VehicleDBService vehicleDBService;
     private final PointOfInterestService pointOfInterestService;
     private final VehicleGraphService vehicleGraphService;
 
-    VehicleService(VehicleRepository vehicleRepository, VehicleUtilitiesService vehicleUtilitiesService,
+    VehicleService(VehicleUtilitiesService vehicleUtilitiesService,
             VehicleGraphService vehicleGraphService, VehicleDBService vehicleDBService,
             PointOfInterestService pointOfInterestService) {
-        this.vehicleRepository = vehicleRepository;
         this.vehicleUtilitiesService = vehicleUtilitiesService;
         this.vehicleGraphService = vehicleGraphService;
         this.vehicleDBService = vehicleDBService;
@@ -145,7 +143,7 @@ public class VehicleService {
         var newLocation = Values.point(4326, location.latitude(), location.longitude()).asPoint();
         vehicle.setLocation(newLocation);
         if (shouldSave) {
-            return vehicleRepository.save(vehicle);
+            return vehicleDBService.save(vehicle);
         }
         return vehicle;
     }
@@ -158,7 +156,7 @@ public class VehicleService {
     public Vehicle updateVehicleStatus(Vehicle vehicle, VehicleStatus status, boolean shouldSave) {
         vehicle.setStatus(status);
         if (shouldSave) {
-            return vehicleRepository.save(vehicle);
+            return vehicleDBService.save(vehicle);
         }
         return vehicle;
     }
@@ -176,7 +174,7 @@ public class VehicleService {
             vehicle.setBattery(vehicleInfoDTO.battery().level());
         }
 
-        return vehicleRepository.save(vehicle);
+        return vehicleDBService.save(vehicle);
     }
 
     public Vehicle initialize(VehicleDAO vehicle) {

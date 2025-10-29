@@ -17,10 +17,10 @@ import net.datafaker.Faker;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-    private VehicleDBService vehicleDBService;
-    private UsageService usageService;
-    private RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher;
+    private final UserRepository userRepository;
+    private final VehicleDBService vehicleDBService;
+    private final UsageService usageService;
+    private final RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher;
 
     UserService(UserRepository userRepository, VehicleDBService vehicleDBService, UsageService usageService,
             RideStatusUpdateEventPublisher rideStatusUpdateEventPublisher) {
@@ -33,7 +33,7 @@ public class UserService {
     private final Faker faker = new Faker();
 
     public List<User> getAll() {
-        return userRepository.findAll();
+        return userRepository.getAll();
     }
 
     public User getById(String username) {

@@ -9,6 +9,8 @@ import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
 
+import gr.iccs.smart.mobility.util.RetryWithBackoff;
+
 @Service
 public class VehicleDBService {
     private final VehicleRepository vehicleRepository;
@@ -20,7 +22,7 @@ public class VehicleDBService {
     }
 
     public Vehicle save(Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
+        return RetryWithBackoff.retryWithBackoff(() -> vehicleRepository.save(vehicle), 5, 1000, 1.5);
     }
 
     protected void validateVehicle(VehicleType type, String vehicleId) {

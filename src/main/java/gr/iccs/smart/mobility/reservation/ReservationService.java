@@ -64,14 +64,14 @@ public class ReservationService {
     }
 
     public void cancelReservation(String username, String vehicleId) {
-        var v = deleteReservation(username, vehicleId);
+        deleteReservation(username, vehicleId);
         // We need to refetch the vehicle, so that Neo4J data recognizes it
-        v = vehicleDbService.getByIdNoConnections(v.getId());
+        var v = vehicleDbService.getByIdNoConnections(vehicleId);
         vehicleGraphService.addVehicleToGraph(v);
 
     }
 
-    public Vehicle deleteReservation(String username, String vehicleId) {
+    public void deleteReservation(String username, String vehicleId) {
         var u = userService.getById(username);
         var reservation = u.getReservations().stream()
                 .filter(r -> r.getVehicle().getId().equals(vehicleId))
@@ -81,6 +81,5 @@ public class ReservationService {
                         HttpStatus.NOT_FOUND));
         var v = reservation.getVehicle();
         userService.deleteReservation(u, v);
-        return v;
     }
 }
