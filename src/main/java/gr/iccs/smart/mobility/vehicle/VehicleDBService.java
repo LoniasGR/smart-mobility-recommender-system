@@ -132,6 +132,15 @@ public class VehicleDBService {
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId()).get();
     }
 
+    public Vehicle saveAndGet(Vehicle vehicle) {
+        neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
+        return vehicleRepository.findNoConnectionsById(vehicle.getId()).get();
+    }
+
+    public Vehicle saveAndGetWithBackoff(Vehicle vehicle) {
+        return RetryWithBackoff.retryWithBackoff(() -> saveAndGet(vehicle), 5, 1000, 1.5);
+    }
+
     public Optional<Vehicle> findVehicleReservation(String vehicleId) {
         return vehicleRepository.findVehicleReservation(vehicleId);
     }

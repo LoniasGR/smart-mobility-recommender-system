@@ -13,9 +13,12 @@ import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.reservation.ReservationService;
 import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.vehicle.VehicleDBService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/ride")
+@Tag(name = "Ride", description = "Manage user rides")
 public class RideController {
     private static final Logger log = LoggerFactory.getLogger(RideController.class);
 
@@ -30,6 +33,7 @@ public class RideController {
     }
 
     @PostMapping("start")
+    @Operation(summary = "Start a ride", description = "Start a new ride for a user", tags = { "Ride" })
     public void startRide(@RequestBody RideDTO rideDTO) {
         if (userService.rideStatus(rideDTO.username()).isPresent()) {
             throw new RideException("The user is already on a ride");
@@ -58,6 +62,7 @@ public class RideController {
     }
 
     @PostMapping("end")
+    @Operation(summary = "End a ride", description = "End the current ride for a user", tags = { "Ride" })
     public void endRide(@RequestBody RideDTO rideDTO) {
         var userCurrentRide = userService.rideStatus(rideDTO.username());
         if (!userCurrentRide.isPresent()) {

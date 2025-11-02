@@ -168,13 +168,17 @@ public class VehicleService {
 
     public Vehicle updateVehicleInfo(String id, VehicleInfoDTO vehicleInfoDTO) {
         var vehicle = vehicleDBService.getByIdOneLevelConnections(id);
-        vehicle = updateVehicleLocation(vehicle, vehicleInfoDTO.location(), false);
-        vehicle = updateVehicleStatus(vehicle, vehicleInfoDTO.status(), false);
+        if( vehicleInfoDTO.location() != null) {
+            vehicle = updateVehicleLocation(vehicle, vehicleInfoDTO.location(), false);
+        }
+        if (vehicleInfoDTO.status() != null) {
+            vehicle = updateVehicleStatus(vehicle, vehicleInfoDTO.status(), false);
+        }
         if (vehicleInfoDTO.battery() != null) {
             vehicle.setBattery(vehicleInfoDTO.battery().level());
         }
 
-        return vehicleDBService.save(vehicle);
+        return vehicleDBService.saveAndGet(vehicle);
     }
 
     public Vehicle initialize(VehicleDAO vehicle) {

@@ -7,8 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/reserve")
+@Tag(name = "Reservations", description = "Manage vehicle reservations")
 public class ReservationController {
     private final ReservationService reservationService;
 
@@ -17,6 +21,7 @@ public class ReservationController {
     }
 
     @PostMapping
+    @Operation(summary = "Create reservation", description = "Create a new vehicle reservation (can include multiple vehicles)", tags = { "Reservations" })
     public ResponseEntity<String> reserve(@RequestBody ReservationInputDTO input) {
         try {
             reservationService.reserve(input);
@@ -27,6 +32,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{username}/cancel/{vehicleId}")
+    @Operation(summary = "Cancel reservation", description = "Cancel a vehicle reservation", tags = { "Reservations" })
     public ResponseEntity<String> cancelReservation(@PathVariable String vehicleId,
             @PathVariable String username) {
         try {

@@ -8,8 +8,6 @@ import org.neo4j.driver.types.Point;
 import gr.iccs.smart.mobility.geojson.Feature;
 import gr.iccs.smart.mobility.geojson.FeatureCollection;
 import gr.iccs.smart.mobility.geojson.GeoJSONUtils;
-import gr.iccs.smart.mobility.location.InvalidLocationException;
-import gr.iccs.smart.mobility.location.IstanbulLocations;
 import gr.iccs.smart.mobility.location.LocationDTO;
 import gr.iccs.smart.mobility.pointsofinterest.BusStopDTO;
 import gr.iccs.smart.mobility.pointsofinterest.PortDTO;
@@ -18,18 +16,6 @@ import gr.iccs.smart.mobility.vehicle.VehicleStatus;
 import gr.iccs.smart.mobility.vehicle.VehicleType;
 
 public class RecommendationUtils {
-
-    protected static Boolean areSameIstanbulSide(Point startingPoint, Point finishingPoint) {
-        var startingPointPosition = LocationDTO.istanbulLocation(startingPoint);
-        var finishingPointPosition = LocationDTO.istanbulLocation(finishingPoint);
-
-        if (startingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA
-                || finishingPointPosition == IstanbulLocations.IstanbulLocationDescription.SEA) {
-            throw new InvalidLocationException("The starting and ending locations must not be on the sea");
-        }
-        return startingPointPosition == finishingPointPosition;
-    }
-
     protected static Feature visualiseNode(InternalNode node) {
         var location = getNodeLocation(node);
         // There are multiple labels for each node, but only one is relevant

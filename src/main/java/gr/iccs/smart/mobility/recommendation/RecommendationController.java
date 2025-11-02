@@ -10,21 +10,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gr.iccs.smart.mobility.user.UserService;
 import gr.iccs.smart.mobility.util.FormatSelection;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/recommend")
-public class RecommendationControler {
+@Tag(name = "Recommendation", description = "Request a path recommendation")
+public class RecommendationController {
 
     private final RecommendationService recommendationService;
     private final UserService userService;
 
-    RecommendationControler(RecommendationService recommendationService,
+    RecommendationController(RecommendationService recommendationService,
             UserService userService) {
         this.recommendationService = recommendationService;
         this.userService = userService;
     }
 
     @PostMapping()
+    @Operation(summary = "Request a path recommendation", description = "Request a recommendation path", tags = { "Recommendation" })
     public ResponseEntity<RecommendationResponse> suggestRoute(
             @RequestBody RecommendationRouteDTO inputs,
             @RequestParam(required = false, defaultValue = "false") Boolean wholeMap,
