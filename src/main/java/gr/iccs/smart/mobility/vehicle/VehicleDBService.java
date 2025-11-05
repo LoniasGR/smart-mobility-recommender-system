@@ -128,12 +128,12 @@ public class VehicleDBService {
     }
 
     public LandVehicle saveAndGet(LandVehicle vehicle) {
-        neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
+        neo4jTemplate.saveAs(vehicle, VehicleWithOneLevelLink.class);
         return vehicleRepository.findLandVehicleWithOneLevelConnection(vehicle.getId()).get();
     }
 
     public Vehicle saveAndGet(Vehicle vehicle) {
-        neo4jTemplate.saveAs(vehicle, LandVehicleWithOneLevelLink.class);
+        neo4jTemplate.saveAs(vehicle, VehicleWithOneLevelLink.class);
         return vehicleRepository.findNoConnectionsById(vehicle.getId()).get();
     }
 

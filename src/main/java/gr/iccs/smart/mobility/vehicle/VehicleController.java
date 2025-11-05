@@ -41,7 +41,7 @@ public class VehicleController {
      * @return A list of all vehicles in the system, either in JSON or GeoJSON
      *         format.
      */
-    @GetMapping(value = { "", "/" })
+    @GetMapping(value = { "" })
     @Operation(summary = "Get all vehicles", description = "Retrieve a list of all vehicles", tags = { "Vehicles" })
     public ResponseEntity<?> getAll(
             @RequestParam(required = false, defaultValue = "json") FormatSelection format) {
