@@ -107,6 +107,7 @@ public abstract sealed class Vehicle implements Serializable permits Boat, LandV
 
     public boolean isOutOfService() {
         return this.getStatus().equals(VehicleStatus.CHARGING) ||
-                this.getStatus().equals(VehicleStatus.CREATING);
+                this.getStatus().equals(VehicleStatus.CREATING) ||
+                this.getStatus().equals(VehicleStatus.UNAVAILABLE);
     }
 }

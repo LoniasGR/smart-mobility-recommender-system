@@ -8,7 +8,8 @@ public enum VehicleStatus {
     IN_USE,
     RESERVED,
     IDLE,
-    CHARGING;
+    CHARGING,
+    UNAVAILABLE;
 
     private static final List<VehicleStatus> VALUES = List.of(values());
     private static final int SIZE = VALUES.size();
