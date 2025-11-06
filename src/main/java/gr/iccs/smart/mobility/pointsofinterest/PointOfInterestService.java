@@ -3,12 +3,10 @@ package gr.iccs.smart.mobility.pointsofinterest;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
-import java.util.random.RandomGenerator;
 
 import org.neo4j.driver.types.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
@@ -70,6 +68,14 @@ public class PointOfInterestService {
 
     public List<BusStop> getAllBusStopsWithOneLevelConnection() {
         return pointOfInterestRepository.getAllBusStopsByOneLevelConnection();
+    }
+
+    public Integer countPorts() {
+        return pointOfInterestRepository.countPorts();
+    }
+
+    public Integer countBusStops() {
+        return pointOfInterestRepository.countBusStops();
     }
 
     public Optional<PointOfInterest> getByID(String id) {

@@ -39,8 +39,7 @@ public class RecommendationUtils {
                 var busStop = new BusStopDTO(node.get("id").asString(), node.get("name").asString(),
                         LocationDTO.fromGeographicPoint(location));
                 return GeoJSONUtils.createBusStopFeature(busStop);
-            case "ReachableNode":
-            case "UserLandmark":
+            case "ReachableNode", "UserLandmark":
                 continue;
             }
         }
@@ -64,10 +63,7 @@ public class RecommendationUtils {
                 return "sea_vessel";
             case "BusStop":
                 return "public_transport";
-            case "ReachableNode":
-            case "UserLandmark":
-            case "LandVehicle":
-            case "UserDestinationLandmark":
+            case "ReachableNode", "UserLandmark", "LandVehicle", "UserDestinationLandmark":
                 continue;
             }
         }
@@ -83,7 +79,7 @@ public class RecommendationUtils {
         for (var i : points) {
             if (i instanceof InternalNode node) {
                 Feature f = RecommendationUtils.visualiseNode(node);
-                if (fc.getFeatures().size() > 0) {
+                if (!fc.getFeatures().isEmpty()) {
                     lineEnd = RecommendationUtils.getNodeLocation(node);
                     var line = GeoJSONUtils.createLine(lineStart, lineEnd);
                     line.getProperties().put("segment_mode", segmentMode);

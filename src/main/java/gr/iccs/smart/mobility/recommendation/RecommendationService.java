@@ -126,6 +126,27 @@ public class RecommendationService {
         }
     }
 
+    private String createGraphNodesList(RecommendationOptions options) {
+        var nodes = new StringBuilder("['UserLandmark'");
+
+        if (pointOfInterestService.countPorts() > 0) {
+            nodes.append(",'Port'");
+        }
+
+        if (pointOfInterestService.countBusStops() > 0) {
+            nodes.append(",'BusStop'");
+        }
+
+        for (var vt : VehicleType.values()) {
+            if (Objects.isNull(options.requestOptions().ignoreTypes())
+                    || !options.requestOptions().ignoreTypes().contains(vt)) {
+                nodes.append(",'").append(VehicleType.nodeOf(vt)).append("'");
+            }
+        }
+        nodes.append("]");
+        return nodes.toString();
+    }
+
     private List<Map<String, Object>> generateRecommendation(Point start, Point finish, User user,
             RecommendationOptions options) {
 
@@ -142,15 +163,7 @@ public class RecommendationService {
             List<Map<String, Object>> data = null;
 
             // Generate the nodes we need to add to the graph projection
-            // TODO: Make the 'BusStop' optional
-            var nodes = new StringBuilder("['UserLandmark', 'Port'");
-            for (var vt : VehicleType.values()) {
-                if (Objects.isNull(options.requestOptions().ignoreTypes())
-                        || !options.requestOptions().ignoreTypes().contains(vt)) {
-                    nodes.append(",'").append(VehicleType.nodeOf(vt)).append("'");
-                }
-            }
-            nodes.append("]");
+            var nodes = createGraphNodesList(options);
 
             // Ensure recommendation paths exists
             var recommendationPaths = options.requestOptions().recommendationPaths();

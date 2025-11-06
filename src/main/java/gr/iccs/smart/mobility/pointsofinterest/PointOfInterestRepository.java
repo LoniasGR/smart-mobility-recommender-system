@@ -14,6 +14,12 @@ public interface PointOfInterestRepository extends Neo4jRepository<PointOfIntere
 
         List<Port> findByLocationNear(Point point);
 
+        @Query("MATCH (n:Port) RETURN count(n)")
+        Integer countPorts();
+
+        @Query("MATCH (n:BusStop) RETURN count(n)")
+        Integer countBusStops();
+
         @Query("""
                         MATCH p=(n:Port)-[*0..1]->(m)
                             WHERE point.distance(n.location, $point) < $max
