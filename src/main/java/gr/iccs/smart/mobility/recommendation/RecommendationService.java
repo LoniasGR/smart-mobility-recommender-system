@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import gr.iccs.smart.mobility.config.TransportationPropertiesConfig;
@@ -107,6 +106,9 @@ public class RecommendationService {
 
         var landVehicles = vehicleDBService.findAllLandVehiclesWithOneLevelConnection();
         for (var v : landVehicles) {
+            if(v.isOutOfService()) {
+                continue;
+            }
             switch (v.getType()) {
                 case VehicleType.CAR:
                     vehicleDBService
